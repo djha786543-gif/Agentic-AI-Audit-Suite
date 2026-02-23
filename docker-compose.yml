@@ -1,0 +1,110 @@
+services:
+
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER:     ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-your_secure_password}
+      POSTGRES_DB:       ${POSTGRES_DB:-audit_vault}
+    ports:
+      - "5445:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      POSTGRES_USER:     ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-your_secure_password}
+      POSTGRES_HOST:     db
+      POSTGRES_PORT:     5432
+      POSTGRES_DB:       ${POSTGRES_DB:-audit_vault}
+      REDIS_URL:         redis://redis:6379/0
+      SECRET_KEY:        ${SECRET_KEY:-acap-dev-secret-key-change-in-production}
+      ENVIRONMENT:       ${ENVIRONMENT:-development}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  worker:
+    build: .
+    restart: unless-stopped
+    command: >
+      celery -A core.celery_app.celery_app worker
+      --loglevel=info --queues=extraction,evaluation --concurrency=2
+    volumes:
+      - .:/app
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      POSTGRES_USER:     ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-your_secure_password}
+      POSTGRES_HOST:     db
+      POSTGRES_PORT:     5432
+      POSTGRES_DB:       ${POSTGRES_DB:-audit_vault}
+      REDIS_URL:         redis://redis:6379/0
+      SECRET_KEY:        ${SECRET_KEY:-acap-dev-secret-key-change-in-production}
+
+  beat:
+    build: .
+    restart: unless-stopped
+    command: celery -A core.celery_app.celery_app beat --loglevel=info
+    volumes:
+      - .:/app
+    depends_on:
+      - worker
+    environment:
+      POSTGRES_USER:     ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-your_secure_password}
+      POSTGRES_HOST:     db
+      POSTGRES_PORT:     5432
+      POSTGRES_DB:       ${POSTGRES_DB:-audit_vault}
+      REDIS_URL:         redis://redis:6379/0
+
+  watcher:
+    build: .
+    restart: unless-stopped
+    command: python watcher_agent.py
+    volumes:
+      - .:/app
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      API_HOST: api
+      API_PORT: 8000
+
+volumes:
+  postgres_data:

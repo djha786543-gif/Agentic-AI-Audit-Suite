@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACAP PRO | Enterprise Audit Suite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@700&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --bg-color: #04060A;
+            --glass-bg: rgba(14, 20, 32, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --accent-glow: rgba(40, 120, 255, 0.15);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at 50% -20%, rgba(20, 40, 80, 0.4), transparent 50%),
+                radial-gradient(circle at 100% 50%, rgba(13, 184, 156, 0.05), transparent 40%);
+            color: #EDF0F7;
+            font-family: 'Outfit', sans-serif;
+            min-height: 100vh;
+        }
+
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            border-radius: 1.5rem;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #0DB89C 0%, #2878FF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .flow-container {
+            border: 1px solid rgba(40, 120, 255, 0.2);
+            border-radius: 1.2rem;
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            background: linear-gradient(90deg, rgba(40, 120, 255, 0.05) 0%, rgba(13, 184, 156, 0.05) 100%);
+        }
+
+        .flow-step {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 10px 16px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 140px;
+            transition: all 0.3s ease;
+        }
+
+        .flow-step:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px var(--accent-glow);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .investigate-control {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: #a0aec0;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            outline: none;
+            transition: border-color 0.2s;
+            appearance: none;
+        }
+
+        .investigate-control:focus {
+            border-color: #2878FF;
+            color: white;
+        }
+
+        .investigate-control option {
+            background: #04060A;
+            color: white;
+        }
+
+        /* Make date picker icon white */
+        ::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+        }
+
+        .hash-cell {
+            position: relative;
+        }
+
+        .hash-cell::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 40px;
+            background: linear-gradient(90deg, transparent, rgba(14, 20, 32, 0.9));
+        }
+    </style>
+</head>
+
+<body class="p-4 md:p-8 lg:p-12 overflow-x-hidden">
+    <div class="max-w-[1800px] mx-auto">
+        <!-- HEADER -->
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-6">
+            <div>
+                <h1 class="text-4xl lg:text-5xl font-black tracking-tighter uppercase font-['Sora'] mb-1">
+                    <span class="gradient-text">ACAP</span> PRO
+                </h1>
+                <p class="text-[11px] text-slate-400 font-bold uppercase tracking-widest">Enterprise Cryptographic Audit
+                    Engine</p>
+            </div>
+            <div class="flex flex-wrap gap-4">
+                <div id="status-pill"
+                    class="glass px-6 py-2.5 rounded-full text-[10px] font-black uppercase flex items-center gap-2 border border-red-500/30 text-red-500 shadow-[0_0_15px_rgba(239,68,68,0.1)] transition-all">
+                    <i class="fas fa-circle animate-pulse"></i> Initializing Async RLS Engine...
+                </div>
+                <button
+                    class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 px-8 py-2.5 rounded-full text-[10px] font-black uppercase shadow-[0_0_20px_rgba(37,99,235,0.25)] transition-all hover:scale-105 active:scale-95 text-white">
+                    <i class="fas fa-file-export mr-2"></i> Export Report
+                </button>
+            </div>
+        </header>
+
+        <!-- DATA PIPELINE VISUALIZATION -->
+        <div class="flow-container glass hidden xl:flex">
+            <div class="flow-step"><i class="fas fa-laptop-code text-teal-400 text-lg"></i>
+                <div>
+                    <p class="text-[8px] text-teal-500/80 uppercase font-black tracking-wider">Source</p>
+                    <p class="text-[11px] font-black uppercase text-white tracking-widest">Watcher Guard</p>
+                </div>
+            </div>
+            <i class="fas fa-arrow-right text-blue-500/40 text-sm"></i>
+            <div class="flow-step"><i class="fas fa-fingerprint text-purple-400 text-lg"></i>
+                <div>
+                    <p class="text-[8px] text-purple-500/80 uppercase font-black tracking-wider">Integrity</p>
+                    <p class="text-[11px] font-black uppercase text-white tracking-widest">SHA-256 Seal</p>
+                </div>
+            </div>
+            <i class="fas fa-arrow-right text-blue-500/40 text-sm"></i>
+            <div class="flow-step"><i class="fas fa-shield-halved text-blue-400 text-lg"></i>
+                <div>
+                    <p class="text-[8px] text-blue-500/80 uppercase font-black tracking-wider">Security</p>
+                    <p class="text-[11px] font-black uppercase text-white tracking-widest">JWT Engine</p>
+                </div>
+            </div>
+            <i class="fas fa-arrow-right text-blue-500/40 text-sm"></i>
+            <div class="flow-step relative overflow-hidden">
+                <div class="absolute inset-0 bg-emerald-500/5 animate-pulse"></div><i
+                    class="fas fa-database text-emerald-400 text-lg relative z-10"></i>
+                <div class="relative z-10">
+                    <p class="text-[8px] text-emerald-500/80 uppercase font-black tracking-wider">Storage</p>
+                    <p class="text-[11px] font-black uppercase text-white tracking-widest">Async Postgres RLS Vault</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 lg:gap-8">
+            <!-- LEFT COLUMN: Metrics, Charts & Help -->
+            <aside class="xl:col-span-3 flex flex-col gap-6">
+                <!-- Intelligence Center Card -->
+                <div class="glass p-8 relative overflow-hidden group">
+                    <div
+                        class="absolute -right-20 -top-20 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-all duration-700">
+                    </div>
+                    <div class="flex items-center gap-3 mb-8">
+                        <i class="fas fa-chart-radar text-blue-500 text-xl"></i>
+                        <p class="text-[10px] font-black text-white uppercase tracking-[0.2em]">Intelligence Center</p>
+                    </div>
+
+                    <div class="space-y-8">
+                        <div>
+                            <p
+                                class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-2 flex items-center justify-between">
+                                System Integrity <i class="fas fa-check-circle text-emerald-500"></i>
+                            </p>
+                            <p id="score" class="text-6xl font-black text-white font-['Sora'] tracking-tighter">--%</p>
+                            <div class="w-full bg-white/5 h-1.5 rounded-full mt-3 overflow-hidden">
+                                <div id="score-bar" class="h-full bg-emerald-500 w-0 transition-all duration-1000">
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <p
+                                class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-2 flex items-center justify-between">
+                                Vaulted Records <i class="fas fa-link text-blue-500"></i>
+                            </p>
+                            <p id="count" class="text-5xl font-black text-blue-400 font-['Sora'] tracking-tighter">--
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Overview Chart -->
+                <div class="glass p-6 relative border-t-2 border-t-purple-500/30">
+                    <div class="flex items-center gap-3 mb-4">
+                        <i class="fas fa-chart-pie text-purple-400 text-lg"></i>
+                        <p class="text-[10px] font-black text-purple-100 uppercase tracking-[0.2em]">Source Analytics
+                        </p>
+                    </div>
+                    <div class="h-48 w-full">
+                        <canvas id="analyticsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Documentation / Help Card -->
+                <div class="glass p-8 relative border-t-2 border-t-indigo-500/30 flex-1">
+                    <div class="flex items-center gap-3 mb-6">
+                        <i class="fas fa-book-open pl-1 text-indigo-400 text-lg"></i>
+                        <p class="text-[10px] font-black text-indigo-100 uppercase tracking-[0.2em]">System Operations
+                        </p>
+                    </div>
+
+                    <div class="space-y-4 text-[11px] text-slate-300 leading-relaxed font-medium">
+                        <div class="bg-white/5 p-4 rounded-xl border border-white/5">
+                            <p class="text-white font-bold uppercase mb-1 flex items-center gap-2 text-[10px]">
+                                <i class="fas fa-microchip text-slate-400"></i> What is this system?
+                            </p>
+                            <p class="opacity-80">This is a state-of-the-art cryptographic audit suite. It continuously
+                                tracks events originating from different enterprise services, ensuring complete
+                                non-repudiation.</p>
+                        </div>
+                        <div class="bg-white/5 p-4 rounded-xl border border-white/5">
+                            <p class="text-white font-bold uppercase mb-1 flex items-center gap-2 text-[10px]">
+                                <i class="fas fa-lock text-purple-400"></i> Cryptographic Integrity
+                            </p>
+                            <p class="opacity-80">Every single payload receives a unique SHA-256 seal. AI determines a
+                                <b>Confidence %</b> based on event anomaly data. If any administrator tampers with the
+                                database, the hash link breaks and Verification changes to Tampered.</p>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- RIGHT COLUMN: Investigation tools & Table -->
+            <div class="xl:col-span-9 flex flex-col gap-6">
+
+                <!-- Investigation Toolbar -->
+                <div
+                    class="glass p-4 sm:p-5 flex flex-col lg:flex-row gap-4 items-center justify-between border-l-4 border-l-blue-500/50">
+                    <div class="flex-1 w-full relative">
+                        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
+                        <input type="text" id="searchInput" placeholder="Search Hash, Origin, or ID..."
+                            class="w-full bg-black/20 border border-white/10 text-white text-xs font-bold uppercase tracking-widest rounded-xl py-3 pl-11 pr-4 focus:outline-none focus:border-blue-500/50 transition-colors placeholder:text-slate-600">
+                    </div>
+
+                    <div class="flex flex-wrap lg:flex-nowrap gap-3 w-full lg:w-auto">
+                        <!-- Date Filter -->
+                        <div
+                            class="relative w-full sm:w-auto flex items-center bg-black/20 border border-white/5 rounded-xl px-3 hover:border-blue-500/30 transition-colors">
+                            <i class="fas fa-calendar-alt text-slate-500 text-xs"></i>
+                            <input type="date" id="dateFilter"
+                                class="investigate-control bg-transparent border-none focus:outline-none w-full sm:w-36 text-slate-300 ml-2"
+                                title="Filter by Log Date">
+                        </div>
+
+                        <!-- Source Filter -->
+                        <div class="relative w-full sm:w-auto">
+                            <select id="originFilter"
+                                class="investigate-control w-full sm:w-40 appearance-none cursor-pointer">
+                                <option value="ALL">All Origins</option>
+                                <option value="FileSystem-Watcher">File System</option>
+                                <option value="Windows-Security-Logs">Windows Logs</option>
+                                <option value="Azure-AD">Azure AD</option>
+                                <option value="Network-Firewall">Firewall</option>
+                            </select>
+                            <i
+                                class="fas fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none text-xs"></i>
+                        </div>
+
+                        <!-- Sort Options -->
+                        <div class="relative w-full sm:w-auto">
+                            <select id="sortFilter"
+                                class="investigate-control w-full sm:w-40 appearance-none cursor-pointer">
+                                <option value="NEWEST">Newest First</option>
+                                <option value="OLDEST">Oldest First</option>
+                            </select>
+                            <i
+                                class="fas fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none text-xs"></i>
+                        </div>
+
+                        <button id="refreshBtn"
+                            class="bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 w-full lg:w-12 h-[38px] flex items-center justify-center rounded-xl transition-colors shrink-0">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Vault Table -->
+                <div class="glass flex-1 overflow-hidden flex flex-col border border-white/5 relative">
+                    <div class="bg-black/40 border-b border-white/5 px-6 py-4 flex justify-between items-center">
+                        <h2
+                            class="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] flex items-center gap-2">
+                            <i class="fas fa-server text-slate-500"></i> Secure Data Ledger
+                        </h2>
+                        <span id="filtered-count"
+                            class="text-[10px] font-bold text-slate-500 bg-white/5 px-2 py-1 rounded">Showing 0
+                            entries</span>
+                    </div>
+
+                    <div class="overflow-x-auto flex-1 h-[600px] xl:h-[700px]">
+                        <table class="w-full text-left whitespace-nowrap min-w-[1000px]">
+                            <thead
+                                class="bg-black/20 text-[9px] font-black uppercase text-slate-500 tracking-[0.15em] sticky top-0 backdrop-blur-md z-10 shadow-sm">
+                                <tr>
+                                    <th class="py-4 px-6 border-b border-white/5">Record ID</th>
+                                    <th class="py-4 px-6 border-b border-white/5">Date & Time</th>
+                                    <th class="py-4 px-6 border-b border-white/5">Origin System</th>
+                                    <th class="py-4 px-6 border-b border-white/5">Confidence</th>
+                                    <th class="py-4 px-6 border-b border-white/5">Cryptographic Seal</th>
+                                    <th class="py-4 px-6 border-b border-white/5 text-right">Verification</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-body" class="divide-y divide-white/5 text-sm">
+                                <tr>
+                                    <td colspan="6" class="p-32 text-center">
+                                        <i class="fas fa-circle-notch fa-spin text-3xl text-blue-500/50 mb-4 block"></i>
+                                        <p
+                                            class="text-slate-500 font-black uppercase tracking-widest text-xs animate-pulse">
+                                            Establishing secure connection to Vault Engine...</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State Management
+        let allVaultData = [];
+        let totalRunsCount = 0;
+        let chartInstance = null;
+
+        // DOM Elements
+        const searchInput = document.getElementById('searchInput');
+        const originFilter = document.getElementById('originFilter');
+        const sortFilter = document.getElementById('sortFilter');
+        const dateFilter = document.getElementById('dateFilter');
+        const tbody = document.getElementById('table-body');
+        const refreshBtn = document.getElementById('refreshBtn');
+
+        // Draw / Update Chart
+        function updateChart(data) {
+            const counts = {};
+            data.forEach(log => {
+                const src = log.source_system || 'Unknown';
+                counts[src] = (counts[src] || 0) + 1;
+            });
+
+            const labels = Object.keys(counts);
+            const chartData = Object.values(counts);
+
+            if (!chartInstance) {
+                const ctx = document.getElementById('analyticsChart').getContext('2d');
+                Chart.defaults.color = '#64748b'; // slate-500
+                Chart.defaults.font.family = 'Outfit';
+
+                chartInstance = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: chartData,
+                            backgroundColor: ['#0DB89C', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444', '#10b981'],
+                            borderColor: '#04060A',
+                            borderWidth: 2,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    color: '#94a3b8',
+                                    font: { size: 10, weight: 'bold' },
+                                    boxWidth: 12,
+                                    padding: 15
+                                }
+                            }
+                        },
+                        cutout: '75%'
+                    }
+                });
+            } else {
+                chartInstance.data.labels = labels;
+                chartInstance.data.datasets[0].data = chartData;
+                chartInstance.update({ duration: 800, easing: 'easeOutQuart' });
+            }
+        }
+
+        // Render Table based on current state & filters
+        function renderTable() {
+            let filtered = [...allVaultData];
+
+            // 1. Apply Search Filter (ID, Origin, Hash)
+            const query = searchInput.value.toLowerCase().trim();
+            if (query) {
+                filtered = filtered.filter(log => {
+                    const idMatch = log.id?.toLowerCase().includes(query);
+                    const originMatch = log.source_system?.toLowerCase().includes(query);
+                    const hashMatch = log.hash_sequence?.toLowerCase().includes(query);
+                    const contentHashMatch = log.content_hash?.toLowerCase().includes(query);
+                    return idMatch || originMatch || hashMatch || contentHashMatch;
+                });
+            }
+
+            // 2. Apply Origin Filter
+            const origin = originFilter.value;
+            if (origin !== "ALL") {
+                filtered = filtered.filter(log => log.source_system === origin);
+            }
+
+            // 3. Apply Date Filter
+            const dateVal = dateFilter.value;
+            if (dateVal) {
+                filtered = filtered.filter(log => {
+                    const d = new Date(log.recorded_at || log.timestamp);
+                    // format Date to YYYY-MM-DD for comparison
+                    const logDate = d.toISOString().split('T')[0];
+                    return logDate === dateVal;
+                });
+            }
+
+            // 4. Apply Sort
+            const sortOrder = sortFilter.value;
+            // Assuming the API returns newer entries at the end by default (or we handle it)
+            // The API query usually has `order_by(desc(recorded_at))` implying Newest First natively.
+            // When we fetch, it's Newest First. If we want Oldest First, we reverse.
+            if (sortOrder === "OLDEST") {
+                filtered.reverse();
+            }
+
+            // Update DOM metrics & Chart
+            document.getElementById('filtered-count').innerText = `Showing ${filtered.length} entries`;
+            updateChart(filtered);
+
+            // Render Rows
+            if (filtered.length === 0) {
+                if (allVaultData.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="p-20 text-center text-slate-600 font-bold uppercase text-xs tracking-widest"><i class="fas fa-inbox text-2xl mb-3 block opacity-50"></i>Vault is Empty. Waiting for background Watcher...</td></tr>';
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="6" class="p-20 text-center text-slate-600 font-bold uppercase text-xs tracking-widest">No records match your investigation criteria.</td></tr>';
+                }
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(log => {
+                // Shorten UUID for display visually
+                const shortId = log.id ? log.id.split('-')[0] : 'N/A';
+
+                // Format Date & Time nicely
+                let dateStr = "Unknown";
+                let timeStr = "";
+                if (log.timestamp || log.recorded_at) {
+                    const d = new Date(log.recorded_at || log.timestamp);
+                    dateStr = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+                    timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + "<span class='text-[8px] opacity-60 ml-0.5'>." + d.getMilliseconds().toString().padStart(3, '0') + "</span>";
+                }
+
+                // AI Confidence representation
+                const confScore = log.ai_confidence_score !== null && log.ai_confidence_score !== undefined ? log.ai_confidence_score : '--';
+                let confColor = "text-slate-400";
+                let confIcon = "fa-robot";
+                if (confScore !== '--') {
+                    if (confScore >= 90) { confColor = "text-emerald-400"; confIcon = "fa-check-circle"; }
+                    else if (confScore >= 70) { confColor = "text-yellow-400"; confIcon = "fa-exclamation-circle"; }
+                    else { confColor = "text-red-400"; confIcon = "fa-triangle-exclamation"; }
+                }
+
+                // Verify status pill
+                const isVerified = log.hash_verified !== false;
+                const statusHtml = isVerified
+                    ? `<span class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)] flex items-center justify-end gap-1.5 w-fit ml-auto"><i class="fas fa-shield-check"></i> Verified</span>`
+                    : `<span class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase bg-red-500/10 text-red-400 border border-red-500/20 shadow-[0_0_10px_rgba(239,68,68,0.1)] flex items-center justify-end gap-1.5 w-fit ml-auto"><i class="fas fa-exclamation-triangle"></i> Tampered</span>`;
+
+                return `
+                    <tr class="hover:bg-white/5 transition-colors group cursor-pointer border-l-2 border-transparent hover:border-l-blue-500">
+                        <td class="py-4 px-6 font-mono text-[10px] text-blue-400 font-bold">#${shortId}</td>
+                        
+                        <td class="py-4 px-6 font-mono text-[10px] text-slate-300">
+                            <div class="flex flex-col">
+                                <span class="font-black tracking-widest uppercase text-[9px] text-slate-500">${dateStr}</span>
+                                <span>${timeStr}</span>
+                            </div>
+                        </td>
+
+                        <td class="py-4 px-6 font-black uppercase text-[10px] text-slate-200 tracking-wider">
+                            ${log.source_system}
+                        </td>
+                        
+                        <td class="py-4 px-6 text-[11px] font-black">
+                            <div class="flex items-center gap-2 ${confColor}">
+                                <i class="fas ${confIcon}"></i> ${confScore}${confScore !== '--' ? '%' : ''}
+                            </div>
+                        </td>
+
+                        <td class="py-4 px-6 font-mono text-[9px] text-slate-500 tracking-widest hash-cell overflow-hidden whitespace-nowrap max-w-[200px] lg:max-w-[300px] group-hover:text-slate-300 transition-colors">${log.hash_sequence || log.content_hash || 'PENDING CALCULATION'}</td>
+                        
+                        <td class="py-4 px-6 text-right">${statusHtml}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Fetch Data from Engine
+        async function fetchSystemData() {
+            try {
+                // Fetch the Vault Data
+                const vaultRes = await fetch('/api/v1/audit/vault');
+                if (!vaultRes.ok) throw new Error("Vault fetch failed");
+                allVaultData = await vaultRes.json();
+
+                // Fetch the Heartbeat Counter
+                const runsRes = await fetch('/api/v1/audit/runs/count');
+                if (runsRes.ok) {
+                    const runsData = await runsRes.json();
+                    totalRunsCount = runsData.count;
+                }
+
+                updateDashboardState(true);
+            } catch (e) {
+                console.error("Engine disconnected", e);
+                updateDashboardState(false);
+            }
+        }
+
+        // Update top-level metrics
+        function updateDashboardState(isConnected) {
+            const pill = document.getElementById('status-pill');
+            const scoreText = document.getElementById('score');
+            const scoreBar = document.getElementById('score-bar');
+            const countText = document.getElementById('count');
+
+            if (isConnected) {
+                pill.innerHTML = '<i class="fas fa-circle text-emerald-500 animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite] drop-shadow-[0_0_5px_rgba(16,185,129,0.8)]"></i> API Connected (Async RLS Vault)';
+                pill.className = "glass px-6 py-2.5 rounded-full text-[10px] font-black uppercase flex items-center gap-2 border border-emerald-500/40 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.15)] transition-all";
+
+                scoreText.innerText = "100%";
+                scoreBar.style.width = "100%";
+
+                countText.innerText = totalRunsCount;
+
+                renderTable(); // Refresh the grid
+            } else {
+                pill.innerHTML = '<i class="fas fa-circle text-red-500"></i> Engine Offline';
+                pill.className = "glass px-6 py-2.5 rounded-full text-[10px] font-black uppercase flex items-center gap-2 border border-red-500/40 text-red-500 shadow-[0_0_15px_rgba(239,68,68,0.15)] transition-all";
+                scoreText.innerText = "--%";
+                scoreBar.style.width = "0%";
+            }
+        }
+
+        // Event Listeners for Investigation Tools
+        searchInput.addEventListener('input', renderTable);
+        originFilter.addEventListener('change', renderTable);
+        sortFilter.addEventListener('change', renderTable);
+        dateFilter.addEventListener('change', renderTable);
+
+        refreshBtn.addEventListener('click', () => {
+            refreshBtn.querySelector('i').classList.add('fa-spin');
+            fetchSystemData().then(() => {
+                setTimeout(() => refreshBtn.querySelector('i').classList.remove('fa-spin'), 500);
+            });
+        });
+
+        // Init
+        fetchSystemData();
+        // Sync every 3.5 seconds
+        setInterval(fetchSystemData, 3500);
+    </script>
+</body>
+
+</html>

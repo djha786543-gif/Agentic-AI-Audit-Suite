@@ -1,0 +1,1696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AuditAI Suite — Continuous SOX Control Testing by Autonomous AI Auditors</title>
+<meta name="description" content="Replace manual SOX cycles with 10 autonomous AI auditors running 24/7. Enterprise-grade ITGC coverage, zero data exfiltration.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ──────────────────────────────────────────────────
+   RESET & TOKENS
+────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Surfaces */
+  --ink:    #070A10;
+  --ink2:   #0B0F1A;
+  --ink3:   #101828;
+  --ink4:   #161F32;
+  --ink5:   #1C273A;
+
+  /* Borders */
+  --b1: rgba(255,255,255,0.06);
+  --b2: rgba(255,255,255,0.10);
+  --b3: rgba(255,255,255,0.17);
+
+  /* Text */
+  --tx1: #EDF0F7;
+  --tx2: #8895AD;
+  --tx3: #505D75;
+  --tx4: #333D52;
+
+  /* Blue — primary */
+  --blue:   #2878FF;
+  --blue2:  #1254CC;
+  --bdim:   rgba(40,120,255,0.12);
+  --bglow:  rgba(40,120,255,0.30);
+  --bbord:  rgba(40,120,255,0.28);
+
+  /* Gold — authority */
+  --gold:   #C89B28;
+  --goldlt: #F0BE42;
+  --gdim:   rgba(200,155,40,0.10);
+  --gbord:  rgba(200,155,40,0.26);
+
+  /* Status */
+  --green:  #18B86A;
+  --red:    #E03E43;
+  --orange: #F07020;
+
+  /* Typography */
+  --fd: 'Sora', sans-serif;
+  --fb: 'Outfit', system-ui, sans-serif;
+  --fm: 'JetBrains Mono', monospace;
+
+  /* Radius */
+  --r:  10px;
+  --rl: 16px;
+  --rx: 22px;
+}
+
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--ink);
+  color: var(--tx1);
+  font-family: var(--fb);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+::selection { background: var(--blue); color: #fff; }
+a { color: inherit; text-decoration: none; }
+
+.wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ──────────────────────────────────────────────────
+   AMBIENT
+────────────────────────────────────────────────── */
+.ambient {
+  position: fixed; inset: 0; z-index: 0;
+  pointer-events: none; overflow: hidden;
+}
+.ambient-orb {
+  position: absolute; border-radius: 50%;
+}
+.ao1 {
+  width: 900px; height: 600px;
+  top: -160px; left: 50%; transform: translateX(-20%);
+  background: radial-gradient(ellipse, rgba(40,120,255,0.055) 0%, transparent 68%);
+  animation: orb1 16s ease-in-out infinite;
+}
+.ao2 {
+  width: 500px; height: 400px;
+  bottom: 15%; right: -8%;
+  background: radial-gradient(ellipse, rgba(200,155,40,0.045) 0%, transparent 65%);
+  animation: orb1 20s ease-in-out infinite reverse;
+}
+@keyframes orb1 {
+  0%,100% { transform: translateX(-20%) translateY(0); }
+  50% { transform: translateX(-20%) translateY(-48px); }
+}
+.grid-overlay {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.013) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.013) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 80% 55% at 50% 0%, black 0%, transparent 100%);
+}
+
+/* ──────────────────────────────────────────────────
+   NAV
+────────────────────────────────────────────────── */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 900;
+  height: 62px;
+  background: rgba(7,10,16,0.80);
+  backdrop-filter: blur(22px) saturate(170%);
+  -webkit-backdrop-filter: blur(22px) saturate(170%);
+  border-bottom: 1px solid var(--b1);
+  display: flex; align-items: center;
+  padding: 0 24px;
+  transition: background 0.3s;
+}
+.nav-inner {
+  max-width: 1180px; width: 100%; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.nav-brand { display: flex; align-items: center; gap: 10px; }
+.nav-logomark {
+  width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--blue), var(--blue2));
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--fm); font-size: 11px; font-weight: 600; color: #fff;
+  box-shadow: 0 0 16px rgba(40,120,255,0.35);
+}
+.nav-name {
+  font-family: var(--fd); font-size: 15px; font-weight: 700;
+  color: var(--tx1); letter-spacing: -0.3px;
+}
+.nav-pill {
+  font-family: var(--fm); font-size: 9px; color: var(--blue);
+  background: var(--bdim); border: 1px solid var(--bbord);
+  padding: 2px 8px; border-radius: 20px; letter-spacing: 0.06em; text-transform: uppercase;
+}
+.nav-links {
+  display: flex; gap: 32px; list-style: none;
+}
+.nav-links a {
+  font-size: 13.5px; font-weight: 500; color: var(--tx3); transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--tx1); }
+.nav-btns { display: flex; gap: 10px; align-items: center; }
+
+/* ──────────────────────────────────────────────────
+   BUTTONS
+────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 9px 20px; border-radius: 8px; border: none;
+  font-family: var(--fb); font-size: 13.5px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s ease;
+  white-space: nowrap; letter-spacing: 0.01em;
+}
+.btn-sm { padding: 7px 16px; font-size: 12.5px; }
+.btn-lg { padding: 14px 32px; font-size: 15px; border-radius: 10px; }
+
+.btn-ghost {
+  background: transparent; color: var(--tx3);
+  border: 1px solid var(--b2);
+}
+.btn-ghost:hover { background: rgba(255,255,255,0.05); color: var(--tx1); border-color: var(--b3); }
+
+.btn-blue {
+  background: var(--blue); color: #fff;
+  box-shadow: 0 0 0 1px rgba(40,120,255,0.3), 0 4px 18px rgba(40,120,255,0.3);
+}
+.btn-blue:hover {
+  background: #3d8fff;
+  box-shadow: 0 0 0 1px rgba(40,120,255,0.5), 0 8px 28px rgba(40,120,255,0.42);
+  transform: translateY(-1px);
+}
+.btn-gold {
+  background: linear-gradient(135deg, var(--goldlt), var(--gold));
+  color: var(--ink); font-weight: 700;
+  box-shadow: 0 2px 14px rgba(200,155,40,0.3);
+}
+.btn-gold:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(200,155,40,0.45);
+  filter: brightness(1.05);
+}
+
+/* ──────────────────────────────────────────────────
+   SECTION SHARED
+────────────────────────────────────────────────── */
+.section { position: relative; z-index: 1; padding: 100px 0; }
+.section-sm { padding: 72px 0; }
+
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 9px;
+  font-family: var(--fm); font-size: 10.5px; color: var(--blue);
+  letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 20px;
+}
+.eyebrow::before { content: ''; width: 18px; height: 1px; background: var(--blue); }
+
+.sec-h {
+  font-family: var(--fd);
+  font-size: clamp(28px, 3.6vw, 46px);
+  font-weight: 800; line-height: 1.09;
+  letter-spacing: -1px; color: var(--tx1); margin-bottom: 16px;
+}
+.sec-sub {
+  font-size: 16.5px; color: var(--tx2); line-height: 1.73; max-width: 540px;
+}
+
+/* ──────────────────────────────────────────────────
+   1. HERO
+────────────────────────────────────────────────── */
+.hero {
+  position: relative; z-index: 1;
+  padding: 152px 0 0; text-align: center;
+}
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--bdim); border: 1px solid var(--bbord);
+  border-radius: 24px; padding: 6px 15px;
+  font-family: var(--fm); font-size: 10.5px; color: var(--blue);
+  letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 30px;
+  animation: fadeUp 0.5s ease both;
+}
+.live-dot {
+  width: 6px; height: 6px; background: var(--green);
+  border-radius: 50%; box-shadow: 0 0 7px var(--green);
+  animation: livepulse 2s infinite;
+}
+@keyframes livepulse {
+  0%,100% { opacity:1; transform:scale(1); }
+  50% { opacity:.45; transform:scale(.7); }
+}
+
+.hero h1 {
+  font-family: var(--fd);
+  font-size: clamp(38px, 5.8vw, 70px);
+  font-weight: 800; line-height: 1.05; letter-spacing: -2px;
+  color: var(--tx1); max-width: 860px; margin: 0 auto 26px;
+  animation: fadeUp 0.5s 0.08s ease both;
+}
+.hero h1 em {
+  font-style: normal;
+  background: linear-gradient(130deg, #2878FF 0%, #78B4FF 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+
+.hero-sub {
+  font-size: 18px; color: var(--tx2); max-width: 520px;
+  margin: 0 auto 38px; line-height: 1.72;
+  animation: fadeUp 0.5s 0.16s ease both;
+}
+
+.hero-cta-row {
+  display: flex; align-items: center; justify-content: center;
+  gap: 12px; flex-wrap: wrap; margin-bottom: 22px;
+  animation: fadeUp 0.5s 0.22s ease both;
+}
+
+.hero-trust {
+  display: flex; align-items: center; justify-content: center;
+  gap: 18px; flex-wrap: wrap; margin-bottom: 70px;
+  animation: fadeUp 0.5s 0.28s ease both;
+}
+.ht-item {
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--fm); font-size: 10.5px; color: var(--tx4);
+  letter-spacing: 0.04em;
+}
+.ht-sep { width: 1px; height: 14px; background: var(--b2); }
+
+/* ── THE BIG SCREENSHOT ── */
+.hero-screen-wrap {
+  position: relative; z-index: 1;
+  animation: fadeUp 0.75s 0.36s ease both;
+}
+.screen-halo {
+  position: absolute;
+  top: -80px; left: 50%; transform: translateX(-50%);
+  width: 1000px; height: 320px;
+  background: radial-gradient(ellipse, rgba(40,120,255,0.13) 0%, transparent 68%);
+  pointer-events: none;
+}
+
+/* Product window chrome */
+.pwin {
+  background: var(--ink3);
+  border: 1px solid var(--b2);
+  border-radius: var(--rx);
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.035),
+    0 40px 100px rgba(0,0,0,0.65),
+    0 0 80px rgba(40,120,255,0.06);
+  position: relative;
+}
+.pwin::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(40,120,255,0.55) 40%, rgba(200,155,40,0.35) 65%, transparent 100%);
+}
+
+.pwin-bar {
+  background: var(--ink4);
+  border-bottom: 1px solid var(--b1);
+  padding: 13px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.pwin-dots { display: flex; gap: 6px; }
+.dot { width: 11px; height: 11px; border-radius: 50%; }
+.dot-r { background: #FF5F57; }
+.dot-y { background: #FEBC2E; }
+.dot-g { background: #28C840; }
+.pwin-tabs {
+  display: flex; gap: 3px;
+  background: rgba(255,255,255,0.04); border: 1px solid var(--b1);
+  border-radius: 9px; padding: 3px;
+}
+.pwin-tab {
+  padding: 6px 16px; border-radius: 7px;
+  font-family: var(--fb); font-size: 11.5px; font-weight: 600;
+  color: rgba(255,255,255,0.3); cursor: default;
+}
+.pwin-tab.on { background: var(--blue); color: #fff; box-shadow: 0 2px 8px rgba(40,120,255,0.4); }
+.pwin-live {
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--fm); font-size: 10px; color: var(--green);
+}
+.pwin-dot-live {
+  width: 6px; height: 6px; background: var(--green); border-radius: 50%;
+  box-shadow: 0 0 6px var(--green); animation: livepulse 2s infinite;
+}
+
+/* App shell */
+.pwin-body {
+  display: grid; grid-template-columns: 196px 1fr; min-height: 480px;
+}
+.pwin-sb {
+  background: var(--ink2); border-right: 1px solid var(--b1);
+  padding: 14px 8px; display: flex; flex-direction: column; gap: 2px;
+}
+.sb-head {
+  font-family: var(--fm); font-size: 9px; font-weight: 600;
+  color: var(--tx4); letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 8px 10px 6px;
+}
+.sb-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px; border-radius: 7px; cursor: default;
+  font-size: 12px; font-weight: 500; color: var(--tx3);
+  border-left: 2px solid transparent; transition: all 0.15s;
+}
+.sb-row:hover { color: var(--tx2); background: rgba(255,255,255,0.04); }
+.sb-row.on {
+  color: var(--blue); background: rgba(40,120,255,0.10);
+  border-left-color: var(--blue); font-weight: 600;
+}
+.sb-ico { font-size: 14px; width: 18px; text-align: center; flex-shrink: 0; }
+
+/* Main pane */
+.pwin-main { display: flex; flex-direction: column; }
+
+/* KPI bar */
+.kbar {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  border-bottom: 1px solid var(--b1);
+  background: var(--ink4);
+}
+.kc {
+  padding: 14px 18px; border-right: 1px solid var(--b1);
+}
+.kc:last-child { border-right: none; }
+.kv {
+  font-family: var(--fm); font-size: 22px; font-weight: 600; line-height: 1; margin-bottom: 4px;
+}
+.kl {
+  font-family: var(--fm); font-size: 9px; color: var(--tx4);
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+
+/* Findings table */
+.ftbl-head-row {
+  padding: 14px 20px 10px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--b1);
+}
+.ftbl-title { font-family: var(--fd); font-size: 13px; font-weight: 700; color: var(--tx1); }
+.ftbl-count {
+  font-family: var(--fm); font-size: 10px; color: var(--blue);
+  background: var(--bdim); border: 1px solid var(--bbord);
+  padding: 2px 9px; border-radius: 5px;
+}
+
+.ftbl { padding: 0 20px 20px; }
+.ftbl-hdr {
+  display: grid; grid-template-columns: 86px 1fr 84px 110px 72px;
+  padding: 8px 0;
+  font-family: var(--fm); font-size: 9px; color: var(--tx4);
+  text-transform: uppercase; letter-spacing: 0.09em;
+  border-bottom: 1px solid var(--b1);
+}
+.frow {
+  display: grid; grid-template-columns: 86px 1fr 84px 110px 72px;
+  padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.025);
+  align-items: center; font-size: 11.5px; color: var(--tx2);
+  transition: background 0.12s; cursor: default;
+}
+.frow:last-child { border-bottom: none; }
+.frow:hover { background: rgba(255,255,255,0.018); }
+.f-id { font-family: var(--fm); color: var(--blue); font-size: 10px; }
+.f-desc { font-size: 11.5px; color: var(--tx2); padding-right: 12px; }
+.badge {
+  display: inline-flex; padding: 2px 7px; border-radius: 4px;
+  font-family: var(--fm); font-size: 9.5px; font-weight: 600;
+}
+.badge-c { background: rgba(224,62,67,0.12); color: #F87171; border: 1px solid rgba(224,62,67,0.22); }
+.badge-h { background: rgba(240,112,32,0.12); color: #FB923C; border: 1px solid rgba(240,112,32,0.22); }
+.badge-m { background: rgba(40,120,255,0.12); color: #60A5FA; border: 1px solid rgba(40,120,255,0.22); }
+.badge-l { background: rgba(24,184,106,0.12); color: #4ADE80; border: 1px solid rgba(24,184,106,0.22); }
+.f-agent { font-family: var(--fm); font-size: 9.5px; color: var(--tx4); }
+.f-ev { font-family: var(--fm); font-size: 9.5px; color: var(--green); }
+
+/* ──────────────────────────────────────────────────
+   LOGOS STRIP
+────────────────────────────────────────────────── */
+.logos-strip {
+  position: relative; z-index: 1;
+  border-top: 1px solid var(--b1); border-bottom: 1px solid var(--b1);
+  padding: 32px 0;
+}
+.logos-label {
+  text-align: center; font-family: var(--fm); font-size: 10px;
+  color: var(--tx4); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 20px;
+}
+.logos-row {
+  display: flex; align-items: center; justify-content: center; gap: 40px; flex-wrap: wrap;
+}
+.logo-chip {
+  font-family: var(--fd); font-size: 13px; font-weight: 700;
+  color: var(--tx4); text-transform: uppercase; letter-spacing: 0.06em;
+  opacity: 0.45; transition: opacity 0.2s;
+}
+.logo-chip:hover { opacity: 0.75; }
+
+/* ──────────────────────────────────────────────────
+   2. THE PROBLEM
+────────────────────────────────────────────────── */
+.problem-section {
+  position: relative; z-index: 1;
+  padding: 100px 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(11,15,26,0.6) 25%, rgba(11,15,26,0.6) 75%, transparent 100%);
+}
+
+.prob-layout {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 80px; align-items: center; margin-top: 56px;
+}
+
+.prob-cards { display: flex; flex-direction: column; gap: 14px; }
+
+.prob-card {
+  display: flex; align-items: flex-start; gap: 18px;
+  padding: 22px 24px;
+  background: var(--ink3); border: 1px solid var(--b1); border-radius: var(--rl);
+  position: relative; overflow: hidden; transition: border-color 0.2s;
+}
+.prob-card::after {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 3px; background: var(--red);
+}
+.prob-card:hover { border-color: var(--b2); }
+
+.prob-icon {
+  width: 44px; height: 44px; border-radius: 10px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 20px;
+  background: rgba(224,62,67,0.08); border: 1px solid rgba(224,62,67,0.15);
+}
+.prob-title {
+  font-family: var(--fd); font-size: 15px; font-weight: 700; color: var(--tx1); margin-bottom: 5px;
+}
+.prob-desc { font-size: 13px; color: var(--tx3); line-height: 1.62; }
+
+/* Stats side */
+.prob-stats {
+  background: var(--ink3); border: 1px solid var(--b2);
+  border-radius: var(--rx); padding: 40px 36px;
+  text-align: center; position: relative; overflow: hidden;
+}
+.prob-stats::before {
+  content: '';
+  position: absolute; top: -100px; left: 50%; transform: translateX(-50%);
+  width: 340px; height: 220px;
+  background: radial-gradient(ellipse, rgba(224,62,67,0.08) 0%, transparent 65%);
+  pointer-events: none;
+}
+.ps-big {
+  font-family: var(--fd); font-size: 80px; font-weight: 800;
+  color: var(--red); line-height: 1; letter-spacing: -4px; margin-bottom: 10px; position: relative;
+}
+.ps-label { font-size: 16px; font-weight: 600; color: var(--tx1); margin-bottom: 8px; }
+.ps-sub { font-size: 13px; color: var(--tx3); line-height: 1.65; max-width: 280px; margin: 0 auto; }
+.ps-divider { height: 1px; background: var(--b1); margin: 28px 0; }
+.ps-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.ps-cell {
+  padding: 16px; background: rgba(255,255,255,0.02);
+  border: 1px solid var(--b1); border-radius: 10px;
+}
+.ps-num {
+  font-family: var(--fm); font-size: 28px; font-weight: 700;
+  color: var(--orange); margin-bottom: 4px;
+}
+.ps-lbl { font-size: 11.5px; color: var(--tx3); line-height: 1.4; }
+
+/* ──────────────────────────────────────────────────
+   3. THE BREAKTHROUGH
+────────────────────────────────────────────────── */
+.break-section { position: relative; z-index: 1; padding: 100px 0; }
+
+.break-box {
+  background: var(--ink3); border: 1px solid var(--b2);
+  border-radius: var(--rx); padding: 72px 80px;
+  position: relative; overflow: hidden; text-align: center;
+}
+.break-box::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--blue), rgba(200,155,40,0.5), transparent);
+}
+.break-box::after {
+  content: '';
+  position: absolute; top: -140px; left: 50%; transform: translateX(-50%);
+  width: 700px; height: 380px;
+  background: radial-gradient(ellipse, rgba(40,120,255,0.07) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.break-vs {
+  display: grid; grid-template-columns: 1fr 56px 1fr;
+  gap: 40px; align-items: start; margin: 52px 0; text-align: left; position: relative; z-index: 1;
+}
+.vs-label {
+  font-family: var(--fm); font-size: 10px; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 18px;
+  display: flex; align-items: center; gap: 7px;
+}
+.vs-old { color: var(--red); }
+.vs-new { color: var(--green); }
+.vs-list { display: flex; flex-direction: column; gap: 9px; }
+.vs-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 13px; border-radius: 8px; font-size: 13.5px;
+}
+.vs-item-old {
+  background: rgba(224,62,67,0.05); border: 1px solid rgba(224,62,67,0.12); color: var(--tx2);
+}
+.vs-item-new {
+  background: rgba(24,184,106,0.06); border: 1px solid rgba(24,184,106,0.15);
+  color: var(--tx1); font-weight: 500;
+}
+.vs-center {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 10px; padding-top: 28px;
+}
+.vs-arr {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--blue); display: flex; align-items: center; justify-content: center;
+  font-size: 18px; box-shadow: 0 0 22px rgba(40,120,255,0.45);
+}
+.vs-arr-lbl { font-family: var(--fm); font-size: 9px; color: var(--tx4); letter-spacing: 0.09em; text-transform: uppercase; }
+
+.break-agents {
+  display: grid; grid-template-columns: repeat(5,1fr); gap: 10px;
+  margin-top: 14px; position: relative; z-index: 1;
+}
+.ba {
+  padding: 14px 10px; text-align: center;
+  background: rgba(40,120,255,0.06); border: 1px solid rgba(40,120,255,0.16);
+  border-radius: 10px; transition: all 0.22s;
+}
+.ba:hover { background: rgba(40,120,255,0.11); border-color: rgba(40,120,255,0.28); transform: translateY(-3px); }
+.ba-ico { font-size: 22px; margin-bottom: 7px; }
+.ba-name { font-size: 11.5px; font-weight: 600; color: var(--tx1); margin-bottom: 1px; }
+.ba-type { font-family: var(--fm); font-size: 9px; color: var(--tx4); }
+
+/* ──────────────────────────────────────────────────
+   4. PROOF
+────────────────────────────────────────────────── */
+.proof-section { position: relative; z-index: 1; padding: 100px 0; }
+
+.proof-tab-row {
+  display: flex; gap: 4px; margin-top: 44px;
+  background: rgba(255,255,255,0.03); border: 1px solid var(--b1);
+  border-radius: 12px; padding: 4px; width: fit-content;
+}
+.ptab {
+  padding: 9px 22px; border-radius: 8px;
+  font-family: var(--fb); font-size: 13px; font-weight: 600;
+  color: var(--tx3); background: transparent; border: none; cursor: pointer; transition: all 0.2s;
+}
+.ptab:hover { color: var(--tx2); }
+.ptab.on {
+  background: var(--ink3); color: var(--tx1);
+  border: 1px solid var(--b2); box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.ppanel { display: none; margin-top: 26px; }
+.ppanel.on { display: block; }
+
+.proof-win {
+  background: var(--ink3); border: 1px solid var(--b2);
+  border-radius: var(--rx); overflow: hidden;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+  position: relative;
+}
+.proof-win::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(40,120,255,0.45), transparent);
+}
+.pw-hdr {
+  background: var(--ink4); border-bottom: 1px solid var(--b1);
+  padding: 12px 20px; display: flex; align-items: center; justify-content: space-between;
+}
+.pw-title { font-family: var(--fm); font-size: 10.5px; color: var(--tx4); letter-spacing: 0.05em; }
+.pw-body { padding: 22px 24px; }
+
+/* Detection */
+.det-kpi-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 18px; }
+.det-kpi {
+  padding: 16px 18px; background: var(--ink4);
+  border: 1px solid var(--b1); border-radius: 10px;
+}
+.det-kpi-n { font-family: var(--fm); font-size: 28px; font-weight: 600; line-height: 1; margin-bottom: 4px; }
+.det-kpi-l { font-family: var(--fm); font-size: 9px; color: var(--tx4); text-transform: uppercase; letter-spacing: 0.08em; }
+
+.vio {
+  padding: 13px 16px; background: rgba(224,62,67,0.05);
+  border: 1px solid rgba(224,62,67,0.16);
+  border-left: 3px solid var(--red); border-radius: 9px; margin-bottom: 9px;
+}
+.vio-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
+.vio-id { font-family: var(--fm); font-size: 10px; color: #F87171; }
+.vio-desc { font-size: 12px; color: var(--tx2); line-height: 1.55; }
+.vio-meta { font-family: var(--fm); font-size: 9.5px; color: var(--tx4); margin-top: 4px; }
+.vio-med { border-left-color: var(--blue); background: rgba(40,120,255,0.04); border-color: rgba(40,120,255,0.15); }
+.vio-med .vio-id { color: #60A5FA; }
+
+/* Finding cards */
+.finding {
+  padding: 16px 18px; background: var(--ink4);
+  border: 1px solid var(--b1); border-radius: 10px; margin-bottom: 12px;
+}
+.finding-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.finding-name { font-family: var(--fd); font-size: 13px; font-weight: 700; color: var(--tx1); }
+.fg { display: grid; grid-template-columns: 88px 1fr; gap: 5px 12px; font-size: 12px; }
+.fgl { color: var(--tx4); font-weight: 600; }
+.fgv { color: var(--tx2); }
+
+/* Report */
+.report-preview {
+  background: var(--ink4); border: 1px solid var(--b1);
+  border-radius: 10px; padding: 20px 22px;
+  font-family: var(--fm); font-size: 11px; color: var(--tx3); line-height: 1.85;
+  max-height: 340px; overflow: hidden; position: relative;
+}
+.report-preview::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 72px;
+  background: linear-gradient(transparent, var(--ink4));
+}
+.rp-h1 { font-size: 12.5px; font-weight: 600; color: var(--tx1); margin-bottom: 14px; letter-spacing: 0.04em; }
+.rp-sec { color: var(--blue); margin-top: 12px; margin-bottom: 3px; }
+.rp-t { color: var(--tx3); }
+
+/* ──────────────────────────────────────────────────
+   5. PLATFORM CAPABILITIES
+────────────────────────────────────────────────── */
+.platform-section { position: relative; z-index: 1; padding: 100px 0; }
+
+.platform-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 56px;
+}
+.pg {
+  background: var(--ink3); border: 1px solid var(--b1); border-radius: var(--rl);
+  padding: 28px; transition: all 0.25s; position: relative; overflow: hidden;
+}
+.pg::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(40,120,255,0.04) 0%, transparent 55%);
+  opacity: 0; transition: opacity 0.25s; border-radius: inherit;
+}
+.pg:hover { border-color: var(--b2); transform: translateY(-3px); box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+.pg:hover::after { opacity: 1; }
+
+.pg-top { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+.pg-ico {
+  width: 46px; height: 46px; border-radius: 11px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 22px;
+}
+.ico-blue { background: var(--bdim); border: 1px solid var(--bbord); }
+.ico-gold { background: var(--gdim); border: 1px solid var(--gbord); }
+.ico-green { background: rgba(24,184,106,0.1); border: 1px solid rgba(24,184,106,0.2); }
+.ico-purple { background: rgba(139,92,246,0.1); border: 1px solid rgba(139,92,246,0.2); }
+
+.pg-title { font-family: var(--fd); font-size: 18px; font-weight: 700; color: var(--tx1); letter-spacing: -0.2px; }
+.pg-desc { font-size: 13px; color: var(--tx3); line-height: 1.62; margin-bottom: 18px; }
+.pg-agents { display: flex; flex-direction: column; gap: 7px; }
+.pg-agent {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 9px 13px; background: rgba(255,255,255,0.025);
+  border: 1px solid var(--b1); border-radius: 8px; font-size: 12.5px;
+}
+.pga-n { color: var(--tx1); font-weight: 500; }
+.pga-t {
+  font-family: var(--fm); font-size: 9.5px; padding: 2px 8px; border-radius: 4px; letter-spacing: 0.04em;
+}
+.pgt-blue { color: var(--blue); background: var(--bdim); border: 1px solid rgba(40,120,255,0.18); }
+.pgt-gold { color: var(--gold); background: var(--gdim); border: 1px solid var(--gbord); }
+.pgt-green { color: var(--green); background: rgba(24,184,106,0.1); border: 1px solid rgba(24,184,106,0.2); }
+.pgt-purple { color: #A78BFA; background: rgba(139,92,246,0.1); border: 1px solid rgba(139,92,246,0.2); }
+
+/* ──────────────────────────────────────────────────
+   6. SECURITY & COMPLIANCE
+────────────────────────────────────────────────── */
+.security-section {
+  position: relative; z-index: 1; padding: 100px 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(11,15,26,0.55) 25%, rgba(11,15,26,0.55) 75%, transparent 100%);
+}
+.sec-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 56px;
+}
+.sec-card {
+  background: var(--ink3); border: 1px solid var(--b1); border-radius: var(--rl);
+  padding: 26px 24px; transition: border-color 0.2s;
+}
+.sec-card:hover { border-color: var(--b2); }
+.sec-ico { font-size: 28px; margin-bottom: 14px; }
+.sec-title { font-family: var(--fd); font-size: 16px; font-weight: 700; color: var(--tx1); margin-bottom: 8px; }
+.sec-desc { font-size: 13px; color: var(--tx2); line-height: 1.65; }
+.sec-mono {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--fm); font-size: 9.5px; color: var(--green);
+  letter-spacing: 0.05em; text-transform: uppercase; margin-top: 14px;
+}
+
+.compliance-bar {
+  margin-top: 40px; padding: 26px 36px;
+  background: var(--ink3); border: 1px solid var(--b1); border-radius: var(--rl);
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 18px;
+}
+.cb-label { font-family: var(--fm); font-size: 10px; color: var(--tx4); letter-spacing: 0.1em; text-transform: uppercase; flex-shrink: 0; }
+.cb-badges { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.cb-b {
+  display: flex; align-items: center; gap: 5px;
+  padding: 6px 13px;
+  background: rgba(255,255,255,0.03); border: 1px solid var(--b2);
+  border-radius: 7px; font-family: var(--fm); font-size: 11px; color: var(--tx2); letter-spacing: 0.04em;
+}
+
+/* ──────────────────────────────────────────────────
+   7. CTA
+────────────────────────────────────────────────── */
+.cta-section { position: relative; z-index: 1; padding: 100px 0; }
+
+.cta-box {
+  background: var(--ink3); border: 1px solid var(--b2);
+  border-radius: var(--rx); overflow: hidden; position: relative;
+}
+.cta-box::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--blue), rgba(200,155,40,0.4), transparent);
+}
+.cta-box::after {
+  content: '';
+  position: absolute; top: -120px; left: 50%; transform: translateX(-50%);
+  width: 700px; height: 320px;
+  background: radial-gradient(ellipse, rgba(40,120,255,0.07) 0%, transparent 65%);
+  pointer-events: none;
+}
+.cta-layout { display: grid; grid-template-columns: 1fr 1fr; }
+
+.cta-l {
+  padding: 60px 56px;
+  border-right: 1px solid var(--b1); position: relative; z-index: 1;
+}
+.cta-l-eye { font-family: var(--fm); font-size: 10px; color: var(--blue); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 18px; }
+.cta-l-title { font-family: var(--fd); font-size: 34px; font-weight: 800; color: var(--tx1); line-height: 1.1; letter-spacing: -0.8px; margin-bottom: 14px; }
+.cta-l-sub { font-size: 14px; color: var(--tx3); line-height: 1.72; margin-bottom: 28px; }
+.cta-feats { display: flex; flex-direction: column; gap: 12px; }
+.cta-feat { display: flex; align-items: flex-start; gap: 11px; font-size: 13.5px; color: var(--tx2); }
+.cta-check {
+  width: 19px; height: 19px; border-radius: 5px; flex-shrink: 0;
+  background: rgba(24,184,106,0.10); border: 1px solid rgba(24,184,106,0.24);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; color: var(--green); margin-top: 2px;
+}
+
+.cta-r { padding: 60px 56px; position: relative; z-index: 1; }
+
+.fg-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.fg-group { margin-bottom: 14px; }
+.fg-label { display: block; font-size: 11.5px; font-weight: 600; color: var(--tx2); margin-bottom: 6px; letter-spacing: 0.03em; }
+.fg-input, .fg-select, .fg-textarea {
+  width: 100%; padding: 11px 14px;
+  background: rgba(255,255,255,0.04); border: 1px solid var(--b2);
+  border-radius: 8px; color: var(--tx1); font-family: var(--fb); font-size: 13.5px;
+  box-sizing: border-box; outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+}
+.fg-input:focus, .fg-select:focus, .fg-textarea:focus {
+  border-color: rgba(40,120,255,0.55); box-shadow: 0 0 0 3px rgba(40,120,255,0.1);
+}
+.fg-input::placeholder { color: var(--tx4); }
+.fg-select option { background: var(--ink3); }
+.fg-textarea { resize: vertical; min-height: 84px; line-height: 1.55; }
+
+.fg-submit {
+  width: 100%; padding: 14px; background: var(--blue); border: none; border-radius: 9px;
+  color: #fff; font-family: var(--fb); font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s;
+  box-shadow: 0 4px 18px rgba(40,120,255,0.35); letter-spacing: 0.01em; margin-top: 6px;
+}
+.fg-submit:hover { background: #3d8fff; transform: translateY(-1px); box-shadow: 0 8px 28px rgba(40,120,255,0.45); }
+.fg-submit:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+.fg-note { font-family: var(--fm); font-size: 10.5px; color: var(--tx4); text-align: center; margin-top: 12px; letter-spacing: 0.03em; }
+
+.cta-success {
+  display: none; flex-direction: column; align-items: center;
+  justify-content: center; text-align: center; padding: 40px 20px; gap: 14px;
+}
+.cs-ico { font-size: 56px; }
+.cs-title { font-family: var(--fd); font-size: 24px; font-weight: 800; color: var(--tx1); }
+.cs-sub { font-size: 14px; color: var(--tx3); line-height: 1.72; max-width: 320px; }
+
+/* ──────────────────────────────────────────────────
+   FOOTER
+────────────────────────────────────────────────── */
+.footer {
+  position: relative; z-index: 1;
+  border-top: 1px solid var(--b1); padding: 64px 0 40px;
+}
+.footer-grid {
+  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 48px;
+}
+.footer-brand-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.footer-desc { font-size: 13px; color: var(--tx4); line-height: 1.72; max-width: 264px; }
+.footer-certs { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
+.footer-cert {
+  font-family: var(--fm); font-size: 9.5px; color: var(--tx4);
+  background: var(--ink3); border: 1px solid var(--b1);
+  padding: 4px 10px; border-radius: 5px; letter-spacing: 0.05em;
+}
+.footer-col-h {
+  font-family: var(--fm); font-size: 10px; font-weight: 600;
+  color: var(--tx1); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 18px;
+}
+.footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.footer-links a { font-size: 13px; color: var(--tx4); transition: color 0.15s; }
+.footer-links a:hover { color: var(--tx2); }
+.footer-bottom {
+  border-top: 1px solid var(--b1); padding-top: 24px;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+}
+.footer-copy { font-family: var(--fm); font-size: 11px; color: var(--tx4); letter-spacing: 0.03em; }
+.footer-btm { display: flex; gap: 24px; }
+.footer-btm a { font-size: 12px; color: var(--tx4); transition: color 0.15s; }
+.footer-btm a:hover { color: var(--tx2); }
+
+/* ──────────────────────────────────────────────────
+   ANIMATIONS
+────────────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fu {
+  opacity: 0; transform: translateY(26px);
+  transition: opacity 0.64s ease, transform 0.64s ease;
+}
+.fu.vis { opacity: 1; transform: translateY(0); }
+.d1 { transition-delay: 0.10s; }
+.d2 { transition-delay: 0.20s; }
+.d3 { transition-delay: 0.30s; }
+.d4 { transition-delay: 0.40s; }
+.d5 { transition-delay: 0.50s; }
+
+/* ──────────────────────────────────────────────────
+   RESPONSIVE
+────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .pwin-body { grid-template-columns: 1fr; }
+  .pwin-sb { display: none; }
+  .kbar { grid-template-columns: repeat(3,1fr); }
+  .ftbl-hdr, .frow { grid-template-columns: 80px 1fr 80px; }
+  .ftbl-hdr span:nth-child(n+4), .frow > *:nth-child(n+4) { display: none; }
+  .prob-layout { grid-template-columns: 1fr; gap: 40px; }
+  .break-vs { grid-template-columns: 1fr; gap: 20px; }
+  .vs-center { flex-direction: row; padding-top: 0; }
+  .break-agents { grid-template-columns: repeat(3,1fr); }
+  .platform-grid { grid-template-columns: 1fr; }
+  .sec-grid { grid-template-columns: repeat(2,1fr); }
+  .cta-layout { grid-template-columns: 1fr; }
+  .cta-l { border-right: none; border-bottom: 1px solid var(--b1); }
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+}
+@media (max-width: 768px) {
+  .hero h1 { font-size: 36px; }
+  .hero-sub { font-size: 16px; }
+  .nav-links { display: none; }
+  .kbar { grid-template-columns: repeat(2,1fr); }
+  .sec-grid { grid-template-columns: 1fr; }
+  .fg-row { grid-template-columns: 1fr; }
+  .cta-l, .cta-r { padding: 36px 28px; }
+  .break-box { padding: 44px 28px; }
+  .break-agents { grid-template-columns: repeat(2,1fr); }
+  .footer-grid { grid-template-columns: 1fr; }
+  .ps-grid { grid-template-columns: 1fr; }
+  .det-kpi-row { grid-template-columns: repeat(2,1fr); }
+  .logos-row { gap: 24px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Ambient -->
+<div class="ambient" aria-hidden="true">
+  <div class="ambient-orb ao1"></div>
+  <div class="ambient-orb ao2"></div>
+</div>
+<div class="grid-overlay" aria-hidden="true"></div>
+
+<!-- ══════════ NAV ══════════ -->
+<nav class="nav" id="topnav">
+  <div class="nav-inner">
+    <div class="nav-brand">
+      <div class="nav-logomark">AI</div>
+      <span class="nav-name">AuditAI Suite</span>
+      <span class="nav-pill">Enterprise</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#problem">The Problem</a></li>
+      <li><a href="#breakthrough">Breakthrough</a></li>
+      <li><a href="#platform">Platform</a></li>
+      <li><a href="#security">Security</a></li>
+    </ul>
+    <div class="nav-btns">
+      <a href="app.html" class="btn btn-ghost">Open Suite →</a>
+      <button class="btn btn-blue" onclick="goTo('cta')">Request Access</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════
+     1. HERO
+══════════════════════════════════════ -->
+<section class="hero" id="hero">
+  <div class="wrap">
+
+    <div class="hero-badge">
+      <span class="live-dot"></span>
+      Enterprise Preview — SOX 404 &nbsp;·&nbsp; ITGC &nbsp;·&nbsp; AI Governance
+    </div>
+
+    <h1>Continuous SOX control testing powered by <em>autonomous AI auditors</em></h1>
+
+    <p class="hero-sub">Replace quarterly manual cycles with 10 specialized agents that test every control, every day — surfacing exceptions with evidence your board can act on.</p>
+
+    <div class="hero-cta-row">
+      <button class="btn btn-blue btn-lg" onclick="goTo('cta')">Request Enterprise Access</button>
+      <a href="app.html" class="btn btn-ghost btn-lg">Explore the Suite →</a>
+    </div>
+
+    <div class="hero-trust">
+      <div class="ht-item">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="6" stroke="#18B86A" stroke-width="1.1"/><path d="M3.5 6.5l2 2 4-4" stroke="#18B86A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        SOX 404 Ready
+      </div>
+      <div class="ht-sep"></div>
+      <div class="ht-item">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1.5" y="5.5" width="10" height="7" rx="1.5" stroke="#18B86A" stroke-width="1.1"/><path d="M4 5.5V4a2.5 2.5 0 015 0v1.5" stroke="#18B86A" stroke-width="1.1"/></svg>
+        Zero Data Exfiltration
+      </div>
+      <div class="ht-sep"></div>
+      <div class="ht-item">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1L1.5 3.5v3c0 2.7 2.1 5.2 5 5.8 2.9-.6 5-3.1 5-5.8v-3L6.5 1z" stroke="#18B86A" stroke-width="1.1"/></svg>
+        HIPAA Compatible
+      </div>
+      <div class="ht-sep"></div>
+      <div class="ht-item">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="6" stroke="#18B86A" stroke-width="1.1"/><path d="M6.5 3.5V7l2 1.5" stroke="#18B86A" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Real-Time Detection
+      </div>
+      <div class="ht-sep"></div>
+      <div class="ht-item">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1.5" y="1.5" width="10" height="10" rx="2" stroke="#18B86A" stroke-width="1.1"/><path d="M4 6.5h5M6.5 4v5" stroke="#18B86A" stroke-width="1.4" stroke-linecap="round"/></svg>
+        IIA Standards
+      </div>
+    </div>
+
+    <!-- ═══ BIG PRODUCT SCREENSHOT ═══ -->
+    <div class="hero-screen-wrap">
+      <div class="screen-halo"></div>
+
+      <div class="pwin">
+        <!-- Chrome bar -->
+        <div class="pwin-bar">
+          <div class="pwin-dots">
+            <div class="dot dot-r"></div>
+            <div class="dot dot-y"></div>
+            <div class="dot dot-g"></div>
+          </div>
+          <div class="pwin-tabs">
+            <div class="pwin-tab on">📊 SOX 404 Audit</div>
+            <div class="pwin-tab">🛡 Audit of AI</div>
+            <div class="pwin-tab">🤖 Copilot Room</div>
+          </div>
+          <div class="pwin-live">
+            <div class="pwin-dot-live"></div>
+            10 Agents Active — Scanning
+          </div>
+        </div>
+
+        <!-- App shell -->
+        <div class="pwin-body">
+          <!-- Sidebar -->
+          <div class="pwin-sb">
+            <div class="sb-head">Modules</div>
+            <div class="sb-row on"><span class="sb-ico">⚙️</span> Configure</div>
+            <div class="sb-row"><span class="sb-ico">▶</span> Execute Audit</div>
+            <div class="sb-row"><span class="sb-ico">📋</span> Results</div>
+            <div class="sb-row"><span class="sb-ico">📊</span> Report</div>
+            <div class="sb-head" style="margin-top:10px">Agents</div>
+            <div class="sb-row"><span class="sb-ico">⚖️</span> SOD Auditor</div>
+            <div class="sb-row"><span class="sb-ico">🔬</span> JE Forensics</div>
+            <div class="sb-row"><span class="sb-ico">🔑</span> Logical Access</div>
+            <div class="sb-row"><span class="sb-ico">⚙️</span> Config Drift</div>
+            <div class="sb-row"><span class="sb-ico">🏦</span> Master Data</div>
+          </div>
+
+          <!-- Main pane -->
+          <div class="pwin-main">
+            <!-- KPI strip -->
+            <div class="kbar">
+              <div class="kc">
+                <div class="kv" style="color:#2878FF;">12,847</div>
+                <div class="kl">Records Tested</div>
+              </div>
+              <div class="kc">
+                <div class="kv" style="color:#E03E43;">23</div>
+                <div class="kl">Exceptions</div>
+              </div>
+              <div class="kc">
+                <div class="kv" style="color:#18B86A;">94.2%</div>
+                <div class="kl">Coverage</div>
+              </div>
+              <div class="kc">
+                <div class="kv" style="color:#C89B28;">4.8s</div>
+                <div class="kl">Avg Audit Time</div>
+              </div>
+              <div class="kc">
+                <div class="kv" style="color:#F07020;">3</div>
+                <div class="kl">Critical Items</div>
+              </div>
+            </div>
+
+            <!-- Findings table -->
+            <div class="ftbl-head-row">
+              <span class="ftbl-title">Audit Findings — Live Session</span>
+              <span class="ftbl-count">23 exceptions · 3 critical</span>
+            </div>
+            <div class="ftbl">
+              <div class="ftbl-hdr">
+                <span>Finding ID</span>
+                <span>Exception Description</span>
+                <span>Severity</span>
+                <span>Agent</span>
+                <span>Evidence</span>
+              </div>
+              <div class="frow">
+                <span class="f-id">SOD-001</span>
+                <span class="f-desc">AP Invoice Create + AP Payment Approve conflict — 3 users, $4.2M exposure</span>
+                <span><span class="badge badge-c">Critical</span></span>
+                <span class="f-agent">SOD Auditor</span>
+                <span class="f-ev">✓ Logged</span>
+              </div>
+              <div class="frow">
+                <span class="f-id">JE-047</span>
+                <span class="f-desc">Manual JE outside business hours — $2.4M, fiscal year-end, no approver</span>
+                <span><span class="badge badge-h">High</span></span>
+                <span class="f-agent">JE Forensics</span>
+                <span class="f-ev">✓ Logged</span>
+              </div>
+              <div class="frow">
+                <span class="f-id">ACC-012</span>
+                <span class="f-desc">Privileged access review overdue — 18 admin accounts, 94 days past SLA</span>
+                <span><span class="badge badge-h">High</span></span>
+                <span class="f-agent">Logical Access</span>
+                <span class="f-ev">✓ Logged</span>
+              </div>
+              <div class="frow">
+                <span class="f-id">CFG-003</span>
+                <span class="f-desc">Production config change without CAB approval — security baseline deviation</span>
+                <span><span class="badge badge-m">Medium</span></span>
+                <span class="f-agent">Config Drift</span>
+                <span class="f-ev">✓ Logged</span>
+              </div>
+              <div class="frow">
+                <span class="f-id">MD-018</span>
+                <span class="f-desc">Vendor master change without dual authorization — 4 records affected</span>
+                <span><span class="badge badge-m">Medium</span></span>
+                <span class="f-agent">Master Data</span>
+                <span class="f-ev">✓ Logged</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /hero-screen-wrap -->
+
+  </div><!-- /wrap -->
+</section>
+
+<!-- Logos strip -->
+<div class="logos-strip" style="position:relative;z-index:1;">
+  <div class="wrap">
+    <div class="logos-label">Aligned to the compliance standards your auditors trust</div>
+    <div class="logos-row">
+      <span class="logo-chip">SOX 404</span>
+      <span class="logo-chip">PCAOB</span>
+      <span class="logo-chip">COSO</span>
+      <span class="logo-chip">COBIT</span>
+      <span class="logo-chip">IIA Standards</span>
+      <span class="logo-chip">HIPAA</span>
+      <span class="logo-chip">NIST CSF</span>
+      <span class="logo-chip">ISO 27001</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     2. THE PROBLEM
+══════════════════════════════════════ -->
+<section class="problem-section" id="problem">
+  <div class="wrap">
+    <div class="eyebrow fu">The Problem</div>
+    <h2 class="sec-h fu d1">Internal audit is stuck<br>in a manual era</h2>
+    <p class="sec-sub fu d2">Legacy audit cycles weren't built for modern enterprise risk. The result is delayed detection, incomplete coverage, and findings that arrive too late to matter.</p>
+
+    <div class="prob-layout">
+      <div class="prob-cards">
+        <div class="prob-card fu">
+          <div class="prob-icon">⏳</div>
+          <div>
+            <div class="prob-title">Manual Testing — Weeks Per Cycle</div>
+            <div class="prob-desc">Auditors spend 60–70% of their time collecting data and writing workpapers by hand. Testing happens once a quarter — not continuously.</div>
+          </div>
+        </div>
+        <div class="prob-card fu d1">
+          <div class="prob-icon">🎲</div>
+          <div>
+            <div class="prob-title">Sampling — Not Full Population</div>
+            <div class="prob-desc">Most audits test 25–60 samples from thousands of transactions. SOD conflicts, fraud, and control failures hide in the 95% that's never examined.</div>
+          </div>
+        </div>
+        <div class="prob-card fu d2">
+          <div class="prob-icon">🚨</div>
+          <div>
+            <div class="prob-title">Delayed Detection — Too Late to Act</div>
+            <div class="prob-desc">By the time findings surface, the quarter has closed. Management can't remediate in time. Regulators and external auditors find what internal audit missed.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="prob-stats fu d2">
+        <div class="ps-big">73%</div>
+        <div class="ps-label">of control failures go undetected by sampling</div>
+        <div class="ps-sub">Traditional audit methodology misses the majority of exceptions hiding in large transaction populations.</div>
+        <div class="ps-divider"></div>
+        <div class="ps-grid">
+          <div class="ps-cell">
+            <div class="ps-num">6–8wk</div>
+            <div class="ps-lbl">Manual SOX audit cycle length</div>
+          </div>
+          <div class="ps-cell">
+            <div class="ps-num">3%</div>
+            <div class="ps-lbl">Average population coverage via sampling</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     3. THE BREAKTHROUGH
+══════════════════════════════════════ -->
+<section class="break-section" id="breakthrough">
+  <div class="wrap">
+    <div class="break-box">
+      <div class="eyebrow fu" style="justify-content:center;">The Breakthrough</div>
+      <h2 class="sec-h fu d1" style="text-align:center;max-width:660px;margin:0 auto 14px;">Not automation.<br><span style="background:linear-gradient(130deg,#2878FF,#78B4FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Autonomous audit agents.</span></h2>
+      <p class="sec-sub fu d2" style="text-align:center;margin:0 auto 0;max-width:520px;">Automation executes scripts on a schedule. Autonomous agents reason, adapt, and act — testing every control in your population and drafting findings without human prompting.</p>
+
+      <div class="break-vs fu d2">
+        <div>
+          <div class="vs-label vs-old">✕ &nbsp;Legacy Audit Today</div>
+          <div class="vs-list">
+            <div class="vs-item vs-item-old">⏳ &nbsp; Quarterly manual testing cycles</div>
+            <div class="vs-item vs-item-old">🎲 &nbsp; 3–5% sampling coverage</div>
+            <div class="vs-item vs-item-old">📄 &nbsp; Manual workpaper preparation</div>
+            <div class="vs-item vs-item-old">🔍 &nbsp; Retrospective exception detection</div>
+            <div class="vs-item vs-item-old">👤 &nbsp; Single-threaded human analysis</div>
+          </div>
+        </div>
+        <div class="vs-center">
+          <div class="vs-arr">→</div>
+          <div class="vs-arr-lbl">Replaced</div>
+        </div>
+        <div>
+          <div class="vs-label vs-new">✓ &nbsp;AuditAI Suite</div>
+          <div class="vs-list">
+            <div class="vs-item vs-item-new">⚡ &nbsp; Continuous, real-time testing</div>
+            <div class="vs-item vs-item-new">📊 &nbsp; 100% population coverage</div>
+            <div class="vs-item vs-item-new">🤖 &nbsp; AI-drafted workpapers in your format</div>
+            <div class="vs-item vs-item-new">🎯 &nbsp; Proactive detection as events occur</div>
+            <div class="vs-item vs-item-new">🚀 &nbsp; 10 agents running in parallel</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fu d3" style="position:relative;z-index:1;">
+        <div style="font-family:var(--fm);font-size:10px;color:var(--tx4);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:14px;text-align:left;">10 Specialized Audit Agents — Always On</div>
+        <div class="break-agents">
+          <div class="ba"><div class="ba-ico">⚖️</div><div class="ba-name">SOD Auditor</div><div class="ba-type">Access Conflicts</div></div>
+          <div class="ba"><div class="ba-ico">🔬</div><div class="ba-name">JE Forensics</div><div class="ba-type">Journal Entries</div></div>
+          <div class="ba"><div class="ba-ico">🔑</div><div class="ba-name">Logical Access</div><div class="ba-type">Auth Controls</div></div>
+          <div class="ba"><div class="ba-ico">⚙️</div><div class="ba-name">Config Drift</div><div class="ba-type">Change Mgmt</div></div>
+          <div class="ba"><div class="ba-ico">🏦</div><div class="ba-name">Master Data</div><div class="ba-type">Data Integrity</div></div>
+          <div class="ba"><div class="ba-ico">💰</div><div class="ba-name">Financial Risk</div><div class="ba-type">Risk Analysis</div></div>
+          <div class="ba"><div class="ba-ico">🧾</div><div class="ba-name">Transactions</div><div class="ba-type">AP / AR / GL</div></div>
+          <div class="ba"><div class="ba-ico">🌐</div><div class="ba-name">Interfaces</div><div class="ba-type">System Flows</div></div>
+          <div class="ba"><div class="ba-ico">🏢</div><div class="ba-name">Vendor Risk</div><div class="ba-type">Third Party</div></div>
+          <div class="ba"><div class="ba-ico">🛡</div><div class="ba-name">AI Governance</div><div class="ba-type">Agent Oversight</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     4. PROOF
+══════════════════════════════════════ -->
+<section class="proof-section" id="proof">
+  <div class="wrap">
+    <div class="eyebrow fu">Proof</div>
+    <h2 class="sec-h fu d1">See it working —<br>live output from real audit runs</h2>
+    <p class="sec-sub fu d2">Every screen below is from the actual platform. What you see is exactly what your audit team gets.</p>
+
+    <div class="proof-tab-row fu d2">
+      <button class="ptab on" onclick="switchProof('detect',this)">Detection Screen</button>
+      <button class="ptab" onclick="switchProof('findings',this)">Findings Output</button>
+      <button class="ptab" onclick="switchProof('report',this)">Generated Report</button>
+    </div>
+
+    <!-- Detection -->
+    <div class="ppanel on" id="pp-detect">
+      <div class="proof-win">
+        <div class="pw-hdr">
+          <span class="pw-title">SOX 404 AUDIT ENGINE — EXCEPTION DETECTION</span>
+          <div class="pwin-live"><div class="pwin-dot-live"></div>12,847 records processed · agents scanning</div>
+        </div>
+        <div class="pw-body">
+          <div class="det-kpi-row">
+            <div class="det-kpi"><div class="det-kpi-n" style="color:#E03E43;">23</div><div class="det-kpi-l">Total Exceptions</div></div>
+            <div class="det-kpi"><div class="det-kpi-n" style="color:#F07020;">3</div><div class="det-kpi-l">Critical</div></div>
+            <div class="det-kpi"><div class="det-kpi-n" style="color:#2878FF;">10</div><div class="det-kpi-l">Agents Active</div></div>
+            <div class="det-kpi"><div class="det-kpi-n" style="color:#18B86A;">4.8s</div><div class="det-kpi-l">Avg Runtime</div></div>
+          </div>
+          <div class="vio">
+            <div class="vio-hdr"><span class="vio-id">SOD-001</span><span class="badge badge-c">Critical</span></div>
+            <div class="vio-desc">SOD Conflict — User jsmith@corp.com holds AP_INVOICE_CREATE + AP_PAYMENT_APPROVE simultaneously. 3 users affected. Transaction exposure: $4.2M in Q4.</div>
+            <div class="vio-meta">Agent: SOD Auditor v4.1 · Detected: 2026-02-20 14:32:07 UTC · Evidence: Role matrix rows 147, 203, 891</div>
+          </div>
+          <div class="vio">
+            <div class="vio-hdr"><span class="vio-id">JE-047</span><span class="badge badge-h">High</span></div>
+            <div class="vio-desc">Manual Journal Entry — $2,412,000 posted by mwilson@corp.com at 23:47 UTC on 2025-12-31 (fiscal year-end close). No secondary approver. Narrative: "YE Adjustment."</div>
+            <div class="vio-meta">Agent: JE Forensics v3.2 · Detected: 2026-02-20 14:32:09 UTC · Evidence: GL record JE-2025-98741</div>
+          </div>
+          <div class="vio vio-med">
+            <div class="vio-hdr"><span class="vio-id">ACC-012</span><span class="badge badge-m">Medium</span></div>
+            <div class="vio-desc">Privileged Access Review Overdue — 18 system administrator accounts not reviewed in 94 days. Policy requires 90-day review cycle. Risk: unauthorized privilege escalation.</div>
+            <div class="vio-meta">Agent: Logical Access v2.8 · Detected: 2026-02-20 14:32:11 UTC · Evidence: Access review log AR-2025-Q3</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Findings -->
+    <div class="ppanel" id="pp-findings">
+      <div class="proof-win">
+        <div class="pw-hdr">
+          <span class="pw-title">AI-DRAFTED FINDINGS — IIA STRUCTURE</span>
+          <span style="font-family:var(--fm);font-size:10px;color:var(--green);">✓ IIA Standards Compliant · Ready for sign-off</span>
+        </div>
+        <div class="pw-body">
+          <div class="finding">
+            <div class="finding-hdr">
+              <span class="finding-name">Finding F-001 — Segregation of Duties Failure</span>
+              <span class="badge badge-c">Critical</span>
+            </div>
+            <div class="fg">
+              <span class="fgl">Condition:</span><span class="fgv">Three users hold both AP Invoice Creation and AP Payment Approval roles, enabling unauthorized transaction processing without independent review.</span>
+              <span class="fgl">Criteria:</span><span class="fgv">SOX Section 404 ITGC requirement; COSO Principle 10; Company Policy AP-CTRL-004 requiring role separation for payment processing.</span>
+              <span class="fgl">Cause:</span><span class="fgv">Role assignments were not updated following Q3 system migration. Access recertification was deferred and not completed within the required 90-day window.</span>
+              <span class="fgl">Effect:</span><span class="fgv">Material risk of unauthorized payments up to $4.2M per quarter. Potential for undetected fraud without compensating detective controls.</span>
+              <span class="fgl">Recommendation:</span><span class="fgv">Immediately revoke conflicting access for all three users. Implement quarterly automated SOD certification. Redesign role structure to enforce separation at the system level.</span>
+            </div>
+          </div>
+          <div class="finding">
+            <div class="finding-hdr">
+              <span class="finding-name">Finding F-002 — Unsupported Year-End Journal Entry</span>
+              <span class="badge badge-h">High</span>
+            </div>
+            <div class="fg">
+              <span class="fgl">Condition:</span><span class="fgv">A $2.4M manual journal entry was posted at 23:47 UTC on fiscal year-end without secondary approval or adequate supporting documentation.</span>
+              <span class="fgl">Criteria:</span><span class="fgv">Journal entry policy JE-CTRL-002 requires dual authorization for entries exceeding $100K. PCAOB AS 2201 financial reporting controls require complete audit trail.</span>
+              <span class="fgl">Cause:</span><span class="fgv">Year-end close pressure resulted in bypassing the standard authorization workflow. Exception approvals were not documented or retained.</span>
+              <span class="fgl">Effect:</span><span class="fgv">Risk of financial misstatement. Entry cannot be fully substantiated for external audit purposes without additional supporting evidence.</span>
+              <span class="fgl">Recommendation:</span><span class="fgv">Obtain management explanation and supporting documentation. Implement system-enforced dual authorization for high-value entries. Review all Q4 JEs above $100K threshold.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Report -->
+    <div class="ppanel" id="pp-report">
+      <div class="proof-win">
+        <div class="pw-hdr">
+          <span class="pw-title">GENERATED WORKPAPER — IIA / BIG 4 TEMPLATE FORMAT</span>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <span style="font-family:var(--fm);font-size:10px;color:var(--tx4);">WP-2026-SOX-001</span>
+            <span style="font-family:var(--fm);font-size:9.5px;background:var(--gdim);color:var(--gold);border:1px solid var(--gbord);padding:2px 8px;border-radius:4px;">Ready for Sign-off</span>
+          </div>
+        </div>
+        <div class="pw-body">
+          <div class="report-preview">
+            <div class="rp-h1">AUDIT WORKPAPER — SOX 404 ITGC TESTING</div>
+            <div>Engagement: Acme Corporation &nbsp;|&nbsp; Period: Q4 FY2025 &nbsp;|&nbsp; Lead: J. Smith, CPA &nbsp;|&nbsp; WP Ref: WP-2026-SOX-001 &nbsp;|&nbsp; Date: 2026-02-20</div>
+            <div class="rp-sec">OBJECTIVE</div>
+            <div class="rp-t">To test the design and operating effectiveness of IT General Controls (ITGCs) supporting financial reporting processes for the period October 1 – December 31, 2025, in accordance with SOX Section 404 and PCAOB AS 2201.</div>
+            <div class="rp-sec">SCOPE</div>
+            <div class="rp-t">Population: 12,847 transactions across AP, GL, and access control domains. Coverage: 100% population via automated agent framework. Systems in scope: SAP S/4HANA, Okta, GL Sub-ledger.</div>
+            <div class="rp-sec">PROCEDURES PERFORMED</div>
+            <div class="rp-t">1. SOD conflict analysis — tested all user-role combinations against conflict matrix (1,240 combinations). 2. Journal entry forensics — analyzed all 8,441 manual JEs for policy compliance. 3. Privileged access review — assessed 247 accounts against 90-day review SLA. 4. Configuration change testing — reviewed 34 production changes against CAB approval records.</div>
+            <div class="rp-sec">EXCEPTIONS NOTED</div>
+            <div class="rp-t">3 Critical · 8 High · 12 Medium — See Findings F-001 through F-023.</div>
+            <div class="rp-sec">CONCLUSION</div>
+            <div class="rp-t">Based on procedures performed, IT General Controls are operating with exceptions. Critical findings require immediate remediation prior to reliance for financial reporting purposes. Recommend escalation to Audit Committee.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     5. PLATFORM CAPABILITIES
+══════════════════════════════════════ -->
+<section class="platform-section" id="platform">
+  <div class="wrap">
+    <div class="eyebrow fu">Platform Capabilities</div>
+    <h2 class="sec-h fu d1">Four domains.<br>Ten autonomous agents.</h2>
+    <p class="sec-sub fu d2">Every agent is purpose-built for its domain — trained on control frameworks, risk patterns, and exception signatures specific to that area.</p>
+
+    <div class="platform-grid">
+      <div class="pg fu">
+        <div class="pg-top">
+          <div class="pg-ico ico-blue">🔑</div>
+          <div class="pg-title">Access Controls</div>
+        </div>
+        <div class="pg-desc">Tests user access, role assignments, and privilege levels against defined SOD requirements — 100% population coverage, no sampling.</div>
+        <div class="pg-agents">
+          <div class="pg-agent"><span class="pga-n">⚖️ SOD Auditor</span><span class="pga-t pgt-blue">Segregation of Duties</span></div>
+          <div class="pg-agent"><span class="pga-n">🔑 Logical Access</span><span class="pga-t pgt-blue">Privileged Accounts</span></div>
+          <div class="pg-agent"><span class="pga-n">🪪 Identity Audit</span><span class="pga-t pgt-blue">Access Certification</span></div>
+        </div>
+      </div>
+
+      <div class="pg fu d1">
+        <div class="pg-top">
+          <div class="pg-ico ico-gold">⚙️</div>
+          <div class="pg-title">Change Management</div>
+        </div>
+        <div class="pg-desc">Monitors system configuration changes against authorized change records, detects unauthorized modifications in real time.</div>
+        <div class="pg-agents">
+          <div class="pg-agent"><span class="pga-n">⚙️ Config Drift</span><span class="pga-t pgt-gold">Configuration Changes</span></div>
+          <div class="pg-agent"><span class="pga-n">🌐 Interface Integrity</span><span class="pga-t pgt-gold">System Interfaces</span></div>
+          <div class="pg-agent"><span class="pga-n">🏦 Master Data Guard</span><span class="pga-t pgt-gold">Reference Data</span></div>
+        </div>
+      </div>
+
+      <div class="pg fu d1">
+        <div class="pg-top">
+          <div class="pg-ico ico-green">🧾</div>
+          <div class="pg-title">Transaction Monitoring</div>
+        </div>
+        <div class="pg-desc">Tests every journal entry, payment, and GL posting against policy thresholds and approval requirements — full population, no exceptions missed.</div>
+        <div class="pg-agents">
+          <div class="pg-agent"><span class="pga-n">🔬 JE Forensics</span><span class="pga-t pgt-green">Journal Entries</span></div>
+          <div class="pg-agent"><span class="pga-n">💰 Financial Risk</span><span class="pga-t pgt-green">Risk Indicators</span></div>
+          <div class="pg-agent"><span class="pga-n">🧾 Transaction Testing</span><span class="pga-t pgt-green">AP / AR / GL</span></div>
+        </div>
+      </div>
+
+      <div class="pg fu d2">
+        <div class="pg-top">
+          <div class="pg-ico ico-purple">🔍</div>
+          <div class="pg-title">Fraud Analytics</div>
+        </div>
+        <div class="pg-desc">Applies behavioral analytics, Benford's Law, and outlier detection to surface anomalies that sampling-based audits routinely miss.</div>
+        <div class="pg-agents">
+          <div class="pg-agent"><span class="pga-n">🔍 Anomaly Detection</span><span class="pga-t pgt-purple">Behavioral Patterns</span></div>
+          <div class="pg-agent"><span class="pga-n">🏢 Vendor Risk</span><span class="pga-t pgt-purple">Third Party</span></div>
+          <div class="pg-agent"><span class="pga-n">🛡 AI Governance</span><span class="pga-t pgt-purple">Agent Oversight</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     6. SECURITY & COMPLIANCE
+══════════════════════════════════════ -->
+<section class="security-section" id="security">
+  <div class="wrap">
+    <div class="eyebrow fu">Security &amp; Compliance</div>
+    <h2 class="sec-h fu d1">Enterprise security<br>is the architecture, not a feature</h2>
+    <p class="sec-sub fu d2">Built from day one for the most regulated industries. Your financial data and PHI never leave your environment.</p>
+
+    <div class="sec-grid">
+      <div class="sec-card fu">
+        <div class="sec-ico">🔒</div>
+        <div class="sec-title">Zero Data Exfiltration</div>
+        <div class="sec-desc">All audit processing runs client-side in your browser. No financial data, ERP exports, or audit evidence is ever transmitted to external servers. Architecture guarantee — not policy.</div>
+        <div class="sec-mono">✦ Architecture Guarantee</div>
+      </div>
+      <div class="sec-card fu d1">
+        <div class="sec-ico">🏥</div>
+        <div class="sec-title">HIPAA Compatible</div>
+        <div class="sec-desc">Designed for US healthcare providers. PHI boundary controls, access audit logging, and zero-transmission architecture satisfy HIPAA Security Rule requirements for audit tools.</div>
+        <div class="sec-mono">✦ Healthcare Ready</div>
+      </div>
+      <div class="sec-card fu d2">
+        <div class="sec-ico">🛡️</div>
+        <div class="sec-title">Private Deployment</div>
+        <div class="sec-desc">Enterprise plan supports on-premise or private cloud deployment. Full control over infrastructure, data residency, access policies, and audit log retention periods.</div>
+        <div class="sec-mono">✦ Enterprise Plan</div>
+      </div>
+      <div class="sec-card fu d1">
+        <div class="sec-ico">📋</div>
+        <div class="sec-title">Immutable Audit Trails</div>
+        <div class="sec-desc">Every agent decision is timestamped and logged in an immutable decision trail. Full reproducibility for external auditor review, regulatory inquiries, and PCAOB inspection.</div>
+        <div class="sec-mono">✦ PCAOB Aligned</div>
+      </div>
+      <div class="sec-card fu d2">
+        <div class="sec-ico">🔑</div>
+        <div class="sec-title">BYOK Architecture</div>
+        <div class="sec-desc">AI features use your own Claude API key. No shared credentials, no data pooling, no model training on your audit data. Your key, your isolation, your control.</div>
+        <div class="sec-mono">✦ Bring Your Own Key</div>
+      </div>
+      <div class="sec-card fu d3">
+        <div class="sec-ico">⚖️</div>
+        <div class="sec-title">Framework Compliance</div>
+        <div class="sec-desc">Built to COSO 2013, COBIT 2019, IIA Standards 2024, and PCAOB AS 2201. Control mappings verified against Big 4 ITGC methodologies.</div>
+        <div class="sec-mono">✦ Standards Verified</div>
+      </div>
+    </div>
+
+    <div class="compliance-bar fu d2">
+      <div class="cb-label">Compliant with</div>
+      <div class="cb-badges">
+        <div class="cb-b">⚖️ SOX 404</div>
+        <div class="cb-b">📋 PCAOB AS 2201</div>
+        <div class="cb-b">🏛 COSO 2013</div>
+        <div class="cb-b">⚙️ COBIT 2019</div>
+        <div class="cb-b">📐 IIA Standards</div>
+        <div class="cb-b">🏥 HIPAA</div>
+        <div class="cb-b">🔐 NIST CSF</div>
+        <div class="cb-b">🌍 ISO 27001</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     7. CTA
+══════════════════════════════════════ -->
+<section class="cta-section" id="cta">
+  <div class="wrap">
+    <div class="cta-box fu">
+      <div class="cta-layout">
+        <div class="cta-l">
+          <div class="cta-l-eye">Enterprise Access Program</div>
+          <div class="cta-l-title">Request Enterprise Access</div>
+          <div class="cta-l-sub">We custom-build integrations, workpaper templates, and control frameworks specific to your ERP, your audit methodology, and your compliance requirements.</div>
+          <div class="cta-feats">
+            <div class="cta-feat"><div class="cta-check">✓</div>Custom workpaper templates in your exact format</div>
+            <div class="cta-feat"><div class="cta-check">✓</div>ERP connectors — SAP, Oracle, Workday, NetSuite</div>
+            <div class="cta-feat"><div class="cta-check">✓</div>RACM mapping to your existing control framework</div>
+            <div class="cta-feat"><div class="cta-check">✓</div>Private cloud or on-premise deployment option</div>
+            <div class="cta-feat"><div class="cta-check">✓</div>Full team onboarding and training included</div>
+            <div class="cta-feat"><div class="cta-check">✓</div>Dedicated support and configuration assistance</div>
+          </div>
+        </div>
+        <div class="cta-r">
+          <div id="ctaForm">
+            <div class="fg-row">
+              <div class="fg-group">
+                <label class="fg-label">Full Name *</label>
+                <input class="fg-input" id="fn" type="text" placeholder="Jane Smith" />
+              </div>
+              <div class="fg-group">
+                <label class="fg-label">Work Email *</label>
+                <input class="fg-input" id="fe" type="email" placeholder="jane@company.com" />
+              </div>
+            </div>
+            <div class="fg-row">
+              <div class="fg-group">
+                <label class="fg-label">Organization *</label>
+                <input class="fg-input" id="fo" type="text" placeholder="Acme Corporation" />
+              </div>
+              <div class="fg-group">
+                <label class="fg-label">Your Role</label>
+                <select class="fg-select" id="fr">
+                  <option value="">Select role</option>
+                  <option>Chief Audit Executive (CAE)</option>
+                  <option>VP / Director of Internal Audit</option>
+                  <option>IT Audit Lead</option>
+                  <option>CFO / Controller</option>
+                  <option>Compliance / Risk Officer</option>
+                  <option>Other</option>
+                </select>
+              </div>
+            </div>
+            <div class="fg-group">
+              <label class="fg-label">Key use cases or customization needs</label>
+              <textarea class="fg-textarea" id="fm" placeholder="e.g. SAP integration, Big 4 workpaper templates, ICFR framework calibration, healthcare compliance overlay..."></textarea>
+            </div>
+            <button class="fg-submit" onclick="submitForm()">Request Enterprise Access →</button>
+            <div class="fg-note">🔒 Confidential · We respond within 1 business day</div>
+          </div>
+          <div class="cta-success" id="ctaSuccess">
+            <div class="cs-ico">✅</div>
+            <div class="cs-title">Request Received</div>
+            <div class="cs-sub">We'll be in touch within <strong style="color:var(--blue)">1 business day</strong>. The platform is live — explore it now while you wait.</div>
+            <a href="app.html" class="btn btn-blue" style="margin-top:20px;">Open AuditAI Suite →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     FOOTER
+══════════════════════════════════════ -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand-logo">
+          <div class="nav-logomark">AI</div>
+          <span style="font-family:var(--fd);font-size:15px;font-weight:700;color:var(--tx1);">AuditAI Suite</span>
+        </div>
+        <div class="footer-desc">The AI-native internal audit platform for enterprise compliance teams. Continuous SOX 404, AI governance, and automated workpapers.</div>
+        <div class="footer-certs">
+          <div class="footer-cert">🔒 Zero Exfiltration</div>
+          <div class="footer-cert">⚖️ SOX 404</div>
+          <div class="footer-cert">🏥 HIPAA</div>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-h">Platform</div>
+        <ul class="footer-links">
+          <li><a href="app.html">Open Suite</a></li>
+          <li><a href="#platform">SOX 404 Engine</a></li>
+          <li><a href="#platform">Audit of AI</a></li>
+          <li><a href="#platform">Copilot Room</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-h">Company</div>
+        <ul class="footer-links">
+          <li><a href="#breakthrough">How It Works</a></li>
+          <li><a href="#security">Security</a></li>
+          <li><a href="#proof">Proof</a></li>
+          <li><a href="#cta">Enterprise</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-h">Contact</div>
+        <ul class="footer-links">
+          <li><a href="#cta">Request Access</a></li>
+          <li><a href="mailto:djha786543@gmail.com">djha786543@gmail.com</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2026 AuditAI Suite · All rights reserved</div>
+      <div class="footer-btm">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="mailto:djha786543@gmail.com">Contact</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Scroll reveal
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
+}, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+document.querySelectorAll('.fu').forEach(el => io.observe(el));
+
+// Sticky nav
+window.addEventListener('scroll', () => {
+  document.getElementById('topnav').style.background =
+    scrollY > 30 ? 'rgba(7,10,16,0.96)' : 'rgba(7,10,16,0.80)';
+}, { passive: true });
+
+// Proof tabs
+function switchProof(id, btn) {
+  document.querySelectorAll('.ptab').forEach(t => t.classList.remove('on'));
+  document.querySelectorAll('.ppanel').forEach(p => p.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('pp-' + id).classList.add('on');
+}
+
+// Go to section
+function goTo(id) {
+  document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+}
+
+// Smooth nav links
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const t = document.querySelector(a.getAttribute('href'));
+    if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth' }); }
+  });
+});
+
+// Form
+function submitForm() {
+  var n = document.getElementById('fn').value.trim();
+  var e = document.getElementById('fe').value.trim();
+  var o = document.getElementById('fo').value.trim();
+  var r = document.getElementById('fr').value;
+  var m = document.getElementById('fm').value.trim();
+  if (!n || !e || !o) { alert('Please fill in name, email, and organization.'); return; }
+  if (!/^[^@]+@[^@]+\.[^@]+$/.test(e)) { alert('Please enter a valid email address.'); return; }
+  var btn = document.querySelector('.fg-submit');
+  btn.disabled = true; btn.textContent = 'Sending...';
+  var subj = encodeURIComponent('AuditAI Enterprise Access Request - ' + o);
+  var body = encodeURIComponent([
+    'ENTERPRISE ACCESS REQUEST','===========================','',
+    'Name:    ' + n,'Email:   ' + e,'Org:     ' + o,'Role:    ' + (r||'Not specified'),
+    '','Message:',m||'No message.','','---','Sent from AuditAI Landing Page','Time: '+new Date().toISOString()
+  ].join('\n'));
+  window.location.href = 'mailto:djha786543@gmail.com?subject='+subj+'&body='+body;
+  setTimeout(() => {
+    document.getElementById('ctaForm').style.display = 'none';
+    document.getElementById('ctaSuccess').style.display = 'flex';
+    btn.disabled = false; btn.textContent = 'Request Enterprise Access \u2192';
+  }, 900);
+}
+</script>
+</body>
+</html>
