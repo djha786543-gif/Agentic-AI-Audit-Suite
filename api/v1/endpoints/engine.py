@@ -124,6 +124,8 @@ async def analyze_file(
             source_system=source_system,
             audit_period=audit_period,
         )
+        if "validation" in parsed:
+            result["validation_summary"] = parsed["validation"]
     except Exception as e:
         logger.error("Engine error: %s", str(e))
         raise HTTPException(status_code=500, detail=f"Engine processing error: {str(e)}")

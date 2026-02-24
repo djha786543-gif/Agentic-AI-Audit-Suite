@@ -9408,289 +9408,631 @@
     .m2c[style*="padding:10px"] {
       background: #111722 !important;
     }
-  /* ── SAMPLE DATA ────────────────────────────────────────── */
-.sample-section {
-  margin-top: 24px; padding: 20px; background: var(--bg-card);
-  border-radius: var(--radius-lg); border: 1px solid var(--border);
-}
-.sample-section h4 {
-  font-size: 13px; color: var(--text-secondary); font-weight: 500;
-  margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.6px;
-}
-.sample-btns { display: flex; gap: 8px; flex-wrap: wrap; }
-.sample-btns button {
-  background: var(--bg-secondary); border: 1px solid var(--border);
-  color: var(--text-primary); padding: 8px 16px; border-radius: 6px;
-  font-size: 12px; font-family: var(--font-sans); cursor: pointer;
-  transition: all 0.15s; font-weight: 500;
-}
-.sample-btns button:hover {
-  border-color: var(--accent-green); color: var(--accent-green);
-}
 
-/* ── VALIDATION PREVIEW ─────────────────────────────────── */
-.validation-panel {
-  background: var(--bg-card); border-radius: var(--radius-lg);
-  border: 1px solid var(--border); overflow: hidden; margin-top: 24px;
-}
-.validation-header {
-  padding: 16px 20px; border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-}
-.validation-header h3 { font-size: 14px; font-weight: 600; }
+    /* ── SAMPLE DATA ────────────────────────────────────────── */
+    .sample-section {
+      margin-top: 24px;
+      padding: 20px;
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+    }
 
-.validation-stats {
-  display: flex; gap: 20px; padding: 16px 20px; border-bottom: 1px solid var(--border);
-  background: var(--bg-secondary);
-}
-.validation-stats .stat {
-  display: flex; flex-direction: column; gap: 2px;
-}
-.validation-stats .stat-label {
-  font-size: 10px; color: var(--text-muted); text-transform: uppercase;
-  letter-spacing: 0.6px; font-weight: 500;
-}
-.validation-stats .stat-value {
-  font-family: var(--font-mono); font-size: 15px; font-weight: 600;
-}
+    .sample-section h4 {
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
 
-.data-preview {
-  overflow-x: auto; max-height: 280px; overflow-y: auto;
-}
-.data-preview table {
-  width: 100%; border-collapse: collapse; font-size: 12px;
-}
-.data-preview th {
-  background: var(--bg-secondary); padding: 8px 12px;
-  text-align: left; font-weight: 600; color: var(--text-secondary);
-  font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px;
-  position: sticky; top: 0; border-bottom: 1px solid var(--border);
-}
-.data-preview td {
-  padding: 7px 12px; border-bottom: 1px solid rgba(30,39,56,0.5);
-  color: var(--text-primary); font-family: var(--font-mono); font-size: 11px;
-  white-space: nowrap; max-width: 200px; overflow: hidden; text-overflow: ellipsis;
-}
-.data-preview tr:hover td { background: var(--bg-card-hover); }
+    .sample-btns {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
 
-.validation-actions {
-  padding: 16px 20px; display: flex; gap: 10px; justify-content: flex-end;
-  border-top: 1px solid var(--border);
-}
+    .sample-btns button {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-family: var(--font-sans);
+      cursor: pointer;
+      transition: all 0.15s;
+      font-weight: 500;
+    }
 
-/* ── BUTTONS ────────────────────────────────────────────── */
-.btn {
-  padding: 9px 20px; border-radius: 6px; font-size: 13px;
-  font-family: var(--font-sans); font-weight: 600; cursor: pointer;
-  border: none; transition: all 0.15s; display: inline-flex;
-  align-items: center; gap: 6px;
-}
-.btn-primary {
-  background: var(--accent-green); color: #000;
-}
-.btn-primary:hover { background: #00c471; transform: translateY(-1px); }
-.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-.btn-secondary {
-  background: var(--bg-card); color: var(--text-primary);
-  border: 1px solid var(--border);
-}
-.btn-secondary:hover { border-color: var(--text-secondary); }
-.btn-danger {
-  background: var(--risk-critical-dim); color: var(--risk-critical);
-  border: 1px solid rgba(239,68,68,0.2);
-}
+    .sample-btns button:hover {
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+    }
 
-/* ── RESULTS DASHBOARD ──────────────────────────────────── */
-.results-header {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 24px;
-}
-.results-header h2 { font-size: 20px; font-weight: 700; }
+    /* ── VALIDATION PREVIEW ─────────────────────────────────── */
+    .validation-panel {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      margin-top: 24px;
+    }
 
-.risk-score-card {
-  display: flex; align-items: center; gap: 20px;
-  padding: 20px 28px; background: var(--bg-card);
-  border-radius: var(--radius-lg); border: 1px solid var(--border);
-  margin-bottom: 20px;
-}
+    .validation-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
 
-.risk-gauge {
-  width: 80px; height: 80px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  flex-direction: column; position: relative;
-}
-.risk-gauge::before {
-  content: ''; position: absolute; inset: 0; border-radius: 50%;
-  border: 4px solid var(--border);
-}
-.risk-gauge .score {
-  font-family: var(--font-mono); font-size: 26px; font-weight: 700;
-  line-height: 1;
-}
-.risk-gauge .label {
-  font-size: 9px; text-transform: uppercase; letter-spacing: 0.6px;
-  color: var(--text-secondary); margin-top: 2px;
-}
+    .validation-header h3 {
+      font-size: 14px;
+      font-weight: 600;
+    }
 
-.risk-gauge.critical { color: var(--risk-critical); }
-.risk-gauge.critical::before { border-color: var(--risk-critical); }
-.risk-gauge.high { color: var(--risk-high); }
-.risk-gauge.high::before { border-color: var(--risk-high); }
-.risk-gauge.medium { color: var(--risk-medium); }
-.risk-gauge.medium::before { border-color: var(--risk-medium); }
-.risk-gauge.low { color: var(--risk-low); }
-.risk-gauge.low::before { border-color: var(--risk-low); }
+    .validation-stats {
+      display: flex;
+      gap: 20px;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-secondary);
+    }
 
-.kpi-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 12px; flex: 1;
-}
-.kpi-card {
-  padding: 14px 16px; background: var(--bg-secondary);
-  border-radius: var(--radius); border: 1px solid var(--border);
-}
-.kpi-card .kpi-value {
-  font-family: var(--font-mono); font-size: 22px; font-weight: 700;
-}
-.kpi-card .kpi-label {
-  font-size: 11px; color: var(--text-secondary); margin-top: 2px;
-}
+    .validation-stats .stat {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
 
-.severity-bar {
-  display: flex; gap: 10px; margin-bottom: 20px;
-}
-.severity-pill {
-  display: flex; align-items: center; gap: 6px;
-  padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
-  cursor: pointer; transition: all 0.15s;
-}
-.severity-pill.active { outline: 2px solid; outline-offset: 1px; }
-.severity-pill[data-risk="CRITICAL"] { background: var(--risk-critical-dim); color: var(--risk-critical); }
-.severity-pill[data-risk="HIGH"] { background: var(--risk-high-dim); color: var(--risk-high); }
-.severity-pill[data-risk="MEDIUM"] { background: var(--risk-medium-dim); color: var(--risk-medium); }
-.severity-pill[data-risk="LOW"] { background: var(--risk-low-dim); color: var(--risk-low); }
-.severity-pill[data-risk="ALL"] { background: var(--accent-blue-dim); color: var(--accent-blue); }
+    .validation-stats .stat-label {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      font-weight: 500;
+    }
 
-/* ── FINDINGS TABLE ─────────────────────────────────────── */
-.findings-panel {
-  background: var(--bg-card); border-radius: var(--radius-lg);
-  border: 1px solid var(--border); overflow: hidden;
-}
-.findings-panel .panel-header {
-  padding: 14px 20px; border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-}
-.findings-panel .panel-header h3 { font-size: 14px; font-weight: 600; }
+    .validation-stats .stat-value {
+      font-family: var(--font-mono);
+      font-size: 15px;
+      font-weight: 600;
+    }
 
-.findings-table {
-  width: 100%; border-collapse: collapse; font-size: 12px;
-}
-.findings-table th {
-  background: var(--bg-secondary); padding: 9px 14px;
-  text-align: left; font-weight: 600; color: var(--text-secondary);
-  font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
-  border-bottom: 1px solid var(--border); position: sticky; top: 0;
-}
-.findings-table td {
-  padding: 10px 14px; border-bottom: 1px solid rgba(30,39,56,0.4);
-  vertical-align: top;
-}
-.findings-table tr:hover td { background: var(--bg-card-hover); }
-.findings-table .td-desc { max-width: 420px; line-height: 1.5; }
-.findings-table .td-rec {
-  font-size: 11px; color: var(--text-secondary); max-width: 300px; line-height: 1.5;
-}
+    .data-preview {
+      overflow-x: auto;
+      max-height: 280px;
+      overflow-y: auto;
+    }
 
-.risk-tag {
-  display: inline-block; padding: 2px 8px; border-radius: 4px;
-  font-size: 10px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-.risk-tag.CRITICAL { background: var(--risk-critical-dim); color: var(--risk-critical); }
-.risk-tag.HIGH { background: var(--risk-high-dim); color: var(--risk-high); }
-.risk-tag.MEDIUM { background: var(--risk-medium-dim); color: var(--risk-medium); }
-.risk-tag.LOW { background: var(--risk-low-dim); color: var(--risk-low); }
+    .data-preview table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
 
-.findings-scroll { max-height: 520px; overflow-y: auto; }
+    .data-preview th {
+      background: var(--bg-secondary);
+      padding: 8px 12px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      position: sticky;
+      top: 0;
+      border-bottom: 1px solid var(--border);
+    }
 
-.no-findings {
-  padding: 48px; text-align: center; color: var(--text-muted);
-}
-.no-findings .big { font-size: 40px; margin-bottom: 12px; }
+    .data-preview td {
+      padding: 7px 12px;
+      border-bottom: 1px solid rgba(30, 39, 56, 0.5);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      white-space: nowrap;
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-/* ── DOMAIN TABS ────────────────────────────────────────── */
-.domain-tabs {
-  display: flex; gap: 4px; margin-bottom: 16px; flex-wrap: wrap;
-}
-.domain-tab {
-  background: var(--bg-card); border: 1px solid var(--border);
-  color: var(--text-secondary); padding: 7px 14px; border-radius: 6px;
-  font-size: 12px; font-family: var(--font-sans); cursor: pointer;
-  transition: all 0.15s; font-weight: 500;
-}
-.domain-tab:hover { border-color: var(--text-secondary); color: var(--text-primary); }
-.domain-tab.active {
-  background: var(--accent-green-dim); border-color: var(--accent-green);
-  color: var(--accent-green);
-}
+    .data-preview tr:hover td {
+      background: var(--bg-card-hover);
+    }
 
-/* ── PROCESSING OVERLAY ─────────────────────────────────── */
-.processing {
-  position: fixed; inset: 0; background: rgba(6,8,12,0.85);
-  display: flex; flex-direction: column; align-items: center;
-  justify-content: center; z-index: 200; backdrop-filter: blur(8px);
-}
-.processing.hidden { display: none; }
-.processing .spinner {
-  width: 48px; height: 48px; border: 3px solid var(--border);
-  border-top-color: var(--accent-green); border-radius: 50%;
-  animation: spin 0.7s linear infinite; margin-bottom: 20px;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-.processing .status {
-  font-size: 15px; font-weight: 600; margin-bottom: 6px;
-}
-.processing .sub {
-  font-size: 12px; color: var(--text-secondary);
-}
+    .validation-actions {
+      padding: 16px 20px;
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      border-top: 1px solid var(--border);
+    }
 
-/* ── ENGINE LOG ─────────────────────────────────────────── */
-.engine-log {
-  margin-top: 20px; background: var(--bg-card);
-  border-radius: var(--radius-lg); border: 1px solid var(--border);
-  overflow: hidden;
-}
-.engine-log .log-header {
-  padding: 12px 16px; font-size: 12px; font-weight: 600;
-  border-bottom: 1px solid var(--border); display: flex;
-  align-items: center; gap: 8px;
-}
-.engine-log .log-body {
-  padding: 12px 16px; max-height: 200px; overflow-y: auto;
-  font-family: var(--font-mono); font-size: 11px;
-  line-height: 1.7; color: var(--text-secondary);
-}
-.engine-log .log-line.info { color: var(--accent-green); }
-.engine-log .log-line.warn { color: var(--risk-high); }
-.engine-log .log-line.error { color: var(--risk-critical); }
+    /* ── BUTTONS ────────────────────────────────────────────── */
+    .btn {
+      padding: 9px 20px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: var(--font-sans);
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
 
-/* ── EXPORT SECTION ─────────────────────────────────────── */
-.export-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 12px; margin-top: 16px;
-}
-.export-card {
-  padding: 18px; background: var(--bg-card); border-radius: var(--radius);
-  border: 1px solid var(--border); cursor: pointer; transition: all 0.15s;
-}
-.export-card:hover {
-  border-color: var(--accent-green); transform: translateY(-2px);
-}
-.export-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
-.export-card p { font-size: 11px; color: var(--text-secondary); }
+    .btn-primary {
+      background: var(--accent-green);
+      color: #000;
+    }
 
+    .btn-primary:hover {
+      background: #00c471;
+      transform: translateY(-1px);
+    }
 
+    .btn-primary:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--text-secondary);
+    }
+
+    .btn-danger {
+      background: var(--risk-critical-dim);
+      color: var(--risk-critical);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    /* ── RESULTS DASHBOARD ──────────────────────────────────── */
+    .results-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .results-header h2 {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .risk-score-card {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 20px 28px;
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+
+    .risk-gauge {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .risk-gauge::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 4px solid var(--border);
+    }
+
+    .risk-gauge .score {
+      font-family: var(--font-mono);
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .risk-gauge .label {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .risk-gauge.critical {
+      color: var(--risk-critical);
+    }
+
+    .risk-gauge.critical::before {
+      border-color: var(--risk-critical);
+    }
+
+    .risk-gauge.high {
+      color: var(--risk-high);
+    }
+
+    .risk-gauge.high::before {
+      border-color: var(--risk-high);
+    }
+
+    .risk-gauge.medium {
+      color: var(--risk-medium);
+    }
+
+    .risk-gauge.medium::before {
+      border-color: var(--risk-medium);
+    }
+
+    .risk-gauge.low {
+      color: var(--risk-low);
+    }
+
+    .risk-gauge.low::before {
+      border-color: var(--risk-low);
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      flex: 1;
+    }
+
+    .kpi-card {
+      padding: 14px 16px;
+      background: var(--bg-secondary);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+    }
+
+    .kpi-card .kpi-value {
+      font-family: var(--font-mono);
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .kpi-card .kpi-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .severity-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .severity-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .severity-pill.active {
+      outline: 2px solid;
+      outline-offset: 1px;
+    }
+
+    .severity-pill[data-risk="CRITICAL"] {
+      background: var(--risk-critical-dim);
+      color: var(--risk-critical);
+    }
+
+    .severity-pill[data-risk="HIGH"] {
+      background: var(--risk-high-dim);
+      color: var(--risk-high);
+    }
+
+    .severity-pill[data-risk="MEDIUM"] {
+      background: var(--risk-medium-dim);
+      color: var(--risk-medium);
+    }
+
+    .severity-pill[data-risk="LOW"] {
+      background: var(--risk-low-dim);
+      color: var(--risk-low);
+    }
+
+    .severity-pill[data-risk="ALL"] {
+      background: var(--accent-blue-dim);
+      color: var(--accent-blue);
+    }
+
+    /* ── FINDINGS TABLE ─────────────────────────────────────── */
+    .findings-panel {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .findings-panel .panel-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .findings-panel .panel-header h3 {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .findings-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .findings-table th {
+      background: var(--bg-secondary);
+      padding: 9px 14px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+    }
+
+    .findings-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(30, 39, 56, 0.4);
+      vertical-align: top;
+    }
+
+    .findings-table tr:hover td {
+      background: var(--bg-card-hover);
+    }
+
+    .findings-table .td-desc {
+      max-width: 420px;
+      line-height: 1.5;
+    }
+
+    .findings-table .td-rec {
+      font-size: 11px;
+      color: var(--text-secondary);
+      max-width: 300px;
+      line-height: 1.5;
+    }
+
+    .risk-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .risk-tag.CRITICAL {
+      background: var(--risk-critical-dim);
+      color: var(--risk-critical);
+    }
+
+    .risk-tag.HIGH {
+      background: var(--risk-high-dim);
+      color: var(--risk-high);
+    }
+
+    .risk-tag.MEDIUM {
+      background: var(--risk-medium-dim);
+      color: var(--risk-medium);
+    }
+
+    .risk-tag.LOW {
+      background: var(--risk-low-dim);
+      color: var(--risk-low);
+    }
+
+    .findings-scroll {
+      max-height: 520px;
+      overflow-y: auto;
+    }
+
+    .no-findings {
+      padding: 48px;
+      text-align: center;
+      color: var(--text-muted);
+    }
+
+    .no-findings .big {
+      font-size: 40px;
+      margin-bottom: 12px;
+    }
+
+    /* ── DOMAIN TABS ────────────────────────────────────────── */
+    .domain-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .domain-tab {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-family: var(--font-sans);
+      cursor: pointer;
+      transition: all 0.15s;
+      font-weight: 500;
+    }
+
+    .domain-tab:hover {
+      border-color: var(--text-secondary);
+      color: var(--text-primary);
+    }
+
+    .domain-tab.active {
+      background: var(--accent-green-dim);
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+    }
+
+    /* ── PROCESSING OVERLAY ─────────────────────────────────── */
+    .processing {
+      position: fixed;
+      inset: 0;
+      background: rgba(6, 8, 12, 0.85);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      backdrop-filter: blur(8px);
+    }
+
+    .processing.hidden {
+      display: none;
+    }
+
+    .processing .spinner {
+      width: 48px;
+      height: 48px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent-green);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .processing .status {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .processing .sub {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    /* ── ENGINE LOG ─────────────────────────────────────────── */
+    .engine-log {
+      margin-top: 20px;
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .engine-log .log-header {
+      padding: 12px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .engine-log .log-body {
+      padding: 12px 16px;
+      max-height: 200px;
+      overflow-y: auto;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      line-height: 1.7;
+      color: var(--text-secondary);
+    }
+
+    .engine-log .log-line.info {
+      color: var(--accent-green);
+    }
+
+    .engine-log .log-line.warn {
+      color: var(--risk-high);
+    }
+
+    .engine-log .log-line.error {
+      color: var(--risk-critical);
+    }
+
+    /* ── EXPORT SECTION ─────────────────────────────────────── */
+    .export-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .export-card {
+      padding: 18px;
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .export-card:hover {
+      border-color: var(--accent-green);
+      transform: translateY(-2px);
+    }
+
+    .export-card h4 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .export-card p {
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
   </style>
+<style>
+  .cc-pill-corr {
+    box-shadow: 0 0 12px #e53e3e, inset 0 0 8px #e53e3e;
+    border-color: #ef4444 !important;
+    animation: criticalPulse 2s infinite;
+  }
+  @keyframes criticalPulse {
+    0% { filter: brightness(1); }
+    50% { filter: brightness(1.3); transform: scale(1.02); }
+    100% { filter: brightness(1); }
+  }
+</style>
 </head>
 
 <body>
@@ -9842,10 +10184,12 @@
       <div style="display:flex;gap:.75rem;align-items:center;flex-grow:1;justify-content:center;">
         <span class="topbar-badge">Universal ERP Engine v2.0</span>
         <span class="topbar-badge" id="modeBanner"
-          style="color:#2ecc71;background:rgba(46,204,113,.1);border-color:rgba(46,204,113,.25);font-weight:bold;">&#x1f512; LIVE &mdash; Connected to Local Engine</span>
-        
+          style="color:#2ecc71;background:rgba(46,204,113,.1);border-color:rgba(46,204,113,.25);font-weight:bold;">&#x1f512;
+          LIVE &mdash; Connected to Local Engine</span>
+
         <!-- Mode Toggle -->
-        <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;background:rgba(255,255,255,0.05);padding:0.25rem 0.75rem;border-radius:20px;font-size:0.8rem;">
+        <label
+          style="display:flex;align-items:center;gap:.5rem;cursor:pointer;background:rgba(255,255,255,0.05);padding:0.25rem 0.75rem;border-radius:20px;font-size:0.8rem;">
           <input type="checkbox" id="modeToggle" checked onchange="toggleMode(this)">
           <span id="modeToggleText" style="color:var(--text);font-weight:600;">LIVE MODE</span>
         </label>
@@ -9957,7 +10301,8 @@
               <strong>completely clean slate</strong> on every load. All findings, KPI numbers, and AI narratives are
               generated exclusively from the data <strong>you upload</strong> in Step 2. There is no simulated or
               placeholder data. Upload your actual ERP export and the agent will analyse it from scratch — see the
-              <strong>Help Guide</strong> for sample CSV layouts per agent.</div>
+              <strong>Help Guide</strong> for sample CSV layouts per agent.
+            </div>
           </div>
         </div>
 
@@ -10117,18 +10462,18 @@
             <!-- SINGLE FILE ZONE -->
             <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
               <div class="uz-icon">&#x1f4c1;</div>
-<div class="sample-section">
-      <h4>Or try with sample data</h4>
-      <div class="sample-btns">
-        <button onclick="loadSample('users')">👤 User Access List</button>
-        <button onclick="loadSample('changes')">🔄 Change Tickets</button>
-        <button onclick="loadSample('transactions')">💰 AP Invoices</button>
-        <button onclick="loadSample('backup')">💾 Backup Jobs</button>
-        <button onclick="loadSample('incident')">🚨 Incidents</button>
-        <button onclick="loadSample('interfaces')">🔗 Interfaces</button>
-        <button onclick="loadSample('all')">🔥 Full Audit (All Types)</button>
-      </div>
-    </div>
+              <div class="sample-section">
+                <h4>Or try with sample data</h4>
+                <div class="sample-btns">
+                  <button onclick="loadSample('users')">👤 User Access List</button>
+                  <button onclick="loadSample('changes')">🔄 Change Tickets</button>
+                  <button onclick="loadSample('transactions')">💰 AP Invoices</button>
+                  <button onclick="loadSample('backup')">💾 Backup Jobs</button>
+                  <button onclick="loadSample('incident')">🚨 Incidents</button>
+                  <button onclick="loadSample('interfaces')">🔗 Interfaces</button>
+                  <button onclick="loadSample('all')">🔥 Full Audit (All Types)</button>
+                </div>
+              </div>
               <h3>Drag &amp; drop your file here</h3>
               <p>or click to browse &mdash; file stays in your browser, never uploaded to any server</p>
               <div class="formats">
@@ -10227,7 +10572,8 @@
               <h3>Drag & drop an image here</h3>
               <p>Screenshots, screen captures, scanned documents — AI extracts tabular data automatically</p>
               <div class="formats">
-                <span>.PNG</span><span>.JPG</span><span>.JPEG</span><span>.WEBP</span><span>.GIF</span></div>
+                <span>.PNG</span><span>.JPG</span><span>.JPEG</span><span>.WEBP</span><span>.GIF</span>
+              </div>
               <input type="file" id="imgFileInput" accept=".png,.jpg,.jpeg,.webp,.gif,image/*">
             </div>
             <div id="imgPreviewWrap" style="display:none;margin:.75rem 0"><img id="imgPreview"
@@ -10474,7 +10820,8 @@
           </div>
           <div
             style="margin-top:2rem;display:flex;align-items:center;justify-content:center;gap:.5rem;font-size:.7rem;color:var(--text-muted)">
-            <span>&#x1f512;</span> All processing runs locally in your browser &mdash; zero data exfiltration</div>
+            <span>&#x1f512;</span> All processing runs locally in your browser &mdash; zero data exfiltration
+          </div>
         </div>
       </div>
 
@@ -10502,6 +10849,17 @@
               <button class="cc-btn cc-btn-outline" onclick="openHelp()"
                 style="border-color:rgba(232,196,104,.4);color:#e8c468">? Help</button>
             </div>
+          </div>
+
+          <!-- DATA VALIDATION PIPELINE RESULTS -->
+          <div id="validationSummaryBox" style="display:none; margin: 0 24px 20px; padding: 18px 24px; background: rgba(46, 204, 113, 0.05); border: 1px dashed rgba(46, 204, 113, 0.25); border-radius: 12px; font-size: 0.85rem; color: #a0aec0; box-shadow: 0 4px 20px rgba(46,204,113,0.05);">
+             <div style="display:flex; align-items:center; gap: 10px; margin-bottom: 6px;">
+                 <span style="font-size: 20px;">&#x1f6e1;&#xfe0f;</span>
+                 <h4 style="color: #2ecc71; margin: 0; font-family: var(--font-mono); font-size: 0.9rem; text-transform: uppercase;">Data Pipeline Integrity Verified</h4>
+                 <span style="background: rgba(46,204,113,0.1); padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; color: #2ecc71; border: 1px solid rgba(46,204,113,0.2); margin-left: 10px;">Deterministic Validation</span>
+             </div>
+             <div id="validationSummaryDetails" style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 14px;">
+             </div>
           </div>
 
           <!-- ══ 5 KPI CARDS ══ -->
@@ -10548,7 +10906,8 @@
               <div class="cc-nav-group">
                 <div class="cc-nav-head">ITGC</div>
                 <div class="cc-nav-item cc-nav-item-active" data-filter="SOD" onclick="filterByArea(this,'SOD')">
-                  <span>🛡️</span> SOD Conflicts</div>
+                  <span>🛡️</span> SOD Conflicts
+                </div>
                 <div class="cc-nav-item" data-filter="LA" onclick="filterByArea(this,'LA')"><span>🔑</span> Logical
                   Access</div>
                 <div class="cc-nav-item" data-filter="CM" onclick="filterByArea(this,'CM')"><span>🔄</span> Change
@@ -12881,17 +13240,114 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         document.getElementById('procAgent').textContent = 'Running ' + ag.name + '...';
         var steps = ['ps1', 'ps2', 'ps3', 'ps4', 'ps5'];
         var i = 0;
+
+        var isLive = document.getElementById('modeToggle') ? document.getElementById('modeToggle').checked : false;
+
         function next() {
           if (i > 0) document.getElementById(steps[i - 1]).className = 'proc-step done';
-          if (i < steps.length) { document.getElementById(steps[i]).className = 'proc-step active'; i++; setTimeout(next, 600 + Math.random() * 400); }
+
+          if (i < steps.length) {
+            document.getElementById(steps[i]).className = 'proc-step active';
+            i++;
+            setTimeout(next, 600 + Math.random() * 400);
+          }
           else {
-            // ag.rules may be undefined in new engine — pass empty array as fallback
-            STATE.violations = ag.detect(STATE.data, STATE.mapping, ag.rules || []);
-            STATE.riskSummary = { Critical: 0, High: 0, Medium: 0, Low: 0 };
-            STATE.violations.forEach(function (v) { if (STATE.riskSummary[v.severity] !== undefined) STATE.riskSummary[v.severity]++ });
-            setTimeout(function () { goStep(4); renderResults(); showCopilotFab(); }, 500);
+            if (isLive && STATE.file && window.location.hostname === 'localhost') {
+              // LIVE MODE: Send to FastAPI Backend
+              document.getElementById('procTitle').textContent = 'Waiting for Engine API...';
+              var formData = new FormData();
+              formData.append("file", STATE.file);
+              formData.append("source_system", "Local Upload");
+
+              fetch("http://localhost:8000/api/v1/engine/analyze", {
+                method: "POST",
+                body: formData
+              })
+                .then(r => r.json())
+                .then(res => {
+                  if (res.detail && !res.all_findings) {
+                    alert("Engine API Error: " + JSON.stringify(res.detail));
+                    goStep(2);
+                    return;
+                  }
+                  var findings = res.all_findings || [];
+                  STATE.validationSummary = res.validation_summary || null;
+
+                  STATE.violations = findings.map(function (item) {
+                    return {
+                      id: item.control_id,
+                      entity: item.user_id || item.ticket_id || item.record_id || item.invoice_id || 'System',
+                      rule: item.finding_type || item.conflict_type || "Finding",
+                      severity: item.risk_level === 'CRITICAL' ? 'Critical' : item.risk_level === 'HIGH' ? 'High' : item.risk_level === 'MEDIUM' ? 'Medium' : 'Low',
+                      scenario: item.description,
+                      field1: 'Domain: ' + (item.domain || "Audit"),
+                      field2: 'Recommendation: ' + item.recommendation,
+                      risk: item.recommendation,
+                      chain: ERP.chain(item.description, 'Detected by Engine', item.recommendation, item.finding_type || 'Rule', 'SOX Control Exception', 'Requires management remediation.')
+                    };
+                  });
+
+                  STATE.riskSummary = { Critical: 0, High: 0, Medium: 0, Low: 0 };
+                  STATE.violations.forEach(function (v) { if (STATE.riskSummary[v.severity] !== undefined) STATE.riskSummary[v.severity]++ });
+                  setTimeout(function () { goStep(4); renderResults(); showCopilotFab(); }, 500);
+                })
+                .catch(e => {
+                  console.error("API Error", e);
+                  alert("Failed to connect to FastAPI engine. Ensure uvicorn main:app is running on port 8000\nFalling back to DEMO logic.");
+                  runFallbackDemo();
+                });
+            } else {
+              // DEMO MODE (or not localhost): Run client-side js
+              runFallbackDemo();
+            }
           }
         }
+
+        function runFallbackDemo() {
+          // ---> INTEGATED PROTOTYPE LOGIC INTERCEPT <---
+          if (typeof detectSoD !== 'undefined') {
+            var f = [];
+            if (STATE.agent === 'sod') {
+              var ur = extractUserRoles(STATE.data);
+              f = detectSoD(ur);
+            } else if (STATE.agent === 'access') {
+              f = testAccessControls(STATE.data);
+            } else if (STATE.agent === 'change') {
+              f = testChangeManagement(STATE.data);
+            } else if (STATE.agent === 'txn' || STATE.agent === 'iface') {
+              f = testITAC(STATE.data, STATE.data);
+            } else if (STATE.agent === 'itops') {
+              f = testOperations(STATE.data, 'backup').concat(testOperations(STATE.data, 'incident'));
+            }
+
+            if (f && f.length > 0) {
+              STATE.violations = f.map(function (item) {
+                var sevStr = item.risk_level === 'CRITICAL' ? 'Critical' : item.risk_level === 'HIGH' ? 'High' : item.risk_level === 'MEDIUM' ? 'Medium' : 'Low';
+                return {
+                  id: item.control_id,
+                  entity: item.user_id || item.ticket_id || item.record_id || 'System',
+                  rule: item.finding_type || item.conflict_type,
+                  severity: sevStr,
+                  scenario: item.description,
+                  field1: 'Domain: ' + item.domain,
+                  field2: 'Recommendation: ' + item.recommendation,
+                  risk: item.recommendation,
+                  chain: ERP.chain(item.description, 'Detected by ' + item.domain + ' engine', item.recommendation, item.finding_type, 'SOX Control Exception', 'Requires management remediation.')
+                };
+              });
+            } else {
+              STATE.violations = ag.detect(STATE.data, STATE.mapping, ag.rules || []);
+            }
+          } else {
+            STATE.violations = ag.detect(STATE.data, STATE.mapping, ag.rules || []);
+          }
+          // ---> END INTEGATED PROTOTYPE LOGIC INTERCEPT <---
+
+          STATE.riskSummary = { Critical: 0, High: 0, Medium: 0, Low: 0 };
+          STATE.violations.forEach(function (v) { if (STATE.riskSummary[v.severity] !== undefined) STATE.riskSummary[v.severity]++ });
+          setTimeout(function () { goStep(4); renderResults(); showCopilotFab(); }, 500);
+        }
+
         next();
       }
 
@@ -13027,6 +13483,39 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         // ── LIVE FEED ──
         buildLiveFeed(vio);
 
+        // ── VALIDATION SUMMARY ──
+        var vCard = document.getElementById('validationSummaryBox');
+        if (STATE.validationSummary && vCard) {
+            var vDetails = document.getElementById('validationSummaryDetails');
+            var v = STATE.validationSummary;
+            vCard.style.display = 'block';
+            var passRate = v.completeness ? Math.round((v.completeness.passed_records / v.completeness.total_records) * 100) : 100;
+            var hashId = v.hash ? v.hash.slice(0, 16) + '...' : 'N/A';
+            var dupCount = v.duplicates ? v.duplicates.count : 0;
+            
+            vDetails.innerHTML = `
+               <div style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+                 <strong style="color:#edf0f7; display:block; margin-bottom:4px; font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase;">Cryptographic Seal</strong>
+                 <span style="color: #60a5fa; font-family: var(--font-mono);">${hashId}</span>
+               </div>
+               <div style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+                 <strong style="color:#edf0f7; display:block; margin-bottom:4px; font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase;">Completeness</strong>
+                 <span style="color: #2ecc71;">${passRate}% Data Viability</span>
+               </div>
+               <div style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+                 <strong style="color:#edf0f7; display:block; margin-bottom:4px; font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase;">Schema Constraints</strong>
+                 <span style="color: ${v.schema_valid ? '#2ecc71' : '#f59e0b'};">${v.schema_valid ? '&#x2705; 100% Validated' : '&#x26a0;&#xfe0f; Warnings Found'}</span>
+               </div>
+               <div style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+                 <strong style="color:#edf0f7; display:block; margin-bottom:4px; font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase;">Data Deduplication</strong>
+                 <span style="color: ${dupCount === 0 ? '#2ecc71' : '#f59e0b'};">${dupCount === 0 ? '&#x2705; 0 Exact Matches' : '&#x26a0;&#xfe0f; ' + dupCount + ' Duplicates'}</span>
+               </div>
+            `;
+        } else if (vCard) {
+            vCard.style.display = 'none';
+        }
+
+
         // ── DEFAULT NAV: activate "ALL" if agent not in a specific nav bucket ──
         // find which nav items match the current agent's prefix
         var prefix = vio.length > 0 ? vio[0].id.split('-')[0] : 'ALL';
@@ -13096,7 +13585,9 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         var html = '';
         vio.forEach(function (v, idx) {
           var dotClass = v.severity === 'Critical' ? 'cc-dot-c' : v.severity === 'High' ? 'cc-dot-h' : v.severity === 'Medium' ? 'cc-dot-m' : 'cc-dot-l';
+          var isCorroborated = (v.scenario || '').includes('Corroborated') || (v.scenario || '').includes('Material Impact');
           var pillClass = v.severity === 'Critical' ? 'cc-pill-c' : v.severity === 'High' ? 'cc-pill-h' : v.severity === 'Medium' ? 'cc-pill-m' : 'cc-pill-l';
+          if (isCorroborated) pillClass += ' cc-pill-corr';
           var areaPrefix = v.id ? v.id.split('-')[0] : '';
           html += '<tr class="cc-tr" id="ccrow' + idx + '" onclick="showNarrative(' + idx + ')">';
           html += '<td><span class="cc-dot ' + dotClass + '"></span></td>';
@@ -15229,7 +15720,8 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
               <h4>Drag & drop your audit policy document</h4>
               <p>The AI reads your policy and maps clauses to detection rules automatically</p>
               <div class="formats">
-                <span>.PDF</span><span>.TXT</span><span>.DOCX</span><span>.PNG</span><span>.JPG</span></div>
+                <span>.PDF</span><span>.TXT</span><span>.DOCX</span><span>.PNG</span><span>.JPG</span>
+              </div>
               <input type="file" id="policyFileInput" accept=".pdf,.txt,.docx,.doc,.png,.jpg,.jpeg">
             </div>
             <div
@@ -15755,288 +16247,618 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
     .m3p.active {
       display: block;
     }
-  /* ── SAMPLE DATA ────────────────────────────────────────── */
-.sample-section {
-  margin-top: 24px; padding: 20px; background: var(--bg-card);
-  border-radius: var(--radius-lg); border: 1px solid var(--border);
-}
-.sample-section h4 {
-  font-size: 13px; color: var(--text-secondary); font-weight: 500;
-  margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.6px;
-}
-.sample-btns { display: flex; gap: 8px; flex-wrap: wrap; }
-.sample-btns button {
-  background: var(--bg-secondary); border: 1px solid var(--border);
-  color: var(--text-primary); padding: 8px 16px; border-radius: 6px;
-  font-size: 12px; font-family: var(--font-sans); cursor: pointer;
-  transition: all 0.15s; font-weight: 500;
-}
-.sample-btns button:hover {
-  border-color: var(--accent-green); color: var(--accent-green);
-}
 
-/* ── VALIDATION PREVIEW ─────────────────────────────────── */
-.validation-panel {
-  background: var(--bg-card); border-radius: var(--radius-lg);
-  border: 1px solid var(--border); overflow: hidden; margin-top: 24px;
-}
-.validation-header {
-  padding: 16px 20px; border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-}
-.validation-header h3 { font-size: 14px; font-weight: 600; }
+    /* ── SAMPLE DATA ────────────────────────────────────────── */
+    .sample-section {
+      margin-top: 24px;
+      padding: 20px;
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+    }
 
-.validation-stats {
-  display: flex; gap: 20px; padding: 16px 20px; border-bottom: 1px solid var(--border);
-  background: var(--bg-secondary);
-}
-.validation-stats .stat {
-  display: flex; flex-direction: column; gap: 2px;
-}
-.validation-stats .stat-label {
-  font-size: 10px; color: var(--text-muted); text-transform: uppercase;
-  letter-spacing: 0.6px; font-weight: 500;
-}
-.validation-stats .stat-value {
-  font-family: var(--font-mono); font-size: 15px; font-weight: 600;
-}
+    .sample-section h4 {
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
 
-.data-preview {
-  overflow-x: auto; max-height: 280px; overflow-y: auto;
-}
-.data-preview table {
-  width: 100%; border-collapse: collapse; font-size: 12px;
-}
-.data-preview th {
-  background: var(--bg-secondary); padding: 8px 12px;
-  text-align: left; font-weight: 600; color: var(--text-secondary);
-  font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px;
-  position: sticky; top: 0; border-bottom: 1px solid var(--border);
-}
-.data-preview td {
-  padding: 7px 12px; border-bottom: 1px solid rgba(30,39,56,0.5);
-  color: var(--text-primary); font-family: var(--font-mono); font-size: 11px;
-  white-space: nowrap; max-width: 200px; overflow: hidden; text-overflow: ellipsis;
-}
-.data-preview tr:hover td { background: var(--bg-card-hover); }
+    .sample-btns {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
 
-.validation-actions {
-  padding: 16px 20px; display: flex; gap: 10px; justify-content: flex-end;
-  border-top: 1px solid var(--border);
-}
+    .sample-btns button {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-family: var(--font-sans);
+      cursor: pointer;
+      transition: all 0.15s;
+      font-weight: 500;
+    }
 
-/* ── BUTTONS ────────────────────────────────────────────── */
-.btn {
-  padding: 9px 20px; border-radius: 6px; font-size: 13px;
-  font-family: var(--font-sans); font-weight: 600; cursor: pointer;
-  border: none; transition: all 0.15s; display: inline-flex;
-  align-items: center; gap: 6px;
-}
-.btn-primary {
-  background: var(--accent-green); color: #000;
-}
-.btn-primary:hover { background: #00c471; transform: translateY(-1px); }
-.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-.btn-secondary {
-  background: var(--bg-card); color: var(--text-primary);
-  border: 1px solid var(--border);
-}
-.btn-secondary:hover { border-color: var(--text-secondary); }
-.btn-danger {
-  background: var(--risk-critical-dim); color: var(--risk-critical);
-  border: 1px solid rgba(239,68,68,0.2);
-}
+    .sample-btns button:hover {
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+    }
 
-/* ── RESULTS DASHBOARD ──────────────────────────────────── */
-.results-header {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 24px;
-}
-.results-header h2 { font-size: 20px; font-weight: 700; }
+    /* ── VALIDATION PREVIEW ─────────────────────────────────── */
+    .validation-panel {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      margin-top: 24px;
+    }
 
-.risk-score-card {
-  display: flex; align-items: center; gap: 20px;
-  padding: 20px 28px; background: var(--bg-card);
-  border-radius: var(--radius-lg); border: 1px solid var(--border);
-  margin-bottom: 20px;
-}
+    .validation-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
 
-.risk-gauge {
-  width: 80px; height: 80px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  flex-direction: column; position: relative;
-}
-.risk-gauge::before {
-  content: ''; position: absolute; inset: 0; border-radius: 50%;
-  border: 4px solid var(--border);
-}
-.risk-gauge .score {
-  font-family: var(--font-mono); font-size: 26px; font-weight: 700;
-  line-height: 1;
-}
-.risk-gauge .label {
-  font-size: 9px; text-transform: uppercase; letter-spacing: 0.6px;
-  color: var(--text-secondary); margin-top: 2px;
-}
+    .validation-header h3 {
+      font-size: 14px;
+      font-weight: 600;
+    }
 
-.risk-gauge.critical { color: var(--risk-critical); }
-.risk-gauge.critical::before { border-color: var(--risk-critical); }
-.risk-gauge.high { color: var(--risk-high); }
-.risk-gauge.high::before { border-color: var(--risk-high); }
-.risk-gauge.medium { color: var(--risk-medium); }
-.risk-gauge.medium::before { border-color: var(--risk-medium); }
-.risk-gauge.low { color: var(--risk-low); }
-.risk-gauge.low::before { border-color: var(--risk-low); }
+    .validation-stats {
+      display: flex;
+      gap: 20px;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-secondary);
+    }
 
-.kpi-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 12px; flex: 1;
-}
-.kpi-card {
-  padding: 14px 16px; background: var(--bg-secondary);
-  border-radius: var(--radius); border: 1px solid var(--border);
-}
-.kpi-card .kpi-value {
-  font-family: var(--font-mono); font-size: 22px; font-weight: 700;
-}
-.kpi-card .kpi-label {
-  font-size: 11px; color: var(--text-secondary); margin-top: 2px;
-}
+    .validation-stats .stat {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
 
-.severity-bar {
-  display: flex; gap: 10px; margin-bottom: 20px;
-}
-.severity-pill {
-  display: flex; align-items: center; gap: 6px;
-  padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
-  cursor: pointer; transition: all 0.15s;
-}
-.severity-pill.active { outline: 2px solid; outline-offset: 1px; }
-.severity-pill[data-risk="CRITICAL"] { background: var(--risk-critical-dim); color: var(--risk-critical); }
-.severity-pill[data-risk="HIGH"] { background: var(--risk-high-dim); color: var(--risk-high); }
-.severity-pill[data-risk="MEDIUM"] { background: var(--risk-medium-dim); color: var(--risk-medium); }
-.severity-pill[data-risk="LOW"] { background: var(--risk-low-dim); color: var(--risk-low); }
-.severity-pill[data-risk="ALL"] { background: var(--accent-blue-dim); color: var(--accent-blue); }
+    .validation-stats .stat-label {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      font-weight: 500;
+    }
 
-/* ── FINDINGS TABLE ─────────────────────────────────────── */
-.findings-panel {
-  background: var(--bg-card); border-radius: var(--radius-lg);
-  border: 1px solid var(--border); overflow: hidden;
-}
-.findings-panel .panel-header {
-  padding: 14px 20px; border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-}
-.findings-panel .panel-header h3 { font-size: 14px; font-weight: 600; }
+    .validation-stats .stat-value {
+      font-family: var(--font-mono);
+      font-size: 15px;
+      font-weight: 600;
+    }
 
-.findings-table {
-  width: 100%; border-collapse: collapse; font-size: 12px;
-}
-.findings-table th {
-  background: var(--bg-secondary); padding: 9px 14px;
-  text-align: left; font-weight: 600; color: var(--text-secondary);
-  font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
-  border-bottom: 1px solid var(--border); position: sticky; top: 0;
-}
-.findings-table td {
-  padding: 10px 14px; border-bottom: 1px solid rgba(30,39,56,0.4);
-  vertical-align: top;
-}
-.findings-table tr:hover td { background: var(--bg-card-hover); }
-.findings-table .td-desc { max-width: 420px; line-height: 1.5; }
-.findings-table .td-rec {
-  font-size: 11px; color: var(--text-secondary); max-width: 300px; line-height: 1.5;
-}
+    .data-preview {
+      overflow-x: auto;
+      max-height: 280px;
+      overflow-y: auto;
+    }
 
-.risk-tag {
-  display: inline-block; padding: 2px 8px; border-radius: 4px;
-  font-size: 10px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-.risk-tag.CRITICAL { background: var(--risk-critical-dim); color: var(--risk-critical); }
-.risk-tag.HIGH { background: var(--risk-high-dim); color: var(--risk-high); }
-.risk-tag.MEDIUM { background: var(--risk-medium-dim); color: var(--risk-medium); }
-.risk-tag.LOW { background: var(--risk-low-dim); color: var(--risk-low); }
+    .data-preview table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
 
-.findings-scroll { max-height: 520px; overflow-y: auto; }
+    .data-preview th {
+      background: var(--bg-secondary);
+      padding: 8px 12px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      position: sticky;
+      top: 0;
+      border-bottom: 1px solid var(--border);
+    }
 
-.no-findings {
-  padding: 48px; text-align: center; color: var(--text-muted);
-}
-.no-findings .big { font-size: 40px; margin-bottom: 12px; }
+    .data-preview td {
+      padding: 7px 12px;
+      border-bottom: 1px solid rgba(30, 39, 56, 0.5);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      white-space: nowrap;
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-/* ── DOMAIN TABS ────────────────────────────────────────── */
-.domain-tabs {
-  display: flex; gap: 4px; margin-bottom: 16px; flex-wrap: wrap;
-}
-.domain-tab {
-  background: var(--bg-card); border: 1px solid var(--border);
-  color: var(--text-secondary); padding: 7px 14px; border-radius: 6px;
-  font-size: 12px; font-family: var(--font-sans); cursor: pointer;
-  transition: all 0.15s; font-weight: 500;
-}
-.domain-tab:hover { border-color: var(--text-secondary); color: var(--text-primary); }
-.domain-tab.active {
-  background: var(--accent-green-dim); border-color: var(--accent-green);
-  color: var(--accent-green);
-}
+    .data-preview tr:hover td {
+      background: var(--bg-card-hover);
+    }
 
-/* ── PROCESSING OVERLAY ─────────────────────────────────── */
-.processing {
-  position: fixed; inset: 0; background: rgba(6,8,12,0.85);
-  display: flex; flex-direction: column; align-items: center;
-  justify-content: center; z-index: 200; backdrop-filter: blur(8px);
-}
-.processing.hidden { display: none; }
-.processing .spinner {
-  width: 48px; height: 48px; border: 3px solid var(--border);
-  border-top-color: var(--accent-green); border-radius: 50%;
-  animation: spin 0.7s linear infinite; margin-bottom: 20px;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-.processing .status {
-  font-size: 15px; font-weight: 600; margin-bottom: 6px;
-}
-.processing .sub {
-  font-size: 12px; color: var(--text-secondary);
-}
+    .validation-actions {
+      padding: 16px 20px;
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      border-top: 1px solid var(--border);
+    }
 
-/* ── ENGINE LOG ─────────────────────────────────────────── */
-.engine-log {
-  margin-top: 20px; background: var(--bg-card);
-  border-radius: var(--radius-lg); border: 1px solid var(--border);
-  overflow: hidden;
-}
-.engine-log .log-header {
-  padding: 12px 16px; font-size: 12px; font-weight: 600;
-  border-bottom: 1px solid var(--border); display: flex;
-  align-items: center; gap: 8px;
-}
-.engine-log .log-body {
-  padding: 12px 16px; max-height: 200px; overflow-y: auto;
-  font-family: var(--font-mono); font-size: 11px;
-  line-height: 1.7; color: var(--text-secondary);
-}
-.engine-log .log-line.info { color: var(--accent-green); }
-.engine-log .log-line.warn { color: var(--risk-high); }
-.engine-log .log-line.error { color: var(--risk-critical); }
+    /* ── BUTTONS ────────────────────────────────────────────── */
+    .btn {
+      padding: 9px 20px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: var(--font-sans);
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
 
-/* ── EXPORT SECTION ─────────────────────────────────────── */
-.export-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 12px; margin-top: 16px;
-}
-.export-card {
-  padding: 18px; background: var(--bg-card); border-radius: var(--radius);
-  border: 1px solid var(--border); cursor: pointer; transition: all 0.15s;
-}
-.export-card:hover {
-  border-color: var(--accent-green); transform: translateY(-2px);
-}
-.export-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
-.export-card p { font-size: 11px; color: var(--text-secondary); }
+    .btn-primary {
+      background: var(--accent-green);
+      color: #000;
+    }
 
+    .btn-primary:hover {
+      background: #00c471;
+      transform: translateY(-1px);
+    }
 
+    .btn-primary:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--text-secondary);
+    }
+
+    .btn-danger {
+      background: var(--risk-critical-dim);
+      color: var(--risk-critical);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    /* ── RESULTS DASHBOARD ──────────────────────────────────── */
+    .results-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .results-header h2 {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .risk-score-card {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 20px 28px;
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+
+    .risk-gauge {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .risk-gauge::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 4px solid var(--border);
+    }
+
+    .risk-gauge .score {
+      font-family: var(--font-mono);
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .risk-gauge .label {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .risk-gauge.critical {
+      color: var(--risk-critical);
+    }
+
+    .risk-gauge.critical::before {
+      border-color: var(--risk-critical);
+    }
+
+    .risk-gauge.high {
+      color: var(--risk-high);
+    }
+
+    .risk-gauge.high::before {
+      border-color: var(--risk-high);
+    }
+
+    .risk-gauge.medium {
+      color: var(--risk-medium);
+    }
+
+    .risk-gauge.medium::before {
+      border-color: var(--risk-medium);
+    }
+
+    .risk-gauge.low {
+      color: var(--risk-low);
+    }
+
+    .risk-gauge.low::before {
+      border-color: var(--risk-low);
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      flex: 1;
+    }
+
+    .kpi-card {
+      padding: 14px 16px;
+      background: var(--bg-secondary);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+    }
+
+    .kpi-card .kpi-value {
+      font-family: var(--font-mono);
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .kpi-card .kpi-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .severity-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .severity-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .severity-pill.active {
+      outline: 2px solid;
+      outline-offset: 1px;
+    }
+
+    .severity-pill[data-risk="CRITICAL"] {
+      background: var(--risk-critical-dim);
+      color: var(--risk-critical);
+    }
+
+    .severity-pill[data-risk="HIGH"] {
+      background: var(--risk-high-dim);
+      color: var(--risk-high);
+    }
+
+    .severity-pill[data-risk="MEDIUM"] {
+      background: var(--risk-medium-dim);
+      color: var(--risk-medium);
+    }
+
+    .severity-pill[data-risk="LOW"] {
+      background: var(--risk-low-dim);
+      color: var(--risk-low);
+    }
+
+    .severity-pill[data-risk="ALL"] {
+      background: var(--accent-blue-dim);
+      color: var(--accent-blue);
+    }
+
+    /* ── FINDINGS TABLE ─────────────────────────────────────── */
+    .findings-panel {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .findings-panel .panel-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .findings-panel .panel-header h3 {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .findings-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .findings-table th {
+      background: var(--bg-secondary);
+      padding: 9px 14px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+    }
+
+    .findings-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(30, 39, 56, 0.4);
+      vertical-align: top;
+    }
+
+    .findings-table tr:hover td {
+      background: var(--bg-card-hover);
+    }
+
+    .findings-table .td-desc {
+      max-width: 420px;
+      line-height: 1.5;
+    }
+
+    .findings-table .td-rec {
+      font-size: 11px;
+      color: var(--text-secondary);
+      max-width: 300px;
+      line-height: 1.5;
+    }
+
+    .risk-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .risk-tag.CRITICAL {
+      background: var(--risk-critical-dim);
+      color: var(--risk-critical);
+    }
+
+    .risk-tag.HIGH {
+      background: var(--risk-high-dim);
+      color: var(--risk-high);
+    }
+
+    .risk-tag.MEDIUM {
+      background: var(--risk-medium-dim);
+      color: var(--risk-medium);
+    }
+
+    .risk-tag.LOW {
+      background: var(--risk-low-dim);
+      color: var(--risk-low);
+    }
+
+    .findings-scroll {
+      max-height: 520px;
+      overflow-y: auto;
+    }
+
+    .no-findings {
+      padding: 48px;
+      text-align: center;
+      color: var(--text-muted);
+    }
+
+    .no-findings .big {
+      font-size: 40px;
+      margin-bottom: 12px;
+    }
+
+    /* ── DOMAIN TABS ────────────────────────────────────────── */
+    .domain-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .domain-tab {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-family: var(--font-sans);
+      cursor: pointer;
+      transition: all 0.15s;
+      font-weight: 500;
+    }
+
+    .domain-tab:hover {
+      border-color: var(--text-secondary);
+      color: var(--text-primary);
+    }
+
+    .domain-tab.active {
+      background: var(--accent-green-dim);
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+    }
+
+    /* ── PROCESSING OVERLAY ─────────────────────────────────── */
+    .processing {
+      position: fixed;
+      inset: 0;
+      background: rgba(6, 8, 12, 0.85);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      backdrop-filter: blur(8px);
+    }
+
+    .processing.hidden {
+      display: none;
+    }
+
+    .processing .spinner {
+      width: 48px;
+      height: 48px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent-green);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .processing .status {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .processing .sub {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    /* ── ENGINE LOG ─────────────────────────────────────────── */
+    .engine-log {
+      margin-top: 20px;
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .engine-log .log-header {
+      padding: 12px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .engine-log .log-body {
+      padding: 12px 16px;
+      max-height: 200px;
+      overflow-y: auto;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      line-height: 1.7;
+      color: var(--text-secondary);
+    }
+
+    .engine-log .log-line.info {
+      color: var(--accent-green);
+    }
+
+    .engine-log .log-line.warn {
+      color: var(--risk-high);
+    }
+
+    .engine-log .log-line.error {
+      color: var(--risk-critical);
+    }
+
+    /* ── EXPORT SECTION ─────────────────────────────────────── */
+    .export-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .export-card {
+      padding: 18px;
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .export-card:hover {
+      border-color: var(--accent-green);
+      transform: translateY(-2px);
+    }
+
+    .export-card h4 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .export-card p {
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
   </style>
 
   <!-- ══ M2/M3 JAVASCRIPT ══ -->
@@ -16814,6 +17636,111 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
     style="position:fixed;bottom:28px;right:28px;z-index:9999;background:#2878FF;color:#fff;font-family:Outfit,sans-serif;font-size:14px;font-weight:600;padding:12px 22px;border-radius:50px;box-shadow:0 4px 20px rgba(40,120,255,0.4);text-decoration:none;display:flex;align-items:center;gap:8px;"
     onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">?? Help &amp;
     Guide</a>
+
+  <!-- GLOBAL SUITE NAVIGATOR -->
+  <style>
+    .suite-nav-widget {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 999999;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .sn-menu {
+      background: rgba(10, 15, 25, 0.95);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(40, 120, 255, 0.3);
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 16px;
+      transform: scale(0.9) translateY(20px);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(40, 120, 255, 0.15);
+    }
+
+    .suite-nav-widget:hover .sn-menu {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .sn-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      color: #edf0f7 !important;
+      text-decoration: none !important;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 8px;
+      transition: background 0.2s, color 0.2s;
+      width: 220px;
+      box-sizing: border-box;
+    }
+
+    .sn-item:hover {
+      background: rgba(40, 120, 255, 0.15) !important;
+      color: #2878ff !important;
+    }
+
+    .sn-icon {
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+    }
+
+    .sn-fab {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1254CC, #2878FF);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(40, 120, 255, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .sn-fab:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 25px rgba(40, 120, 255, 0.5);
+    }
+  </style>
+
+  <div class="suite-nav-widget">
+    <div class="sn-menu">
+      <div
+        style="font-size:10px;color:#8895ad;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;padding-left:16px;font-weight:700;">
+        App Switcher</div>
+      <a href="index.html" class="sn-item"><span class="sn-icon">🏠</span> Landing Page</a>
+      <a href="app.html" class="sn-item"><span class="sn-icon">📊</span> Master Audit Suite</a>
+      <a href="vault.html" class="sn-item"><span class="sn-icon">🔐</span> Evidence Vault</a>
+      <a href="help.html" class="sn-item"><span class="sn-icon">📖</span> Help & Docs</a>
+    </div>
+    <div class="sn-fab">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"
+        stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"></circle>
+        <circle cx="19" cy="12" r="3"></circle>
+        <circle cx="5" cy="12" r="3"></circle>
+      </svg>
+    </div>
+  </div>
+  <!-- END GLOBAL SUITE NAVIGATOR -->
 </body>
+
 
 </html>
