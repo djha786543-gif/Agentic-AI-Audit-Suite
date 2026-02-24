@@ -13267,6 +13267,31 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
           }
       }
     
+      
+      async function submitVerdict(findingId, verdict) {
+          // Send PATCH to backend if possible
+          if (findingId && findingId !== 'undefined') {
+              try {
+                  await fetch('http://localhost:8000/api/v1/engine/findings/' + findingId + '/verdict', {
+                      method: 'PATCH',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ verdict: verdict, notes: '' })
+                  });
+              } catch (e) { console.warn("Sync error", e); }
+          }
+          
+          var badge = document.getElementById('verdict-' + findingId);
+          if (badge) {
+              badge.textContent = verdict === 'confirmed' ? '✅ Confirmed' : verdict === 'false_positive' ? '❌ False Pos' : '🔍 Review';
+              badge.style.display = 'inline-block';
+              badge.style.background = verdict === 'confirmed' ? 'rgba(46,204,113,0.1)' : 'rgba(239,68,68,0.1)';
+              badge.style.color = verdict === 'confirmed' ? '#2ecc71' : '#ef4444';
+          } else {
+              alert('Feedback registered: ' + verdict);
+          }
+          refreshAccuracyKPI();
+      }
+
       function forceRunAudit() {
         goStep(3);
         document.getElementById('procTitle').textContent = 'Processing Audit...';
