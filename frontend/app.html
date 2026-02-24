@@ -9839,11 +9839,16 @@
 
     <div class="topbar">
       <div class="topbar-logo"><span class="dot"></span>Agentic Audit AI</div>
-      <div style="display:flex;gap:.75rem;align-items:center">
+      <div style="display:flex;gap:.75rem;align-items:center;flex-grow:1;justify-content:center;">
         <span class="topbar-badge">Universal ERP Engine v2.0</span>
-        <span class="topbar-badge"
-          style="color:#2ecc71;background:rgba(46,204,113,.1);border-color:rgba(46,204,113,.25)">&#x1f512; Zero
-          Exfiltration &mdash; Client-Side Only</span>
+        <span class="topbar-badge" id="modeBanner"
+          style="color:#2ecc71;background:rgba(46,204,113,.1);border-color:rgba(46,204,113,.25);font-weight:bold;">&#x1f512; LIVE &mdash; Connected to Local Engine</span>
+        
+        <!-- Mode Toggle -->
+        <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;background:rgba(255,255,255,0.05);padding:0.25rem 0.75rem;border-radius:20px;font-size:0.8rem;">
+          <input type="checkbox" id="modeToggle" checked onchange="toggleMode(this)">
+          <span id="modeToggleText" style="color:var(--text);font-weight:600;">LIVE MODE</span>
+        </label>
       </div>
       <div style="display:flex;align-items:center;gap:1rem">
         <button onclick="openHelp()"
