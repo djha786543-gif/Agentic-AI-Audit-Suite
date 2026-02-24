@@ -10020,7 +10020,8 @@
       font-size: 11px;
       color: var(--text-secondary);
     }
-  </style>
+  .btn-hover-fx:hover { filter: brightness(1.4); }
+</style>
 <style>
   .cc-pill-corr {
     box-shadow: 0 0 12px #e53e3e, inset 0 0 8px #e53e3e;
@@ -10032,6 +10033,7 @@
     50% { filter: brightness(1.3); transform: scale(1.02); }
     100% { filter: brightness(1); }
   }
+.btn-hover-fx:hover { filter: brightness(1.4); }
 </style>
 </head>
 
@@ -13233,7 +13235,39 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
       // =====================================================
       // RUN AUDIT (single)
       // =====================================================
+      
       function runAudit() {
+          var isLive = document.getElementById('modeToggle') ? document.getElementById('modeToggle').checked : false;
+          if (isLive && STATE.file) {
+              // Pre-run validation API call
+              var formData = new FormData();
+              formData.append("file", STATE.file);
+              fetch("http://localhost:8000/api/v1/engine/analyze/validate", {
+                  method: "POST", body: formData
+              })
+              .then(r => r.json())
+              .then(res => {
+                  var v = res.validation_summary || {};
+                  document.getElementById('vg-schema').innerHTML = v.schema_valid ? '✅ Validated' : '⚠️ Warning';
+                  var passRate = v.completeness ? Math.round((v.completeness.passed_records / v.completeness.total_records) * 100) : 100;
+                  document.getElementById('vg-null').innerText = (100 - passRate) + '% Missing';
+                  document.getElementById('vg-dup').innerHTML = v.duplicates && v.duplicates.count > 0 ? (v.duplicates.count + ' match(es)') : '0 found';
+                  document.getElementById('vg-hash').innerText = v.hash ? v.hash.slice(0,25) + '...' : 'N/A';
+                  document.getElementById('validationGateModal').style.display = 'flex';
+              }).catch(e => {
+                  forceRunAudit(); // fallback
+              });
+          } else {
+              // Demo mode => mock validation gate
+              document.getElementById('vg-schema').innerHTML = '✅ Validated';
+              document.getElementById('vg-null').innerText = '0.0%';
+              document.getElementById('vg-dup').innerHTML = '0 found';
+              document.getElementById('vg-hash').innerText = 'demohash_a94a8fe5ccb19...';
+              document.getElementById('validationGateModal').style.display = 'flex';
+          }
+      }
+    
+      function forceRunAudit() {
         goStep(3);
         document.getElementById('procTitle').textContent = 'Processing Audit...';
         var ag = AGENTS[STATE.agent];
@@ -16859,7 +16893,8 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
       font-size: 11px;
       color: var(--text-secondary);
     }
-  </style>
+  .btn-hover-fx:hover { filter: brightness(1.4); }
+</style>
 
   <!-- ══ M2/M3 JAVASCRIPT ══ -->
   <script>
@@ -17718,7 +17753,8 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
       transform: scale(1.05);
       box-shadow: 0 6px 25px rgba(40, 120, 255, 0.5);
     }
-  </style>
+  .btn-hover-fx:hover { filter: brightness(1.4); }
+</style>
 
   <div class="suite-nav-widget">
     <div class="sn-menu">

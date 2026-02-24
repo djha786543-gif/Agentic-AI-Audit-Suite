@@ -133,6 +133,33 @@ async def analyze_file(
     return JSONResponse(content=result)
 
 
+@router.post("/analyze/validate")
+async def validate_file(
+    file: UploadFile = File(...),
+):
+    """
+    Validation-only endpoint -> extracts schema validation, duplicates, and hash.
+    Used for the pre-run Validation Gate UI before executing the heavy agent workloads.
+    """
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="No file provided")
+
+    ext = _check_extension(file.filename)
+    raw_bytes = await file.read()
+    
+    try:
+        if ext in (".xlsx", ".xls"):
+            parsed = parse_file(file.filename, file_bytes=raw_bytes)
+        else:
+            content = raw_bytes.decode("utf-8", errors="replace")
+            parsed = parse_file(file.filename, content=content)
+    except Exception as e:
+        logger.error("Parse validate error: %s", str(e))
+        raise HTTPException(status_code=422, detail=f"Could not parse file: {str(e)}")
+
+    return {"validation_summary": parsed.get("validation", {})}
+
+
 @router.post("/analyze/sod")
 async def analyze_sod_direct(payload: dict):
     """
