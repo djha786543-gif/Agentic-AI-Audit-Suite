@@ -15,6 +15,15 @@ class Finding(Base):
     description = Column(Text)
     status = Column(String, default="open") # open, management_response, remediation, retest, closed
     created_at = Column(DateTime, default=datetime.utcnow)
+    
+    # New Evidence and Accuracy tracking fields
+    from sqlalchemy.dialects.postgresql import JSONB
+    from sqlalchemy.types import JSON
+    evidence = Column(JSON, nullable=True) # Fallback JSON works in sqlite/pg
+    auditor_verdict = Column(String, nullable=True) # "confirmed" | "false_positive" | "needs_review"
+    verdict_by = Column(String, nullable=True)
+    verdict_timestamp = Column(DateTime, nullable=True)
+    verdict_notes = Column(Text, nullable=True)
 
 class ManagementResponse(Base):
     __tablename__ = "management_responses"
