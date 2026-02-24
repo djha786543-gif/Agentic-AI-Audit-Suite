@@ -264,7 +264,8 @@
                             </p>
                             <p class="opacity-80">Every single payload receives a unique SHA-256 seal. AI determines a
                                 <b>Confidence %</b> based on event anomaly data. If any administrator tampers with the
-                                database, the hash link breaks and Verification changes to Tampered.</p>
+                                database, the hash link breaks and Verification changes to Tampered.
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -551,12 +552,16 @@
         async function fetchSystemData() {
             try {
                 // Fetch the Vault Data
-                const vaultRes = await fetch('/api/v1/audit/vault');
+                const vaultRes = await fetch('https://stupid-tips-train.loca.lt/api/v1/audit/vault', {
+                    headers: { 'Bypass-Tunnel-Reminder': 'true' }
+                });
                 if (!vaultRes.ok) throw new Error("Vault fetch failed");
                 allVaultData = await vaultRes.json();
 
                 // Fetch the Heartbeat Counter
-                const runsRes = await fetch('/api/v1/audit/runs/count');
+                const runsRes = await fetch('https://stupid-tips-train.loca.lt/api/v1/audit/runs/count', {
+                    headers: { 'Bypass-Tunnel-Reminder': 'true' }
+                });
                 if (runsRes.ok) {
                     const runsData = await runsRes.json();
                     totalRunsCount = runsData.count;
