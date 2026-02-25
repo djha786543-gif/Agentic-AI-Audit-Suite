@@ -4,8 +4,7 @@ on:
   push:
     branches:
       - main
-    paths:
-      - "frontend/**"
+      - copilot/clean-utf8-emoji-symbols
 
   # Allow manual trigger from the Actions tab
   workflow_dispatch:
