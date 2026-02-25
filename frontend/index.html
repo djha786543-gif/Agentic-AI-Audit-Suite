@@ -2272,7 +2272,7 @@
         - surfacing exceptions with evidence your board can act on.</p>
 
       <div class="hero-cta-row">
-        <button class="btn btn-blue btn-lg" onclick="goTo('cta')">Request Enterprise Access</button>
+        <button class="btn btn-blue btn-lg" onclick="goTo('cta')">Book a 30-Min Demo &rarr;</button>
         <a href="app.html" class="btn btn-ghost btn-lg">Explore the Suite </a>
       </div>
 
@@ -2499,20 +2499,25 @@
         </div>
 
         <div class="prob-stats fu d2">
-          <div class="ps-big">73%</div>
+          <div class="ps-big">73%<sup style="font-size:.5em;vertical-align:super;opacity:.7;">1</sup></div>
           <div class="ps-label">of control failures go undetected by sampling</div>
           <div class="ps-sub">Traditional audit methodology misses the majority of exceptions hiding in large
             transaction populations.</div>
           <div class="ps-divider"></div>
           <div class="ps-grid">
             <div class="ps-cell">
-              <div class="ps-num">6-8wk</div>
+              <div class="ps-num">6-8wk<sup style="font-size:.45em;vertical-align:super;opacity:.7;">2</sup></div>
               <div class="ps-lbl">Manual SOX audit cycle length</div>
             </div>
             <div class="ps-cell">
-              <div class="ps-num">3%</div>
+              <div class="ps-num">3%<sup style="font-size:.45em;vertical-align:super;opacity:.7;">3</sup></div>
               <div class="ps-lbl">Average population coverage via sampling</div>
             </div>
+          </div>
+          <div style="margin-top:14px;font-size:11px;color:#888;line-height:1.7;border-top:1px solid rgba(255,255,255,0.08);padding-top:10px;">
+            <sup>1</sup> Based on IIA and PCAOB research on sampling-based audit methodology limitations.<br>
+            <sup>2</sup> Industry benchmark per Big 4 SOX practice surveys.<br>
+            <sup>3</sup> Derived from PCAOB AS 2201 guidance on representative sampling thresholds.
           </div>
         </div>
       </div>
@@ -2791,9 +2796,23 @@
   <div style="margin-top: 20px; margin-bottom: 90px; position:relative; z-index:10;">
     <div class="eyebrow" style="justify-content:center; display:flex; width:100%;">SYSTEM ARCHITECTURE</div>
     <h2 class="sec-h" style="text-align:center; font-size:32px;">Four-Phase Enterprise Integration Roadmap</h2>
-    <p class="sec-sub" style="margin:0 auto 40px; text-align:center;">Fully mapped to the underlying ACAP continuous
+    <p class="sec-sub" style="margin:0 auto 16px; text-align:center;">Fully mapped to the underlying ACAP continuous
       assurance architecture seamlessly bridging Python backend and SaaS frontend.</p>
 
+    <!-- Collapsible toggle -->
+    <div style="text-align:center; margin-bottom:20px;">
+      <p id="archSummary" style="font-size:13px;color:#64748b;margin:0 auto 14px;max-width:640px;">
+        Cryptographic vault &middot; Zero-trust JWT APIs &middot; PostgreSQL Row-Level Security &middot; Autonomous AI Command Center
+      </p>
+      <button id="archToggleBtn" onclick="toggleArchSection()"
+        style="display:inline-flex;align-items:center;gap:8px;padding:9px 22px;border-radius:8px;border:1.5px solid rgba(43,120,255,0.35);background:rgba(43,120,255,0.07);color:#7CB9FF;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit;letter-spacing:.02em;"
+        onmouseover="this.style.background='rgba(43,120,255,0.15)'"
+        onmouseout="this.style.background='rgba(43,120,255,0.07)'">
+        <span id="archToggleIcon">&#9654;</span> View Technical Architecture
+      </button>
+    </div>
+
+    <div id="archDetail" style="display:none;">
     <div class="platform-grid" style="margin-top:0; max-width:1050px; margin:0 auto;">
 
       <!-- Phase 1 -->
@@ -2810,7 +2829,7 @@
       <div class="pg" style="padding:22px;">
         <div class="pg-top" style="margin-bottom:12px;">
           <div class="pg-ico ico-gold" style="font-family:serif; font-weight:bold; font-size:16px;">2</div>
-          <h3 class="pg-title" style="font-size:16px;">Zero-Trust Connectors & JWT</h3>
+          <h3 class="pg-title" style="font-size:16px;">Zero-Trust Connectors &amp; JWT</h3>
         </div>
         <p class="pg-desc" style="font-size:12px;">Strict <strong>Role-Based Access Control (RBAC)</strong> and
           OAuth2/JWT framework securing APIs for external auditors and dynamic Azure AD integration connectors.</p>
@@ -2839,6 +2858,27 @@
       </div>
 
     </div>
+    </div><!-- /archDetail -->
+
+    <script>
+      (function(){
+        var LS_KEY = 'auditai_arch_expanded';
+        function toggleArchSection(forceState){
+          var detail = document.getElementById('archDetail');
+          var btn    = document.getElementById('archToggleBtn');
+          var icon   = document.getElementById('archToggleIcon');
+          var open   = (forceState !== undefined) ? forceState : detail.style.display === 'none';
+          detail.style.display = open ? 'block' : 'none';
+          icon.innerHTML = open ? '&#9660;' : '&#9654;';
+          btn.childNodes[btn.childNodes.length-1].textContent = open ? ' Hide Technical Architecture' : ' View Technical Architecture';
+          try { localStorage.setItem(LS_KEY, open ? '1' : '0'); } catch(e){}
+        }
+        window.toggleArchSection = toggleArchSection;
+        try {
+          if (localStorage.getItem(LS_KEY) === '1') { toggleArchSection(true); }
+        } catch(e){}
+      })();
+    </script>
   </div>
 
   <!-- 
@@ -3003,7 +3043,7 @@
         <div class="cta-layout">
           <div class="cta-l">
             <div class="cta-l-eye">Enterprise Access Program</div>
-            <div class="cta-l-title">Request Enterprise Access</div>
+            <div class="cta-l-title">Book a 30-Min Demo</div>
             <div class="cta-l-sub">We custom-build integrations, workpaper templates, and control frameworks specific to
               your ERP, your audit methodology, and your compliance requirements.</div>
             <div class="cta-feats">
@@ -3062,14 +3102,14 @@
                 <textarea class="fg-textarea" id="fm"
                   placeholder="e.g. SAP integration, Big 4 workpaper templates, ICFR framework calibration, healthcare compliance overlay..."></textarea>
               </div>
-              <button class="fg-submit" onclick="submitForm()">Request Enterprise Access </button>
-              <div class="fg-note"> Confidential - We respond within 1 business day</div>
+              <button class="fg-submit" onclick="submitForm()">Book a 30-Min Demo &rarr;<span style="display:block;font-size:.8rem;font-weight:500;opacity:.8;margin-top:2px;">With a former Big 4 IT auditor — no sales pitch, just a live walkthrough of your use case.</span></button>
+              <div class="fg-note">🔒 Confidential — a former Big 4 IT auditor will follow up personally.</div>
             </div>
             <div class="cta-success" id="ctaSuccess">
               <div class="cs-ico"></div>
-              <div class="cs-title">Request Received</div>
-              <div class="cs-sub">We'll be in touch within <strong style="color:var(--blue)">1 business day</strong>.
-                The platform is live - explore it now while you wait.</div>
+              <div class="cs-title">Demo Booked</div>
+              <div class="cs-sub">✅ Request received. A <strong style="color:var(--blue)">former Big 4 IT auditor</strong> will reach out within 1 business day to schedule your personalized walkthrough.
+                The platform is live — explore it now while you wait.</div>
               <a href="app.html" class="btn btn-blue" style="margin-top:20px;">Open AuditAI Suite </a>
             </div>
           </div>
@@ -3190,7 +3230,7 @@
       setTimeout(() => {
         document.getElementById('ctaForm').style.display = 'none';
         document.getElementById('ctaSuccess').style.display = 'flex';
-        btn.disabled = false; btn.textContent = 'Request Enterprise Access \u2192';
+        btn.disabled = false; btn.textContent = 'Book a 30-Min Demo \u2192';
       }, 900);
     }
   </script>

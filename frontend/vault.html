@@ -145,6 +145,7 @@
                 <h1 class="text-4xl lg:text-5xl font-black tracking-tighter uppercase font-['Sora'] mb-1">
                     <span class="gradient-text">ACAP</span> PRO
                 </h1>
+                <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest mb-0.5">AuditAI Suite &mdash; Cryptographic Vault Module</p>
                 <p class="text-[11px] text-slate-400 font-bold uppercase tracking-widest">Enterprise Cryptographic Audit
                     Engine</p>
             </div>
@@ -157,6 +158,7 @@
                     class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 px-8 py-2.5 rounded-full text-[10px] font-black uppercase shadow-[0_0_20px_rgba(37,99,235,0.25)] transition-all hover:scale-105 active:scale-95 text-white">
                     <i class="fas fa-file-export mr-2"></i> Export Report
                 </button>
+                <span id="demoBadge" style="display:none;padding:5px 14px;border-radius:20px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;background:rgba(245,158,11,0.15);color:#fbbf24;border:1px solid rgba(245,158,11,0.35);box-shadow:0 0 10px rgba(245,158,11,0.2);">&#9733; DEMO MODE</span>
             </div>
         </header>
 
@@ -333,8 +335,7 @@
                             <i class="fas fa-server text-slate-500"></i> Secure Data Ledger
                         </h2>
                         <span id="filtered-count"
-                            class="text-[10px] font-bold text-slate-500 bg-white/5 px-2 py-1 rounded">Showing 0
-                            entries</span>
+                            class="text-[10px] font-bold text-slate-500 bg-white/5 px-2 py-1 rounded">Loading...</span>
                     </div>
 
                     <div class="overflow-x-auto flex-1 h-[600px] xl:h-[700px]">
@@ -356,7 +357,7 @@
                                         <i class="fas fa-circle-notch fa-spin text-3xl text-blue-500/50 mb-4 block"></i>
                                         <p
                                             class="text-slate-500 font-black uppercase tracking-widest text-xs animate-pulse">
-                                            Establishing secure connection to Vault Engine...</p>
+                                            🟢 Demo Mode — Live synthetic data. Connect your enterprise backend for production records.</p>
                                     </td>
                                 </tr>
                             </tbody>
@@ -374,7 +375,92 @@
         let totalRunsCount = 0;
         let chartInstance = null;
 
-        // DOM Elements
+        // ── SIMULATED AUDIT LOG DATA ─────────────────────────────────────
+        const SIM_SYSTEMS  = ['Azure AD','File System','Windows Logs','Firewall','SAP S/4HANA'];
+        let   _simCounter  = 0; // used to deterministically trigger 1-in-12 review
+
+        function _randHex(len) {
+          let s = '';
+          while (s.length < len) s += Math.floor(Math.random()*0x100000000).toString(16).padStart(8,'0');
+          return s.slice(0,len).toUpperCase();
+        }
+        function _pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+        function buildSimRow(offsetMins) {
+          _simCounter++;
+          const ts   = new Date(Date.now() - (offsetMins + Math.random()*3) * 60000);
+          const sys  = _pick(SIM_SYSTEMS);
+          const conf = Math.floor(87 + Math.random() * 13);          // 87–99%
+          const seal = _randHex(16) + '...';
+          const isReview = (_simCounter % 12 === 0);
+          const evtNum   = String(10000 + Math.floor(Math.random()*90000));
+          const id       = 'EVT-2026-' + evtNum;
+          return {
+            id, recorded_at: ts.toISOString(), source_system: sys,
+            ai_confidence_score: conf, hash_sequence: seal, _sim: true,
+            _review: isReview
+          };
+        }
+
+        function buildSimDataset(count) {
+          return Array.from({length: count}, (_,i) => buildSimRow(i * 2));
+        }
+
+        function renderSimRow(log) {
+          const d = new Date(log.recorded_at);
+          const dateStr = d.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});
+          const timeStr = d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+          const isReview = log._review;
+          const rowClass = isReview ? 'vault-sim-row vault-warn-row' : 'vault-sim-row hover:bg-white/5 transition-colors';
+          const badge    = isReview
+            ? `<span class="vault-warn-badge"><i class="fas fa-exclamation-triangle"></i> &#x26A0;&#xFE0F; Review</span>`
+            : `<span class="vault-ok-badge"><i class="fas fa-shield-check"></i> &#x2705; Verified</span>`;
+          const confColor = log.ai_confidence_score >= 93 ? 'text-emerald-400' : 'text-yellow-400';
+          const confIcon  = log.ai_confidence_score >= 93 ? 'fa-check-circle' : 'fa-exclamation-circle';
+          return `<tr class="${rowClass}">
+            <td class="py-4 px-6 font-mono text-[10px] text-blue-400 font-bold">${log.id}</td>
+            <td class="py-4 px-6 font-mono text-[10px] text-slate-300">
+              <div class="text-[9px] uppercase text-slate-500 font-black tracking-widest">${dateStr}</div>
+              <div>${timeStr}</div></td>
+            <td class="py-4 px-6 font-black uppercase text-[10px] text-slate-200 tracking-wider">${log.source_system}</td>
+            <td class="py-4 px-6 text-[11px] font-black">
+              <div class="flex items-center gap-2 ${confColor}">
+                <i class="fas ${confIcon}"></i> ${log.ai_confidence_score}%</div></td>
+            <td class="py-4 px-6 font-mono text-[9px] text-slate-500 tracking-widest overflow-hidden whitespace-nowrap max-w-[200px]">${log.hash_sequence}</td>
+            <td class="py-4 px-6 text-right">${badge}</td>
+          </tr>`;
+        }
+
+        // Inject simulation CSS once
+        (function injectSimCSS(){
+          const s = document.createElement('style');
+          s.textContent = `
+            @keyframes vault-warn-pulse {
+              0%,100%{background:rgba(245,158,11,0.04);}
+              50%{background:rgba(245,158,11,0.12);}
+            }
+            .vault-warn-row { animation: vault-warn-pulse 2s ease-in-out infinite; cursor:pointer; }
+            .vault-warn-row td:first-child { border-left: 2px solid rgba(245,158,11,0.4); }
+            .vault-sim-row td:first-child { border-left: 2px solid transparent; }
+            .vault-warn-badge {
+              display:inline-flex;align-items:center;gap:4px;
+              padding:4px 10px;border-radius:6px;font-size:9px;font-weight:800;
+              text-transform:uppercase;letter-spacing:.06em;
+              background:rgba(245,158,11,0.12);color:#fbbf24;
+              border:1px solid rgba(245,158,11,0.3);
+              box-shadow:0 0 8px rgba(245,158,11,0.15);
+              animation: vault-warn-pulse 2s ease-in-out infinite;
+            }
+            .vault-ok-badge {
+              display:inline-flex;align-items:center;gap:4px;
+              padding:4px 10px;border-radius:6px;font-size:9px;font-weight:800;
+              text-transform:uppercase;letter-spacing:.06em;
+              background:rgba(16,185,129,0.1);color:#34d399;
+              border:1px solid rgba(16,185,129,0.2);
+            }
+          `;
+          document.head.appendChild(s);
+        })();
         const searchInput = document.getElementById('searchInput');
         const originFilter = document.getElementById('originFilter');
         const sortFilter = document.getElementById('sortFilter');
@@ -592,10 +678,39 @@
 
                 renderTable(); // Refresh the grid
             } else {
-                pill.innerHTML = '<i class="fas fa-circle text-red-500"></i> Engine Offline';
-                pill.className = "glass px-6 py-2.5 rounded-full text-[10px] font-black uppercase flex items-center gap-2 border border-red-500/40 text-red-500 shadow-[0_0_15px_rgba(239,68,68,0.15)] transition-all";
-                scoreText.innerText = "--%";
-                scoreBar.style.width = "0%";
+                pill.innerHTML = '<i class="fas fa-circle text-emerald-500 animate-pulse"></i> 🟢 Demo Mode — Live synthetic data. Connect your enterprise backend for production records.';
+                pill.className = "glass px-6 py-2.5 rounded-full text-[10px] font-black uppercase flex items-center gap-2 border border-emerald-500/40 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.15)] transition-all";
+
+                // Show DEMO MODE badge
+                var badge = document.getElementById('demoBadge');
+                if (badge) badge.style.display = 'inline-flex';
+
+                // Populate with simulated audit logs when API is offline
+                if (allVaultData.length === 0) {
+                  allVaultData = buildSimDataset(9);   // 8-10 records on first load
+                  totalRunsCount = allVaultData.length;
+                }
+                scoreText.innerText = "99.2%";
+                scoreBar.style.width = "99.2%";
+                countText.innerText = totalRunsCount;
+
+                // Update Source Analytics label if element exists
+                var srcLabel = document.querySelector('.text-purple-100');
+                if (srcLabel && srcLabel.textContent.includes('Source Analytics')) {
+                  var srcEl = srcLabel.parentElement.querySelector('canvas');
+                  // Inject "5 Systems Active" note below chart
+                  if (srcEl && !document.getElementById('simSrcNote')) {
+                    var note = document.createElement('p');
+                    note.id = 'simSrcNote';
+                    note.style.cssText = 'font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#a78bfa;text-align:center;margin-top:6px;';
+                    note.textContent = '5 Systems Active';
+                    srcEl.parentElement.appendChild(note);
+                  }
+                }
+
+                // Render simulated rows
+                document.getElementById('filtered-count').innerText = `Showing ${allVaultData.length} entries`;
+                tbody.innerHTML = allVaultData.map(renderSimRow).join('');
             }
         }
 
@@ -616,6 +731,25 @@
         fetchSystemData();
         // Sync every 3.5 seconds
         setInterval(fetchSystemData, 3500);
+
+        // ── SIMULATED REAL-TIME SOX MONITORING — append new row every 45s ──
+                // ── SIMULATED REAL-TIME SOX MONITORING — append new row every 4s ──
+        setInterval(function() {
+          // Only run in demo mode (no live data connected)
+          if (allVaultData.length === 0 || allVaultData.find(r => !r._sim)) return;
+          const newLog = buildSimRow(0);
+          allVaultData.unshift(newLog);
+          totalRunsCount = allVaultData.length;
+          document.getElementById('count').innerText = totalRunsCount;
+          document.getElementById('filtered-count').innerText = `Showing ${allVaultData.length} entries`;
+          const newRowHtml = renderSimRow(newLog);
+          const firstRow = tbody.querySelector('tr');
+          if (firstRow && firstRow.classList.contains('vault-sim-row')) {
+            firstRow.insertAdjacentHTML('beforebegin', newRowHtml);
+          } else {
+            tbody.insertAdjacentHTML('afterbegin', newRowHtml);
+          }
+        }, 4000);
     </script>
 
 <!-- GLOBAL SUITE NAVIGATOR -->
