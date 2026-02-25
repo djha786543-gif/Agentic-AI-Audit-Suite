@@ -629,3 +629,61 @@ class ForensicEngine:
                 pass
 
         return 0.0
+
+    # ──────────────────────────────────────────────────────────────────────
+    # EVIDENCE WALKBACK
+    # ──────────────────────────────────────────────────────────────────────
+
+    @staticmethod
+    def walkback_evidence(
+        finding_id: str,
+        vault_records: List[Dict[str, Any]],
+    ) -> Dict[str, Any]:
+        """
+        Perform an evidence walkback for a given finding_id.
+
+        Searches the vault_records for the raw source event linked to
+        this finding, verifies its SHA-256 hash, and returns a full
+        chain-of-custody report.
+
+        Args:
+            finding_id:   The finding identifier to trace.
+            vault_records: List of AuditEntry-like dicts from the vault
+                           (must include 'content_hash' and 'metadata_json').
+
+        Returns:
+            A dict with:
+              - finding_id      : the traced finding
+              - source_events   : matching raw events from the vault
+              - hash_verified   : True/False per record
+              - chain_of_custody: summary string for the audit report
+        """
+        matched: List[Dict[str, Any]] = []
+        for record in vault_records:
+            event_type = str(record.get("event_type", ""))
+            control_id = str(record.get("control_id", ""))
+            if finding_id in event_type or finding_id in control_id:
+                payload = record.get("metadata_json") or record.get("raw_payload")
+                stored_hash = record.get("content_hash") or record.get("hash_sequence")
+                if payload is not None:
+                    canonical = json.dumps(payload, sort_keys=True, ensure_ascii=False, default=str)
+                    recomputed = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+                    hash_ok = recomputed == stored_hash
+                else:
+                    hash_ok = stored_hash is not None
+                matched.append({
+                    "vault_record_id": str(record.get("id", "unknown")),
+                    "event_type": event_type,
+                    "stored_sha256": stored_hash,
+                    "hash_verified": hash_ok,
+                    "vaulted_at": str(record.get("recorded_at") or record.get("timestamp", "")),
+                })
+
+        custody_status = "INTACT" if all(m["hash_verified"] for m in matched) else "COMPROMISED"
+        return {
+            "finding_id": finding_id,
+            "source_events_count": len(matched),
+            "source_events": matched,
+            "chain_of_custody": custody_status,
+            "walkback_performed_at": datetime.now(timezone.utc).isoformat(),
+        }

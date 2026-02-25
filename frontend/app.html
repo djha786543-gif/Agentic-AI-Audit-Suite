@@ -10864,6 +10864,16 @@
              </div>
           </div>
 
+          <!-- ── STATISTICAL SAMPLING SUMMARY ── -->
+          <div id="samplingSummaryBox" style="display:none; margin: 0 24px 20px; padding: 18px 24px; background: rgba(96, 165, 250, 0.05); border: 1px dashed rgba(96, 165, 250, 0.25); border-radius: 12px; font-size: 0.85rem; color: #a0aec0; box-shadow: 0 4px 20px rgba(96,165,250,0.05);">
+            <div style="display:flex; align-items:center; gap: 10px; margin-bottom: 6px;">
+              <span style="font-size: 20px;">📊</span>
+              <h4 style="color: #60a5fa; margin: 0; font-family: var(--font-mono); font-size: 0.9rem; text-transform: uppercase;">Statistical Sampling Plan (95% Confidence)</h4>
+              <span style="background: rgba(96,165,250,0.1); padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; color: #60a5fa; border: 1px solid rgba(96,165,250,0.2); margin-left: 10px;">For Manual Auditor Verification</span>
+            </div>
+            <div id="samplingSummaryDetails" style="margin-top: 14px;"></div>
+          </div>
+
           <!-- ══ 5 KPI CARDS ══ -->
           <div class="cc-kpis" id="ccKpis">
             <div class="cc-kpi kpi-g" id="kpiEffectiveness">
@@ -13319,6 +13329,8 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
                   STATE.validationSummary = res.validation_summary || null;
 
                   STATE.violations = findings.map(function (item) {
+                    var racm = item.racm || {};
+                    var evidenceWalkback = item.evidence_walkback || {};
                     return {
                       id: item.control_id,
                       entity: item.user_id || item.ticket_id || item.record_id || item.invoice_id || 'System',
@@ -13328,9 +13340,16 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
                       field1: 'Domain: ' + (item.domain || "Audit"),
                       field2: 'Recommendation: ' + item.recommendation,
                       risk: item.recommendation,
+                      racm_coso: racm.coso_component || '',
+                      racm_pcaob: racm.pcaob_ref || '',
+                      racm_sox: racm.sox_section || '',
+                      compensating: item.compensating_control_applied || false,
+                      sha256: evidenceWalkback.sha256 || '',
                       chain: ERP.chain(item.description, 'Detected by Engine', item.recommendation, item.finding_type || 'Rule', 'SOX Control Exception', 'Requires management remediation.')
                     };
                   });
+
+                  STATE.samplingStats = res.sampling_stats || {};
 
                   STATE.riskSummary = { Critical: 0, High: 0, Medium: 0, Low: 0 };
                   STATE.violations.forEach(function (v) { if (STATE.riskSummary[v.severity] !== undefined) STATE.riskSummary[v.severity]++ });
@@ -13560,6 +13579,28 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
             vCard.style.display = 'none';
         }
 
+        // ── SAMPLING STATS ──
+        var ssCard = document.getElementById('samplingSummaryBox');
+        if (STATE.samplingStats && ssCard) {
+          var ssDetails = document.getElementById('samplingSummaryDetails');
+          var ss = STATE.samplingStats;
+          var domains = Object.keys(ss);
+          if (domains.length > 0) {
+            ssCard.style.display = 'block';
+            ssDetails.innerHTML = domains.map(function (domain) {
+              var d = ss[domain];
+              return '<div style="background:rgba(255,255,255,0.02);padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.05);margin-bottom:6px">' +
+                '<strong style="color:#edf0f7;display:block;margin-bottom:4px;font-family:var(--font-mono);font-size:0.7rem;text-transform:uppercase">' + domain.toUpperCase() + '</strong>' +
+                '<span style="color:#60a5fa;font-size:.7rem">Population: ' + d.population_size + ' records &nbsp;|&nbsp; Sample: ' + d.sample_size + ' records &nbsp;|&nbsp; Confidence: ' + d.confidence_level_pct + ' &nbsp;|&nbsp; Margin of Error: ' + d.margin_of_error_pct + '</span>' +
+                '</div>';
+            }).join('');
+          } else if (ssCard) {
+            ssCard.style.display = 'none';
+          }
+        } else if (ssCard) {
+          ssCard.style.display = 'none';
+        }
+
 
         // ── DEFAULT NAV: activate "ALL" if agent not in a specific nav bucket ──
         // find which nav items match the current agent's prefix
@@ -13711,6 +13752,11 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         body += '<div class="cc-ev-row"><span class="cc-ev-k">Evidence A</span><span class="cc-ev-v">' + v.field1 + '</span></div>';
         body += '<div class="cc-ev-row"><span class="cc-ev-k">Evidence B</span><span class="cc-ev-v danger">' + v.field2 + '</span></div>';
         body += '<div class="cc-ev-row"><span class="cc-ev-k">Severity</span><span class="cc-ev-v danger">' + v.severity + '</span></div>';
+        if (v.racm_coso) body += '<div class="cc-ev-row"><span class="cc-ev-k">COSO Component</span><span class="cc-ev-v">' + v.racm_coso + '</span></div>';
+        if (v.racm_pcaob) body += '<div class="cc-ev-row"><span class="cc-ev-k">PCAOB AS 2201 Ref</span><span class="cc-ev-v">' + v.racm_pcaob + '</span></div>';
+        if (v.racm_sox) body += '<div class="cc-ev-row"><span class="cc-ev-k">SOX Section</span><span class="cc-ev-v">' + v.racm_sox + '</span></div>';
+        if (v.compensating) body += '<div class="cc-ev-row"><span class="cc-ev-k">Compensating Control</span><span class="cc-ev-v" style="color:#22c55e">✅ Active — severity mitigated</span></div>';
+        if (v.sha256) body += '<div class="cc-ev-row"><span class="cc-ev-k">Chain-of-Custody SHA-256</span><span class="cc-ev-v" style="font-family:monospace;font-size:.55rem;word-break:break-all">' + v.sha256 + '</span></div>';
         body += '</div></div>';
 
         document.getElementById('ccNarrBody').innerHTML = body;

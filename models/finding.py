@@ -24,6 +24,10 @@ class Finding(Base):
     verdict_by = Column(String, nullable=True)
     verdict_timestamp = Column(DateTime, nullable=True)
     verdict_notes = Column(Text, nullable=True)
+    # RACM and remediation workflow fields
+    racm_ref = Column(Text, nullable=True)  # JSON-encoded RACM reference (COSO + PCAOB AS 2201)
+    remediation_target_date = Column(DateTime, nullable=True)
+    retest_status = Column(String, nullable=True, default="pending")  # pending, pass, fail
 
 class ManagementResponse(Base):
     __tablename__ = "management_responses"
