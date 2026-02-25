@@ -374,7 +374,103 @@
         let totalRunsCount = 0;
         let chartInstance = null;
 
-        // DOM Elements
+        // ── SIMULATED AUDIT LOG DATA ─────────────────────────────────────
+        const SIM_CONTROLS = ['AC-01','AC-02','AU-02','AU-06','CM-06','IA-02','IA-05',
+          'IR-04','SC-07','SC-28','SI-02','SI-03','CA-07','CM-02','PM-09'];
+        const SIM_SYSTEMS  = ['SAP ERP','Oracle Financials','Workday IAM','NetSuite GL',
+          'ServiceNow GRC','Active Directory','Salesforce CRM'];
+        const SIM_RISKS    = ['Low','Medium','High','Critical'];
+        const SIM_STATUS   = ['Success','Success','Success','Warning','Warning'];
+
+        function _simHash(n) {
+          let h = 0x811c9dc5;
+          for (let i = 0; i < n.length; i++) { h ^= n.charCodeAt(i); h = (h * 0x01000193) >>> 0; }
+          return h.toString(16).padStart(8,'0').toUpperCase();
+        }
+        function _uuid() {
+          return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+            const r = Math.random()*16|0;
+            return (c==='x' ? r : (r&0x3|0x8)).toString(16);
+          });
+        }
+        function _pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+        function buildSimRow(offsetMins) {
+          const ts = new Date(Date.now() - offsetMins * 60000);
+          const ctrl = _pick(SIM_CONTROLS);
+          const sys  = _pick(SIM_SYSTEMS);
+          const status = _pick(SIM_STATUS);
+          const risk   = _pick(SIM_RISKS);
+          const id     = _uuid();
+          const score  = status === 'Warning' ? Math.floor(55+Math.random()*20) : Math.floor(88+Math.random()*12);
+          const hash   = _simHash(id + ctrl + ts.toISOString());
+          return { id, recorded_at: ts.toISOString(), source_system: sys, ai_confidence_score: score,
+                   hash_sequence: hash, content_hash: hash, hash_verified: status !== 'Warning',
+                   _sim: true, _status: status, _risk: risk, _control: ctrl };
+        }
+
+        function buildSimDataset(count) {
+          return Array.from({length: count}, (_,i) => buildSimRow(i * 2));
+        }
+
+        function renderSimRow(log) {
+          const d = new Date(log.recorded_at);
+          const dateStr = d.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});
+          const timeStr = d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+          const shortId = log.id.split('-')[0];
+          const isWarn  = log._status === 'Warning';
+          const rowClass = isWarn
+            ? 'vault-sim-row vault-warn-row'
+            : 'vault-sim-row hover:bg-white/5 transition-colors';
+          const statusBadge = isWarn
+            ? `<span class="vault-warn-badge"><i class="fas fa-exclamation-triangle"></i> Warning · ${log._risk} Risk</span>`
+            : `<span class="vault-ok-badge"><i class="fas fa-shield-check"></i> Success</span>`;
+          return `<tr class="${rowClass}">
+            <td class="py-4 px-6 font-mono text-[10px] text-blue-400 font-bold">#${shortId}
+              <div class="text-[9px] text-slate-500 font-mono mt-0.5">${log._control}</div></td>
+            <td class="py-4 px-6 font-mono text-[10px] text-slate-300">
+              <div class="text-[9px] uppercase text-slate-500 font-black tracking-widest">${dateStr}</div>
+              <div>${timeStr}</div></td>
+            <td class="py-4 px-6 font-black uppercase text-[10px] text-slate-200 tracking-wider">${log.source_system}</td>
+            <td class="py-4 px-6 text-[11px] font-black">
+              <div class="flex items-center gap-2 ${log.ai_confidence_score>=88?'text-emerald-400':'text-yellow-400'}">
+                <i class="fas ${log.ai_confidence_score>=88?'fa-check-circle':'fa-exclamation-circle'}"></i>
+                ${log.ai_confidence_score}%</div></td>
+            <td class="py-4 px-6 font-mono text-[9px] text-slate-500 tracking-widest overflow-hidden whitespace-nowrap max-w-[200px]">${log.hash_sequence}</td>
+            <td class="py-4 px-6 text-right">${statusBadge}</td>
+          </tr>`;
+        }
+
+        // Inject simulation CSS once
+        (function injectSimCSS(){
+          const s = document.createElement('style');
+          s.textContent = `
+            @keyframes vault-warn-pulse {
+              0%,100%{background:rgba(245,158,11,0.04);}
+              50%{background:rgba(245,158,11,0.12);}
+            }
+            .vault-warn-row { animation: vault-warn-pulse 2s ease-in-out infinite; cursor:pointer; }
+            .vault-warn-row td { border-left: 2px solid rgba(245,158,11,0.4); }
+            .vault-sim-row td { border-left: 2px solid transparent; }
+            .vault-warn-badge {
+              display:inline-flex;align-items:center;gap:4px;
+              padding:4px 10px;border-radius:6px;font-size:9px;font-weight:800;
+              text-transform:uppercase;letter-spacing:.06em;
+              background:rgba(245,158,11,0.12);color:#fbbf24;
+              border:1px solid rgba(245,158,11,0.3);
+              box-shadow:0 0 8px rgba(245,158,11,0.15);
+              animation: vault-warn-pulse 2s ease-in-out infinite;
+            }
+            .vault-ok-badge {
+              display:inline-flex;align-items:center;gap:4px;
+              padding:4px 10px;border-radius:6px;font-size:9px;font-weight:800;
+              text-transform:uppercase;letter-spacing:.06em;
+              background:rgba(16,185,129,0.1);color:#34d399;
+              border:1px solid rgba(16,185,129,0.2);
+            }
+          `;
+          document.head.appendChild(s);
+        })();
         const searchInput = document.getElementById('searchInput');
         const originFilter = document.getElementById('originFilter');
         const sortFilter = document.getElementById('sortFilter');
@@ -592,10 +688,21 @@
 
                 renderTable(); // Refresh the grid
             } else {
-                pill.innerHTML = '<i class="fas fa-circle text-red-500"></i> Engine Offline';
-                pill.className = "glass px-6 py-2.5 rounded-full text-[10px] font-black uppercase flex items-center gap-2 border border-red-500/40 text-red-500 shadow-[0_0_15px_rgba(239,68,68,0.15)] transition-all";
-                scoreText.innerText = "--%";
-                scoreBar.style.width = "0%";
+                pill.innerHTML = '<i class="fas fa-circle text-yellow-500 animate-pulse"></i> SOX Monitoring — Simulated Live Feed';
+                pill.className = "glass px-6 py-2.5 rounded-full text-[10px] font-black uppercase flex items-center gap-2 border border-yellow-500/40 text-yellow-400 shadow-[0_0_15px_rgba(245,158,11,0.15)] transition-all";
+
+                // Populate with simulated audit logs when API is offline
+                if (allVaultData.length === 0) {
+                  allVaultData = buildSimDataset(24);
+                  totalRunsCount = allVaultData.length;
+                }
+                scoreText.innerText = "98%";
+                scoreBar.style.width = "98%";
+                countText.innerText = totalRunsCount;
+
+                // Render simulated rows
+                document.getElementById('filtered-count').innerText = `Showing ${allVaultData.length} entries`;
+                tbody.innerHTML = allVaultData.map(renderSimRow).join('');
             }
         }
 
@@ -616,6 +723,25 @@
         fetchSystemData();
         // Sync every 3.5 seconds
         setInterval(fetchSystemData, 3500);
+
+        // ── SIMULATED REAL-TIME SOX MONITORING — append new row every 45s ──
+        setInterval(function() {
+          const newLog = buildSimRow(0);
+          allVaultData.unshift(newLog);
+          totalRunsCount = allVaultData.length;
+          document.getElementById('count').innerText = totalRunsCount;
+          document.getElementById('filtered-count').innerText = `Showing ${allVaultData.length} entries`;
+          const newRowHtml = renderSimRow(newLog);
+          const firstRow = tbody.querySelector('tr');
+          if (firstRow && firstRow.classList.contains('vault-sim-row')) {
+            firstRow.insertAdjacentHTML('beforebegin', newRowHtml);
+          } else {
+            // Only prepend simulated row if table is in sim mode (no live data)
+            if (!allVaultData.find(r => !r._sim)) {
+              tbody.insertAdjacentHTML('afterbegin', newRowHtml);
+            }
+          }
+        }, 45000);
     </script>
 
 <!-- GLOBAL SUITE NAVIGATOR -->

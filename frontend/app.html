@@ -10139,15 +10139,13 @@
             <textarea class="em-textarea" id="emMessage"
               placeholder="e.g. We need this integrated with our SAP system and calibrated to our ICFR framework. We also want custom workpaper templates for our Big 4 audit coordination..."></textarea>
           </div>
-          <button class="em-submit" onclick="submitEnterpriseRequest()">Request Enterprise Access →</button>
-          <div class="em-privacy">🔒 Your information is confidential. We respond within 1 business day.</div>
+          <button class="em-submit" onclick="submitEnterpriseRequest()">Schedule a live demo with a former Big 4 IT auditor<span style="display:block;font-size:.72rem;font-weight:500;opacity:.8;margin-top:2px;">30-minute technical deep dive</span></button>
+          <div class="em-privacy">🔒 Your information is confidential — a former Big 4 IT auditor will follow up personally.</div>
         </div>
         <div class="em-success" id="emSuccess">
           <div class="em-success-icon">✅</div>
           <div class="em-success-title">Request Received!</div>
-          <div class="em-success-text">Thank you — we've received your request and will be in touch within <strong
-              style="color:#e8c468;">1 business day</strong>.<br /><br />In the meantime, explore the full suite above.
-            We look forward to building something great together.</div>
+          <div class="em-success-text">Your demo request is confirmed — a <strong style="color:#e8c468;">former Big 4 IT auditor</strong> will reach out to schedule your 30-minute technical deep dive.<br /><br />In the meantime, explore the full suite above. We look forward to an expert conversation.</div>
           <button class="btn-enterprise" style="margin-top:24px;" onclick="closeEnterpriseModal()">Continue Exploring
             →</button>
         </div>
@@ -10176,6 +10174,71 @@
       </button>
     </div>
   </nav>
+
+  <!-- ══ PROCESS STEPPER ══ -->
+  <div id="processStepper" style="background:rgba(8,11,18,0.95);border-bottom:1px solid rgba(255,255,255,0.07);padding:0 2rem;">
+    <style>
+      #processStepper { position:sticky; top:56px; z-index:90; }
+      .ps-track { display:flex; align-items:center; justify-content:center; gap:0; max-width:680px; margin:0 auto; padding:14px 0; }
+      .ps-step { display:flex; flex-direction:column; align-items:center; gap:5px; flex-shrink:0; cursor:default; }
+      .ps-icon { width:40px; height:40px; border-radius:50%; border:2px solid rgba(255,255,255,0.13); background:rgba(255,255,255,0.04); display:flex; align-items:center; justify-content:center; font-size:16px; transition:all .25s; }
+      .ps-label { font-size:.62rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:rgba(255,255,255,0.35); transition:color .25s; white-space:nowrap; }
+      .ps-sublabel { font-size:.55rem; font-weight:500; color:rgba(255,255,255,0.2); white-space:nowrap; }
+      .ps-connector { flex:1; height:2px; background:rgba(255,255,255,0.08); margin:0 8px; margin-bottom:18px; min-width:32px; max-width:80px; }
+      .ps-step.ps-active .ps-icon { border-color:#2B7FFF; background:rgba(43,127,255,0.15); box-shadow:0 0 14px rgba(43,127,255,0.3); }
+      .ps-step.ps-active .ps-label { color:#7CB9FF; }
+      .ps-step.ps-active .ps-sublabel { color:rgba(124,185,255,0.7); }
+      .ps-step.ps-done .ps-icon { border-color:rgba(29,184,106,0.5); background:rgba(29,184,106,0.1); }
+      .ps-step.ps-done .ps-label { color:rgba(29,184,106,0.7); }
+      .ps-connector.ps-done { background:rgba(29,184,106,0.35); }
+      @media(max-width:560px){ .ps-sublabel{display:none;} .ps-connector{min-width:16px;} }
+    </style>
+    <div class="ps-track">
+      <div class="ps-step ps-done" id="psStep1">
+        <div class="ps-icon">🛡️</div>
+        <div class="ps-label">SOX 404 Infrastructure</div>
+        <div class="ps-sublabel">Mapping digital assets</div>
+      </div>
+      <div class="ps-connector ps-done"></div>
+      <div class="ps-step ps-active" id="psStep2">
+        <div class="ps-icon">🤖</div>
+        <div class="ps-label">Audit of AI</div>
+        <div class="ps-sublabel">Model integrity &amp; bias</div>
+      </div>
+      <div class="ps-connector"></div>
+      <div class="ps-step" id="psStep3">
+        <div class="ps-icon">💬</div>
+        <div class="ps-label">Copilot Room</div>
+        <div class="ps-sublabel">Human-in-the-loop sign-off</div>
+      </div>
+    </div>
+    <script>
+      (function(){
+        var tabBtns = {m1:'psStep1', m2:'psStep2', m3:'psStep3'};
+        function updateStepper(module){
+          var steps = ['psStep1','psStep2','psStep3'];
+          var connectors = document.querySelectorAll('#processStepper .ps-connector');
+          var active = steps.indexOf(tabBtns[module]);
+          steps.forEach(function(id,i){
+            var el = document.getElementById(id);
+            if(!el) return;
+            el.classList.remove('ps-active','ps-done');
+            if(i < active) el.classList.add('ps-done');
+            else if(i === active) el.classList.add('ps-active');
+          });
+          connectors.forEach(function(c,i){
+            c.classList.toggle('ps-done', i < active);
+          });
+        }
+        var orig = window.switchAuditModule;
+        window.switchAuditModule = function(m){
+          if(orig) orig(m);
+          updateStepper(m);
+        };
+        updateStepper('m1');
+      })();
+    </script>
+  </div>
 
   <!-- ══ MODULE WRAPPER ══ -->
   <div id="auditModuleM1" style="display:block">
@@ -17552,8 +17615,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
   <div id="enterpriseStrip">
     <div class="es-text">
       <strong>Need this tailored for your organization?</strong> We can custom-build integrations, workpaper templates,
-      and audit frameworks specific to your company. <span>Trusted by internal audit teams at Fortune 500
-        companies.</span>
+      and audit frameworks specific to your company. <span>Designed for Global 2000 Compliance Standards.</span>
     </div>
     <button class="btn-enterprise" onclick="openEnterpriseModal()" style="flex-shrink:0;">
       🏢 Request Enterprise Access
