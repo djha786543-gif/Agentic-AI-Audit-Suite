@@ -3,8 +3,8 @@ clean_utf8.py — UTF-8 / Emoji Symbol Cleaner
 =============================================
 Recursively scans .html, .js, and .css files in the repository,
 replaces corrupted UTF-8 / mojibake / emoji sequences with their
-correct counterparts, and ensures every HTML file has a proper
-<meta charset="UTF-8"> tag.
+correct counterparts, strips UTF-8 BOMs, and ensures every HTML
+file has a proper <meta charset="UTF-8"> tag.
 
 Replacement mappings are loaded from ``replacements.csv`` (same
 directory as this script) which must have two columns:
@@ -44,6 +44,9 @@ _CHARSET_META_RE = re.compile(
 )
 
 CHARSET_META_TAG = '<meta charset="UTF-8">'
+
+# The Unicode BOM character that some editors prepend to UTF-8 files.
+UTF8_BOM = "\ufeff"
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -145,15 +148,21 @@ def scan_and_fix(root: str, pairs: list[tuple[str, str]]) -> None:
             content = original
             symbol_fixes: list[str] = []
 
-            # 1. Apply symbol replacements
+            # 1. Strip UTF-8 BOM if present
+            bom_stripped = False
+            if content.startswith(UTF8_BOM):
+                content = content[len(UTF8_BOM):]
+                bom_stripped = True
+
+            # 2. Apply symbol replacements
             content, symbol_fixes = apply_replacements(content, pairs)
 
-            # 2. For HTML files, ensure charset meta tag
+            # 3. For HTML files, ensure charset meta tag
             charset_added = False
             if ext == ".html":
                 content, charset_added = ensure_charset_meta(content)
 
-            # 3. Write back only when something actually changed
+            # 4. Write back only when something actually changed
             if content != original:
                 try:
                     with open(filepath, "w", encoding="utf-8") as fh:
@@ -164,6 +173,8 @@ def scan_and_fix(root: str, pairs: list[tuple[str, str]]) -> None:
 
                 files_modified += 1
                 print(f"[FIXED] {filepath}")
+                if bom_stripped:
+                    print(f"  Stripped UTF-8 BOM")
                 for line in symbol_fixes:
                     print(line)
                 if charset_added:
