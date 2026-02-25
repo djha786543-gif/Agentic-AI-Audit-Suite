@@ -10,6 +10,8 @@ and returns a unified audit result payload.
 from __future__ import annotations
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timezone
+import hashlib
+import json
 import logging
 
 from .sod import detect_sod_conflicts, summarize_sod_results
@@ -18,6 +20,7 @@ from .change import test_change_management, summarize_change_results
 from .operations import test_operations_controls, summarize_operations_results
 from .itac import run_all_itac_tests
 from .parser import extract_user_roles
+from .racm import enrich_with_racm, check_compensating_controls, sample_generator
 
 logger = logging.getLogger(__name__)
 
@@ -41,10 +44,34 @@ def _risk_rating(score: int) -> str:
     return "LOW"
 
 
+def _finding_sha256(finding: Dict) -> str:
+    """Compute a SHA-256 hash of a finding dict for chain-of-custody."""
+    canonical = json.dumps(finding, sort_keys=True, ensure_ascii=False, default=str)
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def _apply_evidence_walkback(finding: Dict) -> Dict:
+    """
+    Attach chain-of-custody metadata to a finding dict.
+    The SHA-256 hash is computed over the finding payload so that any
+    post-hoc alteration can be detected during an evidence walkback.
+    """
+    finding_id = finding.get("finding_id") or finding.get("control_id", "")
+    sha = _finding_sha256(finding)
+    finding["evidence_walkback"] = {
+        "finding_id": finding_id,
+        "sha256": sha,
+        "vaulted_at": datetime.now(timezone.utc).isoformat(),
+        "chain_of_custody": "SHA-256 hash computed over raw finding payload at engine runtime.",
+    }
+    return finding
+
+
 def run_audit_engine(
     parsed_data: Dict[str, Any],
     source_system: str = "Uploaded File",
     audit_period: Optional[str] = None,
+    available_controls: Optional[List[str]] = None,
 ) -> Dict[str, Any]:
     """
     Master orchestrator. Receives output from parser.parse_file() and
@@ -190,6 +217,35 @@ def run_audit_engine(
                     if "CORROBORATED" not in itac.get("recommendation", ""):
                         itac["recommendation"] = str(itac.get("recommendation", "")) + " CORROBORATED: Originating user has ITGC control exceptions (SOD/Access)!"
 
+    # ── RACM Enrichment, Compensating Controls & Evidence Walkback ───────────
+    for f in all_findings:
+        enrich_with_racm(f)
+        check_compensating_controls(f, available_controls=available_controls or [])
+        _apply_evidence_walkback(f)
+
+    # ── Statistical Sampling (per data domain) ────────────────────────────────
+    sampling_stats: Dict[str, Any] = {}
+    _domain_records: Dict[str, List] = {
+        "users": all_records_by_type["users"],
+        "changes": all_records_by_type["changes"],
+        "transactions": all_records_by_type["transactions"],
+        "backup": all_records_by_type["backup"],
+        "incident": all_records_by_type["incident"],
+        "interfaces": all_records_by_type["interfaces"],
+        "dr": all_records_by_type["dr"],
+    }
+    for domain, records in _domain_records.items():
+        if records:
+            plan = sample_generator(records)
+            sampling_stats[domain] = {
+                "population_size": plan["population_size"],
+                "sample_size": plan["sample_size"],
+                "confidence_level_pct": plan["confidence_level_pct"],
+                "margin_of_error_pct": plan["margin_of_error_pct"],
+                "z_score": plan["z_score"],
+                "methodology": plan["methodology"],
+            }
+
     # ── Aggregate Risk Score ──────────────────────────────────────────────────
     risk_score = _compute_risk_score(all_findings)
     overall_rating = _risk_rating(risk_score)
@@ -214,6 +270,7 @@ def run_audit_engine(
         "findings_by_risk": by_risk,
         "domain_results": domain_results,
         "all_findings": all_findings,
+        "sampling_stats": sampling_stats,
         "generated_at": start_time.isoformat(),
         "processing_seconds": round(elapsed, 2),
         "status": "COMPLETE",
