@@ -1,0 +1,7 @@
+"""Register all models so create_all_tables() works."""
+from models.evidence_vault import AuditEntry, ExtractionRun, EvidenceVault  # noqa
+from models.user import User  # noqa
+from models.engagement import Engagement, EngagementRole, ControlTest, Signoff  # noqa
+from models.evidence_artifact import EvidenceArtifact  # noqa
+from models.methodology import ControlLibrary, TestProcedure, SamplingRule  # noqa
+from models.finding import Finding, ManagementResponse, Retest  # noqa

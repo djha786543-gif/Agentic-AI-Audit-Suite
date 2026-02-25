@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ACAP — Build Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800;900&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --ink:#06080E;--ink2:#0A0E17;--ink3:#0E1420;--ink4:#131C2C;--ink5:#192436;
+  --b1:rgba(255,255,255,0.05);--b2:rgba(255,255,255,0.09);--b3:rgba(255,255,255,0.16);
+  --tx1:#EDF0F7;--tx2:#8B9BB8;--tx3:#4D5C78;--tx4:#2C3A52;
+  --teal:#0DB89C;--tdim:rgba(13,184,156,0.11);--tbord:rgba(13,184,156,0.26);
+  --blue:#2878FF;--bdim:rgba(40,120,255,0.11);--bbord:rgba(40,120,255,0.26);
+  --green:#16B866;--grdim:rgba(22,184,102,0.11);--grbord:rgba(22,184,102,0.26);
+  --amber:#D97706;--amdim:rgba(217,119,6,0.11);--ambord:rgba(217,119,6,0.26);
+  --red:#E03843;--rdim:rgba(224,56,67,0.11);--rbord:rgba(224,56,67,0.26);
+  --purple:#7B58F8;--pdim:rgba(123,88,248,0.11);--pbord:rgba(123,88,248,0.26);
+  --fd:"Sora",sans-serif;--fb:"Outfit",sans-serif;--fm:"JetBrains Mono",monospace;
+}
+html{font-size:16px;scroll-behavior:smooth;}
+body{background:var(--ink);color:var(--tx1);font-family:var(--fb);line-height:1.65;-webkit-font-smoothing:antialiased;min-height:100vh;}
+::selection{background:var(--teal);color:#000;}
+
+/* AMBIENT BG */
+body::after{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 80% 40% at 60% -10%,rgba(40,120,255,0.05) 0%,transparent 60%),
+             radial-gradient(ellipse 50% 35% at 5% 70%,rgba(13,184,156,0.04) 0%,transparent 60%);}
+
+.page{position:relative;z-index:1;max-width:1280px;margin:0 auto;padding:52px 36px 100px;}
+
+/* ── HEADER ── */
+.header{margin-bottom:56px;}
+.h-eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:var(--fm);font-size:9.5px;color:var(--teal);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:14px;}
+.h-eyebrow::before{content:"";width:18px;height:1px;background:var(--teal);}
+h1{font-family:var(--fd);font-size:42px;font-weight:900;letter-spacing:-1.4px;line-height:1.05;margin-bottom:10px;}
+h1 em{font-style:normal;color:var(--teal);}
+.h-sub{font-size:15px;color:var(--tx2);max-width:580px;line-height:1.72;}
+
+/* ── STAT STRIP ── */
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:52px;}
+.stat{background:var(--ink3);border:1px solid var(--b1);border-radius:12px;padding:18px 20px;}
+.stat-n{font-family:var(--fd);font-size:30px;font-weight:900;line-height:1;margin-bottom:4px;}
+.stat-l{font-family:var(--fm);font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:0.09em;}
+.n-green{color:var(--green);}
+.n-teal{color:var(--teal);}
+.n-amber{color:var(--amber);}
+.n-blue{color:var(--blue);}
+.n-gray{color:var(--tx4);}
+
+/* ── PHASE TIMELINE ── */
+.timeline{position:relative;margin-bottom:64px;}
+.tl-track{position:absolute;left:22px;top:28px;bottom:28px;width:2px;background:linear-gradient(to bottom,var(--green),var(--teal),var(--blue),var(--tx4) 75%);opacity:0.22;}
+
+.phase{position:relative;padding-left:62px;margin-bottom:20px;}
+.phase-dot{
+  position:absolute;left:11px;top:14px;
+  width:24px;height:24px;border-radius:50%;border:2px solid;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--fm);font-size:10px;font-weight:700;
+  z-index:1;background:var(--ink);
+}
+
+/* done */
+.phase-done .phase-dot{border-color:var(--green);color:var(--green);}
+.phase-done .pc{border-color:var(--grbord);}
+.phase-done .ph-badge{background:var(--grdim);border-color:var(--grbord);color:var(--green);}
+
+/* active */
+.phase-active .phase-dot{border-color:var(--teal);color:var(--teal);box-shadow:0 0 12px rgba(13,184,156,0.4);}
+.phase-active .pc{border-color:var(--tbord);background:linear-gradient(135deg,var(--ink3),var(--tdim));}
+.phase-active .ph-badge{background:var(--tdim);border-color:var(--tbord);color:var(--teal);}
+
+/* next */
+.phase-next .phase-dot{border-color:var(--blue);color:var(--blue);}
+.phase-next .pc{border-color:var(--bbord);}
+.phase-next .ph-badge{background:var(--bdim);border-color:var(--bbord);color:var(--blue);}
+
+/* future */
+.phase-future .phase-dot{border-color:var(--tx4);color:var(--tx4);}
+.phase-future .pc{border-color:var(--b1);}
+.phase-future .ph-badge{background:var(--b1);border-color:var(--b2);color:var(--tx4);}
+
+.pc{
+  background:var(--ink3);border:1px solid var(--b1);border-radius:14px;
+  overflow:hidden;transition:border-color 0.2s;
+}
+.pc-head{padding:16px 22px 14px;border-bottom:1px solid var(--b1);display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap;}
+.pc-meta{flex:1;}
+.ph-label{font-family:var(--fm);font-size:9px;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:5px;}
+.phase-done .ph-label{color:var(--green);}
+.phase-active .ph-label{color:var(--teal);}
+.phase-next .ph-label{color:var(--blue);}
+.phase-future .ph-label{color:var(--tx4);}
+.pc-title{font-family:var(--fd);font-size:17px;font-weight:800;color:var(--tx1);letter-spacing:-0.2px;margin-bottom:3px;}
+.pc-sub{font-size:12.5px;color:var(--tx3);line-height:1.55;}
+.ph-badge{font-family:var(--fm);font-size:9px;padding:3px 12px;border-radius:20px;border:1px solid;white-space:nowrap;align-self:flex-start;margin-top:2px;}
+
+/* tasks inside phase */
+.pc-body{padding:14px 22px 16px;}
+.task-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.task{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--tx2);line-height:1.5;}
+.task-icon{font-size:11px;flex-shrink:0;margin-top:1px;width:16px;text-align:center;}
+.task strong{color:var(--tx1);}
+.task.done-t{opacity:0.7;}
+.task.active-t{}
+.task.pending-t{opacity:0.45;}
+
+/* file chips */
+.pc-files{margin-top:12px;padding-top:12px;border-top:1px solid var(--b1);display:flex;gap:5px;flex-wrap:wrap;align-items:center;}
+.files-label{font-family:var(--fm);font-size:8.5px;color:var(--tx4);text-transform:uppercase;letter-spacing:0.09em;margin-right:3px;}
+.fc{font-family:var(--fm);font-size:9px;padding:2px 8px;border-radius:4px;}
+.fc-done{background:var(--grdim);border:1px solid var(--grbord);color:var(--green);}
+.fc-active{background:var(--tdim);border:1px solid var(--tbord);color:var(--teal);}
+.fc-mod{background:var(--amdim);border:1px solid var(--ambord);color:var(--amber);}
+.fc-pending{background:var(--b1);border:1px solid var(--b2);color:var(--tx4);}
+
+/* ── WHAT'S RUNNING NOW ── */
+.running-section{margin-bottom:64px;}
+.sec-title{font-family:var(--fd);font-size:22px;font-weight:800;letter-spacing:-0.4px;color:var(--tx1);margin-bottom:6px;}
+.sec-sub{font-size:13px;color:var(--tx2);margin-bottom:24px;line-height:1.65;}
+
+.services-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px;}
+.svc{background:var(--ink3);border:1px solid var(--b1);border-radius:12px;padding:18px 20px;transition:border-color 0.2s;}
+.svc:hover{border-color:var(--b2);}
+.svc-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.svc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.dot-live{background:var(--green);box-shadow:0 0 8px rgba(22,184,102,0.5);animation:pulse 2s infinite;}
+.dot-ready{background:var(--teal);}
+.dot-idle{background:var(--tx4);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.5;}}
+.svc-name{font-family:var(--fd);font-size:13px;font-weight:700;color:var(--tx1);}
+.svc-port{font-family:var(--fm);font-size:9.5px;color:var(--teal);background:var(--tdim);border:1px solid var(--tbord);padding:1px 8px;border-radius:4px;margin-left:auto;}
+.svc-desc{font-size:11.5px;color:var(--tx3);line-height:1.55;margin-bottom:8px;}
+.svc-url{font-family:var(--fm);font-size:10px;color:var(--blue);text-decoration:none;background:var(--bdim);border:1px solid var(--bbord);padding:3px 10px;border-radius:5px;display:inline-block;transition:opacity 0.15s;}
+.svc-url:hover{opacity:0.8;}
+
+/* ── ENDPOINTS ── */
+.endpoints-table{width:100%;border-collapse:collapse;background:var(--ink3);border:1px solid var(--b1);border-radius:14px;overflow:hidden;margin-bottom:32px;}
+.endpoints-table th{font-family:var(--fm);font-size:8.5px;font-weight:600;color:var(--tx4);text-transform:uppercase;letter-spacing:0.1em;padding:10px 16px;background:var(--ink4);border-bottom:1px solid var(--b1);text-align:left;}
+.endpoints-table td{font-size:12.5px;color:var(--tx2);padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.03);vertical-align:middle;}
+.endpoints-table tr:last-child td{border-bottom:none;}
+.endpoints-table tr:hover td{background:rgba(255,255,255,0.012);}
+.method{font-family:var(--fm);font-size:9.5px;padding:2px 8px;border-radius:4px;font-weight:600;}
+.m-post{background:var(--tdim);border:1px solid var(--tbord);color:var(--teal);}
+.m-get{background:var(--bdim);border:1px solid var(--bbord);color:var(--blue);}
+.ep-path{font-family:var(--fm);font-size:11px;color:var(--tx1);}
+.ep-new{font-family:var(--fm);font-size:8.5px;padding:1px 7px;border-radius:3px;background:var(--grdim);border:1px solid var(--grbord);color:var(--green);margin-left:6px;}
+
+/* ── VERIFY BOX ── */
+.verify-box{background:var(--ink3);border:1px solid var(--tbord);border-radius:14px;overflow:hidden;margin-bottom:64px;}
+.vb-head{padding:14px 20px;background:var(--tdim);border-bottom:1px solid var(--tbord);display:flex;align-items:center;gap:10px;}
+.vb-head-title{font-family:var(--fd);font-size:14px;font-weight:700;color:var(--tx1);}
+.vb-head-sub{font-size:12px;color:var(--tx3);margin-left:auto;}
+.vb-body{padding:18px 20px;}
+.vb-step{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px;}
+.vb-step:last-child{margin-bottom:0;}
+.vb-n{font-family:var(--fm);font-size:11px;color:var(--teal);background:var(--tdim);border:1px solid var(--tbord);width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:600;}
+.vb-text{font-size:13px;color:var(--tx2);line-height:1.6;padding-top:2px;}
+.vb-text strong{color:var(--tx1);}
+.vb-code{font-family:var(--fm);font-size:11px;background:var(--ink4);border:1px solid var(--b2);color:var(--teal);padding:2px 10px;border-radius:5px;display:inline-block;margin-top:4px;}
+
+/* ── NEXT UP ── */
+.next-box{background:var(--ink3);border:1px solid var(--bbord);border-radius:14px;overflow:hidden;margin-bottom:64px;}
+.next-head{padding:16px 22px;background:var(--bdim);border-bottom:1px solid var(--bbord);}
+.next-label{font-family:var(--fm);font-size:9px;color:var(--blue);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:5px;}
+.next-title{font-family:var(--fd);font-size:18px;font-weight:800;color:var(--tx1);letter-spacing:-0.2px;}
+.next-sub{font-size:12.5px;color:var(--tx2);margin-top:4px;line-height:1.6;}
+.next-body{padding:18px 22px;}
+.next-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.next-col-title{font-family:var(--fm);font-size:9px;color:var(--tx4);text-transform:uppercase;letter-spacing:0.09em;margin-bottom:10px;}
+.next-item{display:flex;gap:8px;font-size:12.5px;color:var(--tx2);margin-bottom:7px;line-height:1.5;}
+.next-item::before{content:"→";color:var(--blue);font-family:var(--fm);flex-shrink:0;}
+.next-item strong{color:var(--tx1);}
+
+/* ── FOOTER ── */
+.footer{padding-top:28px;border-top:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;font-family:var(--fm);font-size:10px;color:var(--tx4);flex-wrap:wrap;gap:10px;}
+
+@media(max-width:900px){
+  .stats{grid-template-columns:repeat(3,1fr);}
+  .task-grid{grid-template-columns:1fr;}
+  .services-grid{grid-template-columns:1fr 1fr;}
+  .next-grid{grid-template-columns:1fr;}
+}
+@media(max-width:600px){
+  .page{padding:32px 18px 60px;}
+  h1{font-size:28px;}
+  .stats{grid-template-columns:repeat(2,1fr);}
+  .services-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- HEADER -->
+<div class="header">
+  <div class="h-eyebrow">ACAP · Agentic Continuous Assurance Platform</div>
+  <h1>Build <em>Dashboard</em></h1>
+  <p class="h-sub">Live status of the ACAP build. Phase 1 is deployed and running. Track progress, verify your services, and see what's coming next.</p>
+</div>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat"><div class="stat-n n-green">1</div><div class="stat-l">Phases complete</div></div>
+  <div class="stat"><div class="stat-n n-teal">30</div><div class="stat-l">Files deployed</div></div>
+  <div class="stat"><div class="stat-n n-blue">5</div><div class="stat-l">Services running</div></div>
+  <div class="stat"><div class="stat-n n-amber">3</div><div class="stat-l">Phases remaining</div></div>
+  <div class="stat"><div class="stat-n n-gray">4</div><div class="stat-l">Total phases</div></div>
+</div>
+
+<!-- PHASE TIMELINE -->
+<div class="timeline">
+  <div class="tl-track"></div>
+
+  <!-- PHASE 1 — DONE -->
+  <div class="phase phase-done">
+    <div class="phase-dot">✓</div>
+    <div class="pc">
+      <div class="pc-head">
+        <div class="pc-meta">
+          <div class="ph-label">Phase 1 · Complete ✓</div>
+          <div class="pc-title">Stable vault · SHA-256 integrity · Chain of custody</div>
+          <div class="pc-sub">Conflicts fixed, hash-verified writes wired, extraction ledger active, Celery running, all 5 Docker services healthy.</div>
+        </div>
+        <div class="ph-badge">Deployed</div>
+      </div>
+      <div class="pc-body">
+        <div class="task-grid">
+          <div class="task done-t"><div class="task-icon">✓</div><div><strong>Deleted</strong> duplicate Evidence class conflict</div></div>
+          <div class="task done-t"><div class="task-icon">✓</div><div><strong>Deleted</strong> duplicate Base class conflict</div></div>
+          <div class="task done-t"><div class="task-icon">✓</div><div><strong>SHA-256 hash</strong> wired to every vault write</div></div>
+          <div class="task done-t"><div class="task-icon">✓</div><div><strong>ExtractionRun ledger</strong> written before evidence</div></div>
+          <div class="task done-t"><div class="task-icon">✓</div><div><strong>core/celery_app.py</strong> written — tasks now run</div></div>
+          <div class="task done-t"><div class="task-icon">✓</div><div><strong>Secrets</strong> moved to .env, no hardcoded passwords</div></div>
+          <div class="task done-t"><div class="task-icon">✓</div><div><strong>Redis</strong> added to docker-compose</div></div>
+          <div class="task done-t"><div class="task-icon">✓</div><div><strong>Integrity verifier</strong> Celery Beat task active</div></div>
+        </div>
+        <div class="pc-files">
+          <span class="files-label">New / changed</span>
+          <span class="fc fc-done">models/evidence_vault.py</span>
+          <span class="fc fc-done">vault/writer.py</span>
+          <span class="fc fc-done">schemas/evidence.py</span>
+          <span class="fc fc-done">core/celery_app.py</span>
+          <span class="fc fc-done">worker/integrity.py</span>
+          <span class="fc fc-done">docker-compose.yml</span>
+          <span class="fc fc-done">main.py</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 2 — NEXT -->
+  <div class="phase phase-next">
+    <div class="phase-dot">2</div>
+    <div class="pc">
+      <div class="pc-head">
+        <div class="pc-meta">
+          <div class="ph-label">Phase 2 · Up next</div>
+          <div class="pc-title">Connector framework + JWT authentication</div>
+          <div class="pc-sub">Abstract BaseConnector with Azure AD as the first real implementation. JWT OAuth2 with RBAC so external auditors get scoped read-only tokens.</div>
+        </div>
+        <div class="ph-badge">Queued</div>
+      </div>
+      <div class="pc-body">
+        <div class="task-grid">
+          <div class="task pending-t"><div class="task-icon">○</div><div><strong>connectors/base.py</strong> — abstract class, TypeError if incomplete</div></div>
+          <div class="task pending-t"><div class="task-icon">○</div><div><strong>connectors/azure_ad.py</strong> — Microsoft Graph connector</div></div>
+          <div class="task pending-t"><div class="task-icon">○</div><div><strong>auth/oauth2.py</strong> — JWT issue + validate</div></div>
+          <div class="task pending-t"><div class="task-icon">○</div><div><strong>auth/rbac.py</strong> — role decorator (AUDITOR / READ-ONLY)</div></div>
+          <div class="task pending-t"><div class="task-icon">○</div><div><strong>Connector health endpoint</strong> — GET /connectors/health</div></div>
+          <div class="task pending-t"><div class="task-icon">○</div><div><strong>Service account tokens</strong> for connector agents</div></div>
+        </div>
+        <div class="pc-files">
+          <span class="files-label">Will add</span>
+          <span class="fc fc-pending">connectors/base.py</span>
+          <span class="fc fc-pending">connectors/azure_ad.py</span>
+          <span class="fc fc-pending">auth/oauth2.py</span>
+          <span class="fc fc-pending">auth/rbac.py</span>
+          <span class="fc fc-pending">auth/context.py</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 3 -->
+  <div class="phase phase-future">
+    <div class="phase-dot">3</div>
+    <div class="pc">
+      <div class="pc-head">
+        <div class="pc-meta">
+          <div class="ph-label">Phase 3 · Planned</div>
+          <div class="pc-title">Multi-tenancy · PostgreSQL RLS · Async DB</div>
+          <div class="pc-sub">org_id on every table, PostgreSQL Row-Level Security so tenant data is isolated at DB layer. Async SQLAlchemy session. Integrity verifier fully wired.</div>
+        </div>
+        <div class="ph-badge">Planned</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 4 -->
+  <div class="phase phase-future">
+    <div class="phase-dot">4</div>
+    <div class="pc">
+      <div class="pc-head">
+        <div class="pc-meta">
+          <div class="ph-label">Phase 4 · Planned</div>
+          <div class="pc-title">Control evaluation · SOD matrix · Exception workflow · Audit packages</div>
+          <div class="pc-sub">Parameterised ITGC test engine, terminated user access test, SOD conflict detection, exception lifecycle (acknowledge / remediate / accept), sealed audit packages.</div>
+        </div>
+        <div class="ph-badge">Planned</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- WHAT'S RUNNING -->
+<div class="running-section">
+  <div class="sec-title">What's running right now</div>
+  <div class="sec-sub">5 Docker services started by <code style="font-family:var(--fm);font-size:11px;color:var(--teal);">docker compose up --build</code></div>
+
+  <div class="services-grid">
+    <div class="svc">
+      <div class="svc-top">
+        <div class="svc-dot dot-live"></div>
+        <div class="svc-name">FastAPI</div>
+        <div class="svc-port">:8000</div>
+      </div>
+      <div class="svc-desc">Main API + live SOC dashboard. Hash-verified vault endpoints. Extraction run ledger.</div>
+      <a href="http://localhost:8000" class="svc-url" target="_blank">localhost:8000 →</a>
+      &nbsp;
+      <a href="http://localhost:8000/docs" class="svc-url" target="_blank">API docs →</a>
+    </div>
+    <div class="svc">
+      <div class="svc-top">
+        <div class="svc-dot dot-live"></div>
+        <div class="svc-name">PostgreSQL</div>
+        <div class="svc-port">:5433</div>
+      </div>
+      <div class="svc-desc">Vault DB. Tables: <code style="font-family:var(--fm);font-size:10px;">evidence_vault</code>, <code style="font-family:var(--fm);font-size:10px;">extraction_runs</code>. Auto-created on startup.</div>
+      <a href="http://localhost:8000/api/v1/audit/vault/summary" class="svc-url" target="_blank">vault summary →</a>
+    </div>
+    <div class="svc">
+      <div class="svc-top">
+        <div class="svc-dot dot-live"></div>
+        <div class="svc-name">Redis</div>
+        <div class="svc-port">:6379</div>
+      </div>
+      <div class="svc-desc">Celery broker + result backend. All task queues route through here.</div>
+    </div>
+    <div class="svc">
+      <div class="svc-top">
+        <div class="svc-dot dot-ready"></div>
+        <div class="svc-name">Celery Worker</div>
+      </div>
+      <div class="svc-desc">Processes <code style="font-family:var(--fm);font-size:10px;">extraction</code> and <code style="font-family:var(--fm);font-size:10px;">evaluation</code> queues. Handles control test tasks.</div>
+    </div>
+    <div class="svc">
+      <div class="svc-top">
+        <div class="svc-dot dot-ready"></div>
+        <div class="svc-name">Celery Beat</div>
+      </div>
+      <div class="svc-desc">Scheduler. Runs integrity hash re-verification every 60 minutes automatically.</div>
+    </div>
+    <div class="svc">
+      <div class="svc-top">
+        <div class="svc-dot dot-idle"></div>
+        <div class="svc-name">Watcher Agent</div>
+      </div>
+      <div class="svc-desc">Run manually to stream live evidence into the dashboard.</div>
+      <span style="font-family:var(--fm);font-size:10px;color:var(--tx3);">python watcher_agent.py</span>
+    </div>
+  </div>
+
+  <!-- ENDPOINTS TABLE -->
+  <table class="endpoints-table">
+    <thead>
+      <tr><th>Method</th><th>Endpoint</th><th>What it does</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="method m-get">GET</span></td>
+        <td class="ep-path">/</td>
+        <td>Live SOC dashboard — hash table, confidence scores, tamper alerts</td>
+      </tr>
+      <tr>
+        <td><span class="method m-post">POST</span></td>
+        <td class="ep-path">/api/v1/audit/evidence<span class="ep-new">new</span></td>
+        <td>Submit evidence → writes extraction ledger first → computes SHA-256 → stores</td>
+      </tr>
+      <tr>
+        <td><span class="method m-get">GET</span></td>
+        <td class="ep-path">/api/v1/audit/vault</td>
+        <td>All vault records with <code style="font-family:var(--fm);font-size:10.5px;">content_hash</code> + <code style="font-family:var(--fm);font-size:10.5px;">hash_verified</code> per record</td>
+      </tr>
+      <tr>
+        <td><span class="method m-get">GET</span></td>
+        <td class="ep-path">/api/v1/audit/vault/summary<span class="ep-new">new</span></td>
+        <td>Total / verified / tampered / low-confidence counts — powers dashboard header</td>
+      </tr>
+      <tr>
+        <td><span class="method m-get">GET</span></td>
+        <td class="ep-path">/api/v1/audit/vault/{id}<span class="ep-new">new</span></td>
+        <td>Single record with live hash re-verification on every fetch</td>
+      </tr>
+      <tr>
+        <td><span class="method m-get">GET</span></td>
+        <td class="ep-path">/api/v1/audit/runs<span class="ep-new">new</span></td>
+        <td>Extraction run audit trail — every batch that fed the vault</td>
+      </tr>
+      <tr>
+        <td><span class="method m-get">GET</span></td>
+        <td class="ep-path">/api/v1/health</td>
+        <td>Liveness probe — returns 200 if process is alive</td>
+      </tr>
+      <tr>
+        <td><span class="method m-get">GET</span></td>
+        <td class="ep-path">/api/v1/health/ready<span class="ep-new">new</span></td>
+        <td>Readiness probe — checks DB connectivity</td>
+      </tr>
+      <tr>
+        <td><span class="method m-get">GET</span></td>
+        <td class="ep-path">/docs</td>
+        <td>Interactive Swagger UI (development mode only)</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- VERIFY IT'S WORKING -->
+<div class="verify-box">
+  <div class="vb-head">
+    <div class="vb-head-title">✓ Verify Phase 1 is working</div>
+    <div class="vb-head-sub">Run these in order — each confirms a different layer</div>
+  </div>
+  <div class="vb-body">
+    <div class="vb-step">
+      <div class="vb-n">1</div>
+      <div class="vb-text"><strong>Dashboard loads</strong> — open <a href="http://localhost:8000" style="color:var(--teal);">http://localhost:8000</a> and see the SOC panel with stats strip. Counter shows 0 until watcher runs.</div>
+    </div>
+    <div class="vb-step">
+      <div class="vb-n">2</div>
+      <div class="vb-text"><strong>All services healthy</strong> — run in PowerShell:<br>
+        <span class="vb-code">docker compose ps</span><br>
+        All 5 should show <code style="font-family:var(--fm);font-size:10.5px;color:var(--green);">running</code> or <code style="font-family:var(--fm);font-size:10.5px;color:var(--green);">healthy</code>.</div>
+    </div>
+    <div class="vb-step">
+      <div class="vb-n">3</div>
+      <div class="vb-text"><strong>Watcher streams evidence</strong> — in a second terminal:<br>
+        <span class="vb-code">python watcher_agent.py</span><br>
+        You should see lines like: <code style="font-family:var(--fm);font-size:10.5px;color:var(--tx2);">✓  ACAP-FS-001  |  FileSystem-Watcher  |  conf=87%  |  hash=4f2a8c1b…</code></div>
+    </div>
+    <div class="vb-step">
+      <div class="vb-n">4</div>
+      <div class="vb-text"><strong>Hash verified in dashboard</strong> — after watcher runs, refresh the dashboard. Every row should show <code style="font-family:var(--fm);font-size:10.5px;color:var(--green);">✓ OK</code> in the Integrity column and a truncated hash in the Content Hash column.</div>
+    </div>
+    <div class="vb-step">
+      <div class="vb-n">5</div>
+      <div class="vb-text"><strong>API docs work</strong> — open <a href="http://localhost:8000/docs" style="color:var(--teal);">http://localhost:8000/docs</a> and try POST /audit/evidence with a test payload.</div>
+    </div>
+    <div class="vb-step">
+      <div class="vb-n">6</div>
+      <div class="vb-text"><strong>Extraction run ledger</strong> — open <a href="http://localhost:8000/api/v1/audit/runs" style="color:var(--teal);">http://localhost:8000/api/v1/audit/runs</a> — every evidence submission should have a corresponding run entry with its own ID.</div>
+    </div>
+  </div>
+</div>
+
+<!-- NEXT UP -->
+<div class="next-box">
+  <div class="next-head">
+    <div class="next-label">Up next — Phase 2</div>
+    <div class="next-title">Connector framework + JWT authentication</div>
+    <div class="next-sub">Say "build Phase 2" to start. All Phase 1 files stay exactly as-is — Phase 2 only adds new modules.</div>
+  </div>
+  <div class="next-body">
+    <div class="next-grid">
+      <div>
+        <div class="next-col-title">What gets built</div>
+        <div class="next-item"><strong>BaseConnector ABC</strong> — abstract class every connector must implement</div>
+        <div class="next-item"><strong>Azure AD connector</strong> — Microsoft Graph, mock + real mode</div>
+        <div class="next-item"><strong>Okta connector</strong> — SCIM API integration</div>
+        <div class="next-item"><strong>auth/oauth2.py</strong> — JWT issue + validate, short-lived tokens</div>
+        <div class="next-item"><strong>auth/rbac.py</strong> — INTERNAL_AUDITOR, EXTERNAL_AUDITOR, CONNECTOR_SERVICE roles</div>
+        <div class="next-item"><strong>Connector health endpoint</strong> — GET /connectors/{id}/health</div>
+      </div>
+      <div>
+        <div class="next-col-title">What you get after Phase 2</div>
+        <div class="next-item">API endpoints are <strong>protected by JWT</strong> — no more open access</div>
+        <div class="next-item">External auditors get <strong>read-only scoped tokens</strong></div>
+        <div class="next-item">Watcher agent uses <strong>BaseConnector pattern</strong> — pluggable</div>
+        <div class="next-item">Azure AD connector can <strong>pull real access data</strong> from Graph API</div>
+        <div class="next-item">Connector health is <strong>visible in dashboard</strong> — green/red per source</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div>ACAP Build Dashboard · Phase 1 complete · Feb 2026</div>
+  <div style="display:flex;gap:16px;">
+    <a href="ACAP_Architecture.html" style="color:var(--tx3);text-decoration:none;">Architecture →</a>
+    <a href="ACAP_Schema.html" style="color:var(--tx3);text-decoration:none;">Schema →</a>
+    <a href="ACAP_Step3_FastAPI_Structure.html" style="color:var(--tx3);text-decoration:none;">API Structure →</a>
+  </div>
+</div>
+
+</div>
+</body>
+</html>
