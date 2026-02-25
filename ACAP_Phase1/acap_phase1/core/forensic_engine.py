@@ -280,7 +280,8 @@ class ForensicEngine:
         self, summary: Dict, raw_records: List[Dict], result: IntegrityCheckResult
     ):
         """Verify that financial totals are mathematically correct."""
-        claimed_total = summary.get("total_financial_impact")
+        # Check both 'total_financial_impact' and 'total_amount' fields
+        claimed_total = summary.get("total_financial_impact") or summary.get("total_amount")
         if claimed_total is not None:
             actual_total = sum(self._extract_amount(r) for r in raw_records)
             # Allow up to 1% tolerance for floating point and materiality filtering
@@ -299,6 +300,13 @@ class ForensicEngine:
                         f"(claimed ${claimed_total:,.2f} vs actual ${actual_total:,.2f}). "
                         f"This may be due to materiality filtering."
                     )
+            elif actual_total == 0 and claimed_total > 100:
+                result.add_math_error(
+                    calculation="total_financial_impact",
+                    expected=0,
+                    actual=round(claimed_total, 2),
+                    severity="critical",
+                )
 
     def _check_priority_distribution(
         self, summary: Dict, raw_records: List[Dict], result: IntegrityCheckResult
@@ -324,8 +332,21 @@ class ForensicEngine:
     ):
         """Check that source systems referenced in summary actually exist in data."""
         actual_sources = {str(r.get("source_system", "")).lower() for r in raw_records}
+        actual_sources.discard("")
 
-        # If summary mentions specific sources, verify they exist
+        # Check top-level 'source_systems' array
+        claimed_sources = summary.get("source_systems", [])
+        if isinstance(claimed_sources, list):
+            for src in claimed_sources:
+                src_lower = str(src).lower()
+                if src_lower and src_lower not in actual_sources:
+                    result.add_hallucination(
+                        claim=f"Summary references source system '{src}'",
+                        evidence=f"Actual sources in data: {', '.join(actual_sources)}",
+                        severity="high",
+                    )
+
+        # Also check findings[].category for source references
         findings = summary.get("findings", [])
         if isinstance(findings, list):
             for finding in findings:
