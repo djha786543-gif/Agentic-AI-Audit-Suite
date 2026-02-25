@@ -6,10 +6,14 @@ replaces corrupted UTF-8 / mojibake / emoji sequences with their
 correct counterparts, strips UTF-8 BOMs, and ensures every HTML
 file has a proper <meta charset="UTF-8"> tag.
 
-Replacement mappings are loaded from ``replacements.csv`` (same
-directory as this script) which must have two columns:
-  Corrupted   – the broken byte sequence as it appears in the file
-  Replacement – the correct Unicode character(s) to substitute
+Two-pass replacement strategy:
+  1. Algorithmic auto-detection: scans for sequences of characters
+     whose CP1252/Latin-1 byte values form a valid UTF-8 sequence
+     for a single Unicode code point and replaces them automatically.
+     This handles box-drawing chars (─ ═ ━), emoji, math symbols, etc.
+     without requiring manual CSV entries.
+  2. CSV-driven replacement: applies explicit (Corrupted, Replacement)
+     pairs from ``replacements.csv`` as a belt-and-suspenders fallback.
 
 Usage:
     python clean_utf8.py [root_dir]
@@ -47,6 +51,79 @@ CHARSET_META_TAG = '<meta charset="UTF-8">'
 
 # The Unicode BOM character that some editors prepend to UTF-8 files.
 UTF8_BOM = "\ufeff"
+
+# ---------------------------------------------------------------------------
+# Algorithmic mojibake auto-detection
+# ---------------------------------------------------------------------------
+
+
+def _char_to_byte(c: str):
+    """Return the single Latin-1/CP1252 byte value for *c*, or None."""
+    try:
+        return c.encode("latin-1")[0]
+    except UnicodeEncodeError:
+        try:
+            return c.encode("cp1252")[0]
+        except (UnicodeEncodeError, UnicodeDecodeError):
+            return None
+
+
+def fix_mojibake_auto(content: str) -> tuple:
+    """Fix CP1252-re-encoded UTF-8 (mojibake) algorithmically.
+
+    Scans for sequences of characters whose CP1252/Latin-1 byte values
+    form a valid 2-4 byte UTF-8 sequence for exactly one Unicode code
+    point, and replaces each such sequence with the correct character.
+
+    Returns ``(fixed_content, count)`` where *count* is the number of
+    sequences that were replaced.
+    """
+    result: list = []
+    count = 0
+    i = 0
+    n = len(content)
+
+    while i < n:
+        c = content[i]
+        lead = _char_to_byte(c)
+
+        # Only attempt decode when the byte value looks like the start
+        # of a multi-byte UTF-8 sequence (0xC0..0xFF).
+        if lead is not None and lead >= 0xC0:
+            replaced = False
+            # Try longest match first (4 input chars → 4-byte UTF-8 → 1 emoji)
+            for length in (4, 3, 2):
+                if i + length > n:
+                    continue
+                seq = content[i : i + length]
+                raw = bytearray()
+                ok = True
+                for ch in seq:
+                    bval = _char_to_byte(ch)
+                    if bval is None:
+                        ok = False
+                        break
+                    raw.append(bval)
+                if not ok:
+                    continue
+                try:
+                    decoded = raw.decode("utf-8")
+                    if len(decoded) == 1:          # exactly one Unicode char
+                        result.append(decoded)
+                        count += 1
+                        i += length
+                        replaced = True
+                        break
+                except UnicodeDecodeError:
+                    pass
+            if not replaced:
+                result.append(c)
+                i += 1
+        else:
+            result.append(c)
+            i += 1
+
+    return "".join(result), count
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -153,6 +230,13 @@ def scan_and_fix(root: str, pairs: list[tuple[str, str]]) -> None:
             if content.startswith(UTF8_BOM):
                 content = content[len(UTF8_BOM):]
                 bom_stripped = True
+
+            # 1a. Algorithmic mojibake auto-detection (CP1252 re-encoding)
+            content, auto_count = fix_mojibake_auto(content)
+            if auto_count:
+                symbol_fixes.append(
+                    f"  Auto-fixed {auto_count} mojibake sequence(s) algorithmically"
+                )
 
             # 2. Apply symbol replacements
             content, symbol_fixes = apply_replacements(content, pairs)
