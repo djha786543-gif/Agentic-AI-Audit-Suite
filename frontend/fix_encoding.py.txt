@@ -1,0 +1,38 @@
+import os
+
+# Define the broken strings and their correct versions
+replacements = {
+    'â€”': '—',
+    'Â·': '·',
+    'ðŸš': '🚀',
+    'ðŸ“š': '📚',
+    'ðŸ”': '🔍',
+    'â€': '"',
+}
+
+def clean_files():
+    # Only target html, css, and js files
+    extensions = ('.html', '.js', '.css')
+    
+    for root, dirs, files in os.walk("."):
+        for file in files:
+            if file.endswith(extensions):
+                path = os.path.join(root, file)
+                
+                # Read the file
+                with open(path, 'r', encoding='utf-8', errors='ignore') as f:
+                    content = f.read()
+                
+                # Replace the junk
+                new_content = content
+                for broken, fixed in replacements.items():
+                    new_content = new_content.replace(broken, fixed)
+                
+                # Save it back if changes were made
+                if new_content != content:
+                    with open(path, 'w', encoding='utf-8') as f:
+                        f.write(new_content)
+                    print(f"Fixed: {file}")
+
+if __name__ == "__main__":
+    clean_files()
