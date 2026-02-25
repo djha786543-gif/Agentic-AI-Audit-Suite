@@ -1,10 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <meta charset="UTF-8">
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Help & Guide — Agentic AI Audit Suite</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -676,7 +674,6 @@
       <div class="toc-card-title">AWS Cloud Audit</div>
       <div class="toc-card-desc">Cloud security controls & assessments</div>
     </a>
-    <a href="#vault" class="toc-card"><div class="toc-card-icon">🛡️</div><div class="toc-card-title">Live Data Vault</div><div class="toc-card-desc">Cryptographic ledger, tamper detection & real-time monitoring</div></a>
     <a href="#troubleshooting" class="toc-card">
       <div class="toc-card-icon">🔧</div>
       <div class="toc-card-title">Troubleshooting</div>
@@ -711,8 +708,6 @@
       <a href="#reports" class="sidebar-link">📊 Reports & Exports</a>
       <a href="#security" class="sidebar-link">🛡️ Security & Privacy</a>
       <div class="nav-group-title">Support</div>
-      <a href="#vault" class="toc-card"><div class="toc-card-icon">🛡️</div><div class="toc-card-title">Live Data Vault</div><div class="toc-card-desc">Cryptographic ledger, tamper detection & real-time monitoring</div></a>
-    <a href="#vault" class="sidebar-link">🛡️ Live Data Vault</a>
       <a href="#troubleshooting" class="sidebar-link">🔧 Troubleshooting</a>
       <a href="#faq" class="sidebar-link">💬 FAQ</a>
     </nav>
@@ -933,7 +928,7 @@
           <div class="step-num">3</div>
           <div class="step-body">
             <div class="step-title">Connect Your First Data Source</div>
-            <div class="step-desc">Go to <strong>Settings &rarr; Data Sources</strong> and click <strong>+ Add Source</strong>. Choose from ERP systems, Active Directory, cloud environments, or file uploads. See the <a href="#data-sources">Data Connectivity section</a> for full details on each connector type.</div>
+            <div class="step-desc">Go to <strong>Settings → Data Sources</strong> and click <strong>+ Add Source</strong>. Choose from ERP systems, Active Directory, cloud environments, or file uploads. See the <a href="#data-sources">Data Connectivity section</a> for full details on each connector type.</div>
           </div>
         </div>
         <div class="step">
@@ -1024,7 +1019,7 @@
           <rect x="180" y="163" width="250" height="32" rx="6" fill="#112240"/>
           <text x="305" y="183" text-anchor="middle" fill="#ccd6f6" font-size="10" font-family="Outfit,sans-serif">Test all change management controls Q4</text>
           <rect x="260" y="203" width="295" height="42" rx="6" fill="rgba(0,212,255,0.08)" stroke="rgba(0,212,255,0.2)" stroke-width="1"/>
-          <text x="407" y="220" text-anchor="middle" fill="#00d4ff" font-size="9.5" font-family="Outfit,sans-serif"><i class="fa-solid fa-check"></i> Deploying Change Mgmt Agent (08)...</text>
+          <text x="407" y="220" text-anchor="middle" fill="#00d4ff" font-size="9.5" font-family="Outfit,sans-serif">✓ Deploying Change Mgmt Agent (08)...</text>
           <text x="407" y="237" text-anchor="middle" fill="#8892b0" font-size="9" font-family="Outfit,sans-serif">Scanning 847 change tickets · Found 3 unauthorized</text>
           <!-- Input bar -->
           <rect x="180" y="337" width="376" height="17" rx="5" fill="#070d1a" stroke="#1e3a5f" stroke-width="1"/>
@@ -1546,7 +1541,7 @@
         <div class="step">
           <div class="step-num">1</div>
           <div class="step-body">
-            <div class="step-title">Go to Settings &rarr; Data Sources</div>
+            <div class="step-title">Go to Settings → Data Sources</div>
             <div class="step-desc">Click the gear icon in the left navigation, then select "Data Sources" from the settings menu.</div>
           </div>
         </div>
@@ -1901,153 +1896,8 @@
   <span class="str">"Action"</span>: <span class="str">"sts:AssumeRole"</span>
 }
 
-<span class="comment">// Step 3: Enter the Role ARN in Data Sources &rarr; AWS</span>
+<span class="comment">// Step 3: Enter the Role ARN in Data Sources → AWS</span>
 <span class="comment">// The suite uses STS to assume the role temporarily (1 hour sessions)</span>
-      </div>
-    </section>
-
-        <!-- LIVE VAULT SECTION -->
-    <section class="help-section" id="vault">
-      <div class="section-header">
-        <div class="section-icon">🛡️</div>
-        <div>
-          <h2>Live Data Vault</h2>
-          <p class="section-subtitle">CRYPTOGRAPHIC LEDGER · REAL-TIME MONITORING · TAMPER DETECTION</p>
-        </div>
-      </div>
-      <div class="prose">
-        <p>The <strong>Live Data Vault</strong> (<code style="background:rgba(0,212,255,0.1);color:#00d4ff;padding:2px 6px;border-radius:4px;font-family:IBM Plex Mono,monospace;font-size:13px;">vault.html</code>) is your real-time cryptographic ledger — a tamper-evident window into the PostgreSQL <code style="background:rgba(0,212,255,0.1);color:#00d4ff;padding:2px 6px;border-radius:4px;font-family:IBM Plex Mono,monospace;font-size:13px;">audit_vault</code> table. Every audit event, agent action, and control test result is written here with a SHA-256 cryptographic hash. Any tampering immediately alters the hash and triggers an alert.</p>
-        <p>The Vault operates independently from the main suite and connects directly to your backend API at <code style="background:rgba(0,212,255,0.1);color:#00d4ff;padding:2px 6px;border-radius:4px;font-family:IBM Plex Mono,monospace;font-size:13px;">/api/v1/audit/vault</code>, auto-refreshing every few seconds to show live data.</p>
-      </div>
-
-      <h3 class="sub-heading">Vault Dashboard Features</h3>
-      <div class="feature-grid">
-        <div class="feature-card">
-          <div class="feature-card-icon">📊</div>
-          <div class="feature-card-title">Live Data Grid</div>
-          <div class="feature-card-desc">Auto-refreshing table showing all audit vault records in real time. Columns include event type, timestamp, agent ID, SHA-256 hash, and status. Updates automatically every few seconds without needing to refresh the page.</div>
-        </div>
-        <div class="feature-card">
-          <div class="feature-card-icon">📈</div>
-          <div class="feature-card-title">Interactive Charts</div>
-          <div class="feature-card-desc">Chart.js powered visualizations showing audit event frequency, agent activity over time, and control test pass/fail trends — all driven by live vault data streamed from the API.</div>
-        </div>
-        <div class="feature-card">
-          <div class="feature-card-icon">🔍</div>
-          <div class="feature-card-title">Filter by Log Date</div>
-          <div class="feature-card-desc">Filter the entire vault view to a specific date range to isolate evidence for a particular audit period or investigate a specific incident window. Filters both the grid and charts simultaneously.</div>
-        </div>
-        <div class="feature-card">
-          <div class="feature-card-icon">🟢</div>
-          <div class="feature-card-title">Connection State Indicator</div>
-          <div class="feature-card-desc">Green = connected to backend API receiving live data. Red = disconnected. The dashboard gracefully handles reconnection attempts and always shows the last known data state while offline.</div>
-        </div>
-        <div class="feature-card">
-          <div class="feature-card-icon">#️⃣</div>
-          <div class="feature-card-title">SHA-256 Cryptographic Hashing</div>
-          <div class="feature-card-desc">Every record gets a SHA-256 hash computed by the Watcher Guard before being written to the vault. Any modification to the record — even a single character — produces a completely different hash, making alterations instantly detectable.</div>
-        </div>
-        <div class="feature-card">
-          <div class="feature-card-icon">🏢</div>
-          <div class="feature-card-title">Tenant Isolation (RLS)</div>
-          <div class="feature-card-desc">Row-Level Security policy on the audit_vault table ensures each organization's data is completely isolated at the database level. No cross-tenant data leakage is architecturally possible.</div>
-        </div>
-      </div>
-
-      <h3 class="sub-heading">How the Vault Works — Data Flow</h3>
-      <div class="diagram-container">
-        <div class="diagram-title">// Live Data Vault — Cryptographic Data Flow</div>
-        <svg viewBox="0 0 760 300" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:760px;display:block;margin:0 auto;">
-          <defs>
-            <marker id="va1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#00d4ff" opacity="0.7"/></marker>
-            <marker id="va2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#00ff88" opacity="0.7"/></marker>
-            <marker id="va3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#f7931a" opacity="0.7"/></marker>
-          </defs>
-          <rect x="0" y="0" width="760" height="300" rx="10" fill="#070d1a" stroke="#1e3a5f" stroke-width="1"/>
-          <rect x="15" y="20" width="120" height="48" rx="7" fill="#0d1b2e" stroke="#1e3a5f" stroke-width="1.5"/>
-          <text x="75" y="41" text-anchor="middle" fill="#ffffff" font-size="14">🤖</text>
-          <text x="75" y="58" text-anchor="middle" fill="#ccd6f6" font-size="10" font-family="Outfit,sans-serif">Agent Events</text>
-          <rect x="15" y="80" width="120" height="48" rx="7" fill="#0d1b2e" stroke="#1e3a5f" stroke-width="1.5"/>
-          <text x="75" y="101" text-anchor="middle" fill="#ffffff" font-size="14">⚖️</text>
-          <text x="75" y="118" text-anchor="middle" fill="#ccd6f6" font-size="10" font-family="Outfit,sans-serif">Control Tests</text>
-          <rect x="15" y="140" width="120" height="48" rx="7" fill="#0d1b2e" stroke="#1e3a5f" stroke-width="1.5"/>
-          <text x="75" y="161" text-anchor="middle" fill="#ffffff" font-size="14">👤</text>
-          <text x="75" y="178" text-anchor="middle" fill="#ccd6f6" font-size="10" font-family="Outfit,sans-serif">User Actions</text>
-          <line x1="135" y1="44" x2="185" y2="115" stroke="#00d4ff" stroke-width="1.2" marker-end="url(#va1)" opacity="0.5"/>
-          <line x1="135" y1="104" x2="185" y2="120" stroke="#00d4ff" stroke-width="1.2" marker-end="url(#va1)" opacity="0.5"/>
-          <line x1="135" y1="164" x2="185" y2="130" stroke="#00d4ff" stroke-width="1.2" marker-end="url(#va1)" opacity="0.5"/>
-          <rect x="185" y="88" width="140" height="80" rx="10" fill="rgba(247,147,26,0.08)" stroke="rgba(247,147,26,0.4)" stroke-width="2"/>
-          <text x="255" y="116" text-anchor="middle" fill="#f7931a" font-size="16">👁️</text>
-          <text x="255" y="134" text-anchor="middle" fill="#f7931a" font-size="12" font-family="Outfit,sans-serif" font-weight="700">Watcher Guard</text>
-          <text x="255" y="150" text-anchor="middle" fill="#8892b0" font-size="9" font-family="Outfit,sans-serif">Intercepts all events</text>
-          <text x="255" y="162" text-anchor="middle" fill="#8892b0" font-size="9" font-family="Outfit,sans-serif">Computes SHA-256 hash</text>
-          <line x1="325" y1="128" x2="370" y2="128" stroke="#f7931a" stroke-width="1.5" marker-end="url(#va3)" opacity="0.7"/>
-          <rect x="370" y="90" width="155" height="76" rx="10" fill="rgba(0,255,136,0.06)" stroke="rgba(0,255,136,0.3)" stroke-width="2"/>
-          <text x="447" y="115" text-anchor="middle" fill="#00ff88" font-size="14">🗄️</text>
-          <text x="447" y="133" text-anchor="middle" fill="#00ff88" font-size="11" font-family="Outfit,sans-serif" font-weight="700">audit_vault (PostgreSQL)</text>
-          <text x="447" y="148" text-anchor="middle" fill="#8892b0" font-size="9" font-family="Outfit,sans-serif">RLS · Tenant isolated · Immutable</text>
-          <text x="447" y="160" text-anchor="middle" fill="#8892b0" font-size="9" font-family="Outfit,sans-serif">Hash-verified · Tamper-evident</text>
-          <line x1="525" y1="128" x2="565" y2="128" stroke="#00ff88" stroke-width="1.5" marker-end="url(#va2)" opacity="0.7"/>
-          <rect x="565" y="100" width="175" height="56" rx="8" fill="#0d1b2e" stroke="#1e3a5f" stroke-width="1.5"/>
-          <text x="652" y="122" text-anchor="middle" fill="#00d4ff" font-size="11" font-family="IBM Plex Mono,monospace">/api/v1/audit/vault</text>
-          <text x="652" y="140" text-anchor="middle" fill="#8892b0" font-size="9" font-family="Outfit,sans-serif">Auto-refresh · Live streaming</text>
-          <text x="652" y="152" text-anchor="middle" fill="#8892b0" font-size="9" font-family="Outfit,sans-serif">fetchSystemData() polls API</text>
-          <line x1="652" y1="156" x2="652" y2="200" stroke="#00d4ff" stroke-width="1.5" marker-end="url(#va1)" opacity="0.6"/>
-          <rect x="430" y="200" width="300" height="65" rx="8" fill="rgba(0,212,255,0.06)" stroke="rgba(0,212,255,0.2)" stroke-width="1.5"/>
-          <text x="580" y="222" text-anchor="middle" fill="#00d4ff" font-size="12" font-family="Outfit,sans-serif" font-weight="700">📊 Live Vault Dashboard (vault.html)</text>
-          <text x="580" y="240" text-anchor="middle" fill="#8892b0" font-size="10" font-family="Outfit,sans-serif">renderTable() · updateChart() · Filter by date</text>
-          <text x="580" y="255" text-anchor="middle" fill="#8892b0" font-size="10" font-family="Outfit,sans-serif">updateDashboardState() · Connection indicator</text>
-          <rect x="15" y="230" width="390" height="45" rx="8" fill="rgba(255,107,53,0.05)" stroke="rgba(255,107,53,0.2)" stroke-width="1"/>
-          <text x="210" y="250" text-anchor="middle" fill="#ff6b35" font-size="11" font-family="Outfit,sans-serif" font-weight="600">⚠️ Tamper Detection</text>
-          <text x="210" y="266" text-anchor="middle" fill="#8892b0" font-size="9" font-family="Outfit,sans-serif">Modified record = different SHA-256 hash = immediate alert raised</text>
-        </svg>
-      </div>
-
-      <h3 class="sub-heading">Watcher Guard — Step by Step</h3>
-      <div class="steps">
-        <div class="step">
-          <div class="step-num">1</div>
-          <div class="step-body">
-            <div class="step-title">Event Occurs</div>
-            <div class="step-desc">An agent completes a test, a user logs in, or a control evaluation is recorded — this triggers an event in the system.</div>
-          </div>
-        </div>
-        <div class="step">
-          <div class="step-num">2</div>
-          <div class="step-body">
-            <div class="step-title">Watcher Intercepts</div>
-            <div class="step-desc">The Watcher Guard intercepts the event before it's written to the database and serializes all event fields into a canonical string.</div>
-          </div>
-        </div>
-        <div class="step">
-          <div class="step-num">3</div>
-          <div class="step-body">
-            <div class="step-title">SHA-256 Hash Computed</div>
-            <div class="step-desc">A cryptographic SHA-256 hash is computed from the serialized data. This hash is mathematically unique to that exact combination of values.</div>
-          </div>
-        </div>
-        <div class="step">
-          <div class="step-num">4</div>
-          <div class="step-body">
-            <div class="step-title">Written to Vault with Hash</div>
-            <div class="step-desc">Both the event data AND its hash are written together to the <code style="background:rgba(0,212,255,0.1);color:#00d4ff;padding:1px 5px;border-radius:3px;font-family:IBM Plex Mono,monospace;">audit_vault</code> PostgreSQL table.</div>
-          </div>
-        </div>
-        <div class="step">
-          <div class="step-num">5</div>
-          <div class="step-body">
-            <div class="step-title">Continuous Verification</div>
-            <div class="step-desc">At any time, the system recomputes the hash from stored data and compares it to the stored hash. If they differ — the record was tampered with and an alert is raised immediately.</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="alert warn">
-        <span class="alert-icon">⚠️</span>
-        <div class="alert-content">
-          <strong>Vault Requires Backend Connection</strong>
-          The Live Data Vault only functions when the backend API is running. In standalone/demo mode, the dashboard shows a disconnected state. Contact your system administrator to configure the API endpoint connection.
-        </div>
       </div>
     </section>
 
@@ -2101,7 +1951,7 @@
           <tr>
             <td><strong>SOX mapping not showing</strong></td>
             <td>FSLI mapping table has not been configured for your company</td>
-            <td>Go to Settings &rarr; SOX Configuration and upload your FSLI/control mapping file</td>
+            <td>Go to Settings → SOX Configuration and upload your FSLI/control mapping file</td>
             <td><span class="badge badge-orange">Medium</span></td>
           </tr>
           <tr>
@@ -2123,7 +1973,7 @@
         <span class="alert-icon">💡</span>
         <div class="alert-content">
           <strong>Enable Debug Logging</strong>
-          To get detailed error information, go to Settings &rarr; Advanced &rarr; Enable Debug Logging. This records verbose agent activity to help diagnose unusual behavior. Remember to disable after troubleshooting to avoid performance impact.
+          To get detailed error information, go to Settings → Advanced → Enable Debug Logging. This records verbose agent activity to help diagnose unusual behavior. Remember to disable after troubleshooting to avoid performance impact.
         </div>
       </div>
 
@@ -2166,7 +2016,7 @@
           Can I customize the test procedures for each agent?
           <svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
-        <div class="faq-a">Yes. Every agent has a configurable test procedure library. Go to Settings &rarr; Test Procedures and you can edit existing test scripts, add custom tests, modify pass/fail criteria, and adjust sample sizes. You can also save custom templates for reuse across audit cycles.</div>
+        <div class="faq-a">Yes. Every agent has a configurable test procedure library. Go to Settings → Test Procedures and you can edit existing test scripts, add custom tests, modify pass/fail criteria, and adjust sample sizes. You can also save custom templates for reuse across audit cycles.</div>
       </div>
 
       <div class="faq-item">
@@ -2206,7 +2056,7 @@
           Can I schedule recurring audits to run automatically?
           <svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
-        <div class="faq-a">Yes. Under Settings &rarr; Scheduled Audits, you can configure recurring audit runs — daily, weekly, monthly, or quarterly. Automated runs will execute the specified agent tasks, generate results, and optionally email a summary to designated reviewers. This is especially useful for continuous monitoring of access controls and change management.</div>
+        <div class="faq-a">Yes. Under Settings → Scheduled Audits, you can configure recurring audit runs — daily, weekly, monthly, or quarterly. Automated runs will execute the specified agent tasks, generate results, and optionally email a summary to designated reviewers. This is especially useful for continuous monitoring of access controls and change management.</div>
       </div>
 
       <div class="faq-item">
@@ -2214,7 +2064,7 @@
           What happens to the audit evidence after the engagement closes?
           <svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
-        <div class="faq-a">Audit evidence is retained within your environment according to your configured retention policy (default: 7 years). You can archive closed engagements to cold storage, export full evidence packages for your document management system, or securely delete specific items. Retention policies can be configured at Settings &rarr; Data Retention.</div>
+        <div class="faq-a">Audit evidence is retained within your environment according to your configured retention policy (default: 7 years). You can archive closed engagements to cold storage, export full evidence packages for your document management system, or securely delete specific items. Retention policies can be configured at Settings → Data Retention.</div>
       </div>
     </section>
 
@@ -2281,6 +2131,100 @@
     });
   });
 </script>
-</body>
-</html>
 
+<!-- GLOBAL SUITE NAVIGATOR -->
+<style>
+  .suite-nav-widget {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 999999;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-family: 'Outfit', sans-serif;
+  }
+  .sn-menu {
+    background: rgba(10, 15, 25, 0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(40, 120, 255, 0.3);
+    border-radius: 12px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 16px;
+    transform: scale(0.9) translateY(20px);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(40, 120, 255, 0.15);
+  }
+  .suite-nav-widget:hover .sn-menu {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .sn-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    color: #edf0f7 !important;
+    text-decoration: none !important;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: background 0.2s, color 0.2s;
+    width: 220px;
+    box-sizing: border-box;
+  }
+  .sn-item:hover {
+    background: rgba(40, 120, 255, 0.15) !important;
+    color: #2878ff !important;
+  }
+  .sn-icon {
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+  }
+  .sn-fab {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1254CC, #2878FF);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(40, 120, 255, 0.4);
+    border: 1px solid rgba(255,255,255,0.2);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .sn-fab:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 25px rgba(40, 120, 255, 0.5);
+  }
+</style>
+
+<div class="suite-nav-widget">
+  <div class="sn-menu">
+    <div style="font-size:10px;color:#8895ad;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;padding-left:16px;font-weight:700;">App Switcher</div>
+    <a href="index.html" class="sn-item"><span class="sn-icon">🏠</span> Landing Page</a>
+    <a href="app.html" class="sn-item"><span class="sn-icon">📊</span> Master Audit Suite</a>
+    <a href="vault.html" class="sn-item"><span class="sn-icon">🔐</span> Evidence Vault</a>
+    <a href="help.html" class="sn-item"><span class="sn-icon">📖</span> Help & Docs</a>
+  </div>
+  <div class="sn-fab">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="3"></circle>
+      <circle cx="19" cy="12" r="3"></circle>
+      <circle cx="5" cy="12" r="3"></circle>
+    </svg>
+  </div>
+</div>
+<!-- END GLOBAL SUITE NAVIGATOR -->
+</body>
+
+</html>
