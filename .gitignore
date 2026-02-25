@@ -1,0 +1,35 @@
+# ─── Python ───────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+
+# ─── Environment ──────────────────────────────────────────
+.env
+.env.local
+.venv/
+venv/
+env/
+
+# ─── IDE ──────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.gemini/
+
+# ─── OS ───────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── SQLite Intelligence DB (regenerated on startup) ──────
+audit_intelligence.db
+
+# ─── Archives ─────────────────────────────────────────────
+*.zip

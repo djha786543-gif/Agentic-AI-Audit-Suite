@@ -1,0 +1,19 @@
+services:
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=dj_admin
+      - POSTGRES_PASSWORD=password123
+      - POSTGRES_DB=postgres
+    ports:
+      - "5433:5432"
+
+  api:
+    build: .
+    ports:
+      - "8002:8000"
+    depends_on:
+      - db
+    environment:
+      # CRITICAL CHANGE: Changed 'localhost' to 'db'
+      - DATABASE_URL=postgresql://dj_admin:password123@db:5432/postgres
