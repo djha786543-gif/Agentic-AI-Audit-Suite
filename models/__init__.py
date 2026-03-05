@@ -5,3 +5,5 @@ from models.engagement import Engagement, EngagementRole, ControlTest, Signoff  
 from models.evidence_artifact import EvidenceArtifact  # noqa
 from models.methodology import ControlLibrary, TestProcedure, SamplingRule  # noqa
 from models.finding import Finding, ManagementResponse, Retest  # noqa
+from models.evaluation import ControlEvaluation, SODConflict  # noqa
+from models.exceptions import AuditException  # noqa

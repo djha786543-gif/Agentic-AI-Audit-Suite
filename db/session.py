@@ -1,7 +1,7 @@
 """db/session.py — single engine, correct URI from settings"""
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, Session
-from typing import Generator
+from typing import Generator, Optional
 from core.config import settings
 
 engine = create_engine(
@@ -14,11 +14,12 @@ engine = create_engine(
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
-def get_db() -> Generator[Session, None, None]:
+def get_db(org_id: Optional[str] = None) -> Generator[Session, None, None]:
+    """Yield a sync session with the RLS tenant set."""
     db = SessionLocal()
+    tenant = org_id or "default-org"
     try:
-        # Defaulting to 'default-org' for now to demonstrate RLS multi-tenancy in sync worker
-        db.execute(text("SET LOCAL app.current_tenant = 'default-org'"))
+        db.execute(text("SET LOCAL app.current_tenant = :tenant"), {"tenant": tenant})
         yield db
     finally:
         db.close()

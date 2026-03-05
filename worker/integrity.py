@@ -34,7 +34,7 @@ def verify_recent_records(hours_lookback: int = 2) -> dict:
     """
     from sqlalchemy import text
     db = SessionLocal()
-    db.execute(text("SET LOCAL app.current_tenant = 'default-org'"))
+    db.execute(text("SET LOCAL app.current_tenant = :tenant"), {"tenant": "default-org"})
     checked = passed = failed = already_flagged = 0
 
     try:
