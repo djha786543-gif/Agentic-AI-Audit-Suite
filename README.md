@@ -1,12 +1,12 @@
-# ACAP: Agentic Continuous Assurance Platform (v4.0)
+# ACAP: Agentic Continuous Assurance Platform (v6.0)
 
-Welcome to the **Agentic Continuous Assurance Platform (ACAP)**, a fully integrated, multi-tenant enterprise audit ecosystem. It successfully fuses a high-speed Python/PostgreSQL backend with an autonomous AI Command Center frontend. 
+Welcome to the **Agentic Continuous Assurance Platform (ACAP)**, a fully integrated, multi-tenant enterprise audit ecosystem. It fuses a high-speed Python/PostgreSQL backend with an autonomous AI Command Center frontend. 
 
 This platform represents a revolutionary approach to IT and Financial auditing by transitioning workflows from manual, sample-based testing to 100% automated, continuous compliance.
 
 ---
 
-## 🏛️ The 4-Phase Architecture
+## 🏛️ The 6-Phase Architecture
 
 ACAP is engineered on a highly secure, enterprise-grade architecture:
 
@@ -14,6 +14,8 @@ ACAP is engineered on a highly secure, enterprise-grade architecture:
 2. **Zero-Trust Connectors & JWT APIs (Phase 2):** A highly secure REST API powered by FastAPI that validates every request through JWT (JSON Web Tokens) and enforces Strict Role-Based Access Control (RBAC), ensuring only authorized systems write or read data.
 3. **Async PostgreSQL RLS (Phase 3):** Data isn't just stored; it's isolated. Postgres natively enforces Tenant isolation via `org_id` parameters (Row-Level Security). Multi-tenant asynchronous operations (`asyncpg`) provide unblocking enterprise data streaming logic.
 4. **Autonomous AI Command Center (Phase 4):** The visual SaaS frontend where auditors command the AI. Everything executed on the screen forces async API interactions back down to Phase 3, seeding automated tests seamlessly into the database.
+5. **Continuous Assurance & Governance Layer (Phase 5):** Governance policy management, compliance framework mapping, enterprise risk register, and automated threshold-based alert rules evaluated every 30 minutes by Celery. A live Governance dashboard provides real-time visibility.
+6. **Enterprise Reporting (Phase 6):** On-demand and scheduled report generation for seven built-in report types (Executive Summary, Compliance Status, KPI Dashboard, Audit Findings, SOD Matrix, Risk Register, Continuous Assurance). PDF/JSON export, full run history, and a dedicated reporting page.
 
 ---
 
@@ -92,6 +94,23 @@ The absolute core of the Phase 4 integrations. This is where auditors trigger te
 * **AI Rule Modules:** Includes dedicated testing clusters like Segregation of Duties (SOD), Change Management, and Financial Forensics.
 * **Live API Sync:** Clicking "Run Scan" locally renders the results while simultaneously transmitting JSON webhooks into the Python backend (`/api/v1/evaluation/controls`), permanently archiving the executed test in PostgreSQL.
 * **KPI Dashboard:** Features dynamic data metrics mapping to live tests.
+
+### 4. Governance & Continuous Assurance (`governance.html`)
+The Phase 5 governance command center for auditors and compliance officers.
+* **Live Assurance KPIs:** Pass rate, failed controls, open exceptions, SOD conflicts, and open alerts auto-refreshed every 30 seconds.
+* **Compliance Alerts:** View active alerts raised automatically by the Celery monitoring sweep or manually by auditors.
+* **Governance Policies:** Full CRUD interface for organizational governance policies with status, version, and owner tracking.
+* **Compliance Frameworks:** Register and manage compliance standards (SOX, ISO 27001, COBIT 2019, etc.) and map controls to framework requirements.
+* **Risk Register:** Enterprise risk register with automated risk scoring (likelihood × impact), risk ratings, and treatment classification.
+* **Alert Rules:** Configure threshold-based alert rules evaluated every 30 minutes against live DB metrics.
+
+### 5. Enterprise Reporting (`reports.html`)
+The Phase 6 reporting hub for generating and exporting board-ready audit deliverables.
+* **Quick Generate Cards:** One-click report generation for seven built-in types: Executive Summary, Compliance Status, KPI Dashboard, Audit Findings, SOD Matrix, Risk Register, and Continuous Assurance.
+* **Interactive Viewer:** Modal report viewer with KPI mini-cards for instant insights without opening a file.
+* **PDF Export:** jsPDF-powered export with ACAP branding, KPI tables, compliance coverage tables, and official standard references (SOX 404, PCAOB AS 2201, COSO 2013).
+* **JSON Export:** Machine-readable full report payload for integration with external GRC tools.
+* **Run History:** Complete audit trail of all generated reports with replay capability.
 
 ### 📑 Generating Audit Deliverables (SOX Compliant)
 Automated testing requires automated workpapers. Using the exporters inside the **Command Center**:

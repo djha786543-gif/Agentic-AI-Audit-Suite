@@ -151,7 +151,129 @@ open → acknowledged → remediation_in_progress → remediated → closed
 
 ---
 
-## Running Everything
+## Phase 5 — Continuous Assurance & Governance Layer
+
+**Goal:** Governance policy management, compliance framework mapping, enterprise risk register,
+threshold-based alert rules evaluated automatically by Celery, and a live Governance dashboard.
+
+### New Models
+| File | Models |
+|------|--------|
+| `models/governance.py` | `GovernancePolicy`, `ComplianceFramework`, `ComplianceMapping`, `RiskRegisterEntry` |
+| `models/alerts.py` | `AlertRule`, `ComplianceAlert` |
+
+### New Schemas
+| File | Schemas |
+|------|---------|
+| `schemas/governance.py` | Policy, Framework, Mapping, Risk create/response shapes |
+| `schemas/alerts.py` | `AlertRuleCreate/Response`, `ComplianceAlertCreate/Response`, `AlertAcknowledge`, `AlertResolve` |
+
+### API Endpoints
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/api/v1/governance/policies` | List governance policies |
+| `POST` | `/api/v1/governance/policies` | Create a governance policy |
+| `GET` | `/api/v1/governance/policies/{policy_id}` | Get a single policy |
+| `GET` | `/api/v1/governance/frameworks` | List compliance frameworks |
+| `POST` | `/api/v1/governance/frameworks` | Register a framework |
+| `GET` | `/api/v1/governance/mappings` | List compliance mappings |
+| `POST` | `/api/v1/governance/mappings` | Create a control↔framework mapping |
+| `GET` | `/api/v1/governance/risks` | List risk register entries |
+| `POST` | `/api/v1/governance/risks` | Add risk register entry |
+| `GET` | `/api/v1/governance/risks/{risk_id}` | Get a single risk |
+| `GET` | `/api/v1/alerts/rules` | List alert rules |
+| `POST` | `/api/v1/alerts/rules` | Create an alert rule |
+| `GET` | `/api/v1/alerts/` | List compliance alerts |
+| `POST` | `/api/v1/alerts/` | Raise a manual alert |
+| `PATCH` | `/api/v1/alerts/{id}/acknowledge` | Acknowledge an alert |
+| `PATCH` | `/api/v1/alerts/{id}/resolve` | Resolve an alert |
+
+### Continuous Monitoring Worker
+`worker/continuous_monitoring.py` — Celery task `run_monitoring_sweep` evaluates all
+active `AlertRule` records every **30 minutes** (Celery Beat schedule).
+
+Supported metric names:
+- `failed_controls_count`
+- `open_exceptions_count`
+- `critical_findings_count`
+- `sod_conflicts_count`
+- `open_alerts_count`
+
+Supported operators: `gte`, `gt`, `lte`, `lt`, `eq`
+
+### Frontend
+`frontend/governance.html` — Full Governance & Continuous Assurance dashboard:
+- Live KPI refresh (30 s interval)
+- Compliance Alerts management
+- Governance Policy CRUD
+- Compliance Framework registration
+- Risk Register CRUD
+- Alert Rule configuration
+
+### Verify
+1. `POST /api/v1/governance/policies` — creates policy
+2. `POST /api/v1/governance/risks` — computes risk_score + risk_rating automatically
+3. `POST /api/v1/alerts/rules` body `{"rule_id":"R1","name":"x","metric":"failed_controls_count","operator":"gte","threshold":1}` — creates rule
+4. `GET /api/v1/alerts/` — returns alerts raised by the monitoring sweep
+5. Open `http://localhost:8000/governance.html` — live dashboard
+
+---
+
+## Phase 6 — Enterprise Reporting
+
+**Goal:** On-demand and scheduled report generation with PDF/JSON export, executive
+dashboard aggregation, compliance status by framework, and a full Report Run history.
+
+### New Models
+| File | Models |
+|------|--------|
+| `models/reports.py` | `ReportDefinition`, `ReportRun`, `ReportSchedule` |
+
+### New Schemas
+| File | Schemas |
+|------|---------|
+| `schemas/reports.py` | `ReportDefinitionCreate/Response`, `ReportRunRequest/Response`, `ReportScheduleCreate/Response`, `KPISummary`, `ComplianceStatusSummary`, `ExecutiveDashboard` |
+
+### API Endpoints
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/api/v1/reports/dashboard` | Full executive dashboard (KPIs + compliance + alerts + risks) |
+| `GET` | `/api/v1/reports/kpis` | Standalone KPI snapshot |
+| `GET` | `/api/v1/reports/definitions` | List saved report definitions |
+| `POST` | `/api/v1/reports/definitions` | Create a report definition |
+| `GET` | `/api/v1/reports/runs` | List all report runs |
+| `POST` | `/api/v1/reports/runs` | Trigger on-demand report generation |
+| `GET` | `/api/v1/reports/runs/{run_id}` | Retrieve a specific report run |
+| `GET` | `/api/v1/reports/schedules` | List report schedules |
+| `POST` | `/api/v1/reports/schedules` | Create a recurring report schedule |
+
+### Built-in Report Types
+| Type | Description |
+|------|-------------|
+| `executive_summary` | KPIs + compliance framework coverage + standard references |
+| `compliance_status` | Coverage % per active framework |
+| `kpi_dashboard` | All KPI metrics from live DB state |
+| `audit_findings` | All findings with severity, status, and control references |
+| `sod_matrix` | All SOD conflicts with resolution status |
+| `risk_register` | Full risk register with scores and ratings |
+| `continuous_assurance` | KPIs + last 50 compliance alerts |
+
+### Frontend
+`frontend/reports.html` — Enterprise Reporting page:
+- Quick Generate cards for every built-in report type
+- Interactive report viewer modal with KPI mini-cards
+- PDF export (jsPDF + autotable) with ACAP branding and standard references
+- JSON export
+- Full run history table with replay viewer
+
+### Verify
+1. `GET /api/v1/reports/dashboard` — returns `ExecutiveDashboard` payload
+2. `POST /api/v1/reports/runs` body `{"report_type":"executive_summary","name":"Q1 2026"}` — generates report
+3. `GET /api/v1/reports/runs` — lists all generated reports
+4. Open `http://localhost:8000/reports.html` — click any Quick Generate card, view results, export PDF
+
+---
+
 
 ```bash
 # 1. Copy and configure environment

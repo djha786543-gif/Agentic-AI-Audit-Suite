@@ -1,2 +1,434 @@
-﻿<!doctype html><html><head><meta charset="utf-8"><title>Reports</title></head><body>
-<h1>Reports</h1><p><a href="app.html">Back</a></p></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ACAP — Enterprise Reporting</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#080B12;--bg2:#0C1019;--surface:#111722;--surface2:#171E2E;--surface3:#1E2840;
+      --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.11);
+      --text:#F0F2F7;--text-dim:#8A95AA;--text-muted:#525D72;
+      --accent:#2B7FFF;--accent2:#1456CC;--accent-glow:rgba(43,127,255,0.15);
+      --gold:#D4A72C;--gold-light:#F5C842;--gold-bg:rgba(212,167,44,0.10);--gold-border:rgba(212,167,44,0.28);
+      --critical:#E5484D;--high:#F97316;--medium:#2B7FFF;--low:#1DB86A;
+      --green:#1DB86A;--green-bg:rgba(29,184,106,0.10);--green-border:rgba(29,184,106,0.25);
+    }
+    body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh}
+    nav{display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:60px;
+        background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+    .nav-logo{font-family:'Sora',sans-serif;font-weight:700;font-size:1.1rem;color:var(--text)}
+    .nav-logo span{color:var(--accent)}
+    .nav-links{display:flex;gap:4px}
+    .nav-links a{color:var(--text-dim);text-decoration:none;font-size:.85rem;padding:6px 14px;border-radius:8px;transition:.2s}
+    .nav-links a:hover{background:var(--surface);color:var(--text)}
+    .nav-links a.active{background:var(--accent-glow);color:var(--accent);border:1px solid rgba(43,127,255,.25)}
+    main{max-width:1280px;margin:0 auto;padding:40px 24px}
+    h1{font-family:'Sora',sans-serif;font-size:2rem;font-weight:700;margin-bottom:6px}
+    h1 span{color:var(--accent)}
+    .subtitle{color:var(--text-dim);margin-bottom:36px;font-size:.95rem}
+    .section-title{font-family:'Sora',sans-serif;font-size:1.1rem;font-weight:600;margin-bottom:16px;
+                   display:flex;align-items:center;gap:10px}
+    .section-title .dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+
+    .report-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px;margin-bottom:44px}
+    .report-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;
+                 cursor:pointer;transition:.2s;position:relative;overflow:hidden}
+    .report-card:hover{border-color:var(--accent);box-shadow:0 0 24px var(--accent-glow)}
+    .report-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent);
+                         transform:scaleX(0);transform-origin:left;transition:.3s}
+    .report-card:hover::before{transform:scaleX(1)}
+    .report-icon{font-size:2rem;margin-bottom:12px}
+    .report-title{font-family:'Sora',sans-serif;font-weight:700;font-size:1rem;margin-bottom:6px}
+    .report-desc{font-size:.83rem;color:var(--text-muted);line-height:1.5}
+    .report-tag{display:inline-block;margin-top:10px;font-size:.72rem;font-weight:600;
+                background:var(--accent-glow);color:var(--accent);border:1px solid rgba(43,127,255,.2);
+                padding:2px 10px;border-radius:20px}
+
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px}
+    @media(max-width:768px){.two-col{grid-template-columns:1fr}}
+
+    .panel{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px}
+
+    table{width:100%;border-collapse:collapse;font-size:.85rem}
+    th{text-align:left;padding:10px 14px;color:var(--text-muted);font-weight:600;
+       font-size:.75rem;text-transform:uppercase;letter-spacing:.04em;
+       border-bottom:1px solid var(--border)}
+    td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--text-dim)}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:var(--surface2)}
+
+    .badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:.72rem;font-weight:600;text-transform:uppercase}
+    .badge-complete{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+    .badge-failed{background:rgba(229,72,77,.15);color:var(--critical);border:1px solid rgba(229,72,77,.25)}
+    .badge-running{background:var(--gold-bg);color:var(--gold);border:1px solid var(--gold-border)}
+    .badge-pending{background:rgba(255,255,255,.05);color:var(--text-muted);border:1px solid var(--border2)}
+
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:9px 20px;border-radius:9px;
+         font-family:'Outfit',sans-serif;font-weight:600;font-size:.875rem;cursor:pointer;
+         border:none;transition:.2s}
+    .btn-primary{background:var(--accent);color:#fff}
+    .btn-primary:hover{background:var(--accent2)}
+    .btn-outline{background:transparent;border:1px solid var(--border2);color:var(--text-dim)}
+    .btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+    .btn-gold{background:var(--gold-bg);color:var(--gold);border:1px solid var(--gold-border)}
+    .btn-gold:hover{background:rgba(212,167,44,.2)}
+
+    .actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+
+    .alert-bar{background:rgba(229,72,77,.10);border:1px solid rgba(229,72,77,.25);border-radius:10px;
+               padding:12px 18px;margin-bottom:24px;font-size:.875rem;color:var(--critical);display:none}
+    .success-bar{background:var(--green-bg);border:1px solid var(--green-border);border-radius:10px;
+                 padding:12px 18px;margin-bottom:24px;font-size:.875rem;color:var(--green);display:none}
+
+    .loading{display:flex;gap:6px;align-items:center;color:var(--text-muted);font-size:.875rem}
+    .spinner{width:16px;height:16px;border:2px solid var(--border2);border-top-color:var(--accent);
+             border-radius:50%;animation:spin .7s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .empty-state{text-align:center;padding:48px;color:var(--text-muted);font-size:.9rem}
+    .empty-icon{font-size:2.5rem;margin-bottom:12px}
+
+    /* Report viewer modal */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;
+                   display:none;align-items:center;justify-content:center}
+    .modal-overlay.open{display:flex}
+    .modal{background:var(--surface);border:1px solid var(--border2);border-radius:16px;
+           max-width:860px;width:90vw;max-height:85vh;overflow:auto;padding:32px}
+    .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+    .modal-title{font-family:'Sora',sans-serif;font-size:1.25rem;font-weight:700}
+    .modal-close{background:none;border:none;color:var(--text-dim);font-size:1.5rem;cursor:pointer}
+    .modal-close:hover{color:var(--text)}
+    .result-block{background:var(--bg2);border:1px solid var(--border);border-radius:10px;
+                  padding:16px;font-family:'JetBrains Mono',monospace;font-size:.78rem;
+                  color:var(--text-dim);white-space:pre-wrap;max-height:400px;overflow:auto;
+                  line-height:1.6}
+
+    .kpi-mini-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+    .kpi-mini{background:var(--surface2);border:1px solid var(--border);border-radius:10px;
+              padding:14px 16px;text-align:center}
+    .kpi-mini-label{font-size:.7rem;color:var(--text-muted);text-transform:uppercase;margin-bottom:4px}
+    .kpi-mini-value{font-size:1.4rem;font-weight:700;font-family:'Sora',sans-serif;color:var(--text)}
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">ACA<span>P</span> — Reports</div>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="app.html">Command Center</a>
+    <a href="vault.html">Evidence Vault</a>
+    <a href="governance.html">Governance</a>
+    <a href="reports.html" class="active">Reports</a>
+  </div>
+</nav>
+
+<main>
+  <h1>Enterprise <span>Reporting</span></h1>
+  <p class="subtitle">Phase 6 — Generate, schedule, and export board-ready audit reports and executive dashboards.</p>
+
+  <div id="alertBar" class="alert-bar"></div>
+  <div id="successBar" class="success-bar"></div>
+
+  <!-- Quick-generate report cards -->
+  <div class="section-title"><span class="dot"></span> Quick Generate</div>
+  <div class="report-grid">
+    <div class="report-card" onclick="generateReport('executive_summary','Executive Summary Report')">
+      <div class="report-icon">📊</div>
+      <div class="report-title">Executive Summary</div>
+      <div class="report-desc">KPIs, compliance coverage, top risks, and open alerts — board-ready one-pager.</div>
+      <span class="report-tag">SOX 302 &amp; 404</span>
+    </div>
+    <div class="report-card" onclick="generateReport('compliance_status','Compliance Status Report')">
+      <div class="report-icon">🏛️</div>
+      <div class="report-title">Compliance Status</div>
+      <div class="report-desc">Coverage percentage per registered framework (SOX, ISO 27001, COBIT 2019, etc.).</div>
+      <span class="report-tag">Framework Coverage</span>
+    </div>
+    <div class="report-card" onclick="generateReport('kpi_dashboard','KPI Dashboard Report')">
+      <div class="report-icon">📈</div>
+      <div class="report-title">KPI Dashboard</div>
+      <div class="report-desc">Real-time pass rates, exception counts, SOD conflicts, and overall risk rating.</div>
+      <span class="report-tag">Live Metrics</span>
+    </div>
+    <div class="report-card" onclick="generateReport('audit_findings','Audit Findings Report')">
+      <div class="report-icon">🔍</div>
+      <div class="report-title">Audit Findings</div>
+      <div class="report-desc">Full listing of all findings by severity with status tracking and control references.</div>
+      <span class="report-tag">PCAOB AS 2201</span>
+    </div>
+    <div class="report-card" onclick="generateReport('sod_matrix','SOD Conflict Matrix')">
+      <div class="report-icon">⚔️</div>
+      <div class="report-title">SOD Conflict Matrix</div>
+      <div class="report-desc">All detected Segregation of Duties conflicts with user, role, and resolution status.</div>
+      <span class="report-tag">COSO 2013</span>
+    </div>
+    <div class="report-card" onclick="generateReport('risk_register','Risk Register Report')">
+      <div class="report-icon">⚠️</div>
+      <div class="report-title">Risk Register</div>
+      <div class="report-desc">Enterprise risk register with inherent/residual scores, ratings, owners, and treatment.</div>
+      <span class="report-tag">ISO 31000</span>
+    </div>
+    <div class="report-card" onclick="generateReport('continuous_assurance','Continuous Assurance Report')">
+      <div class="report-icon">🔄</div>
+      <div class="report-title">Continuous Assurance</div>
+      <div class="report-desc">Monitoring sweep results, alert history, and assurance posture over the review period.</div>
+      <span class="report-tag">Phase 5</span>
+    </div>
+  </div>
+
+  <!-- Report run history -->
+  <div class="section-title"><span class="dot"></span> Report Run History</div>
+  <div class="panel" style="margin-bottom:40px">
+    <div id="runHistory"><div class="loading"><div class="spinner"></div>Loading history…</div></div>
+    <div class="actions">
+      <button class="btn btn-outline" onclick="loadHistory()">↺ Refresh</button>
+    </div>
+  </div>
+
+</main>
+
+<!-- Report Viewer Modal -->
+<div class="modal-overlay" id="reportModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Report</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modalKPIs"></div>
+    <div id="modalContent"></div>
+    <div class="actions" id="modalActions"></div>
+  </div>
+</div>
+
+<script>
+  const API = '/api/v1';
+  let jwt = sessionStorage.getItem('acap_token') || '';
+  let _lastRun = null;
+
+  function headers() {
+    const h = { 'Content-Type': 'application/json' };
+    if (jwt) h['Authorization'] = `Bearer ${jwt}`;
+    return h;
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('alertBar');
+    el.textContent = '⚠ ' + msg;
+    el.style.display = 'block';
+    setTimeout(() => el.style.display = 'none', 7000);
+  }
+  function showSuccess(msg) {
+    const el = document.getElementById('successBar');
+    el.textContent = '✓ ' + msg;
+    el.style.display = 'block';
+    setTimeout(() => el.style.display = 'none', 4000);
+  }
+
+  function statusBadge(s) {
+    const cls = { complete: 'complete', failed: 'failed', running: 'running', pending: 'pending' };
+    return `<span class="badge badge-${cls[s] || 'pending'}">${s}</span>`;
+  }
+
+  // ── Generate Report ──────────────────────────────────────────────────────────
+  async function generateReport(type, name) {
+    showSuccess('Generating ' + name + '…');
+    try {
+      const r = await fetch(`${API}/reports/runs`, {
+        method: 'POST',
+        headers: headers(),
+        body: JSON.stringify({ report_type: type, name })
+      });
+      if (!r.ok) {
+        const err = await r.json();
+        showError(err.detail || 'Generation failed — ensure API is running.');
+        return;
+      }
+      const run = await r.json();
+      _lastRun = run;
+      loadHistory();
+      openModal(run);
+    } catch (e) {
+      showError('Cannot reach API — is the server running?');
+    }
+  }
+
+  // ── Modal ────────────────────────────────────────────────────────────────────
+  function openModal(run) {
+    document.getElementById('modalTitle').textContent = run.name;
+    const kpiEl = document.getElementById('modalKPIs');
+    const contentEl = document.getElementById('modalContent');
+    const actionsEl = document.getElementById('modalActions');
+
+    kpiEl.innerHTML = '';
+    actionsEl.innerHTML = `
+      <button class="btn btn-gold" onclick="exportPDF()">⬇ Export PDF</button>
+      <button class="btn btn-outline" onclick="exportJSON()">⬇ Export JSON</button>
+      <button class="modal-close btn btn-outline" onclick="closeModal()">Close</button>
+    `;
+
+    if (!run.result_payload) {
+      contentEl.innerHTML = '<div class="empty-state">No payload — report failed or is pending.</div>';
+    } else {
+      const p = run.result_payload;
+      // Render KPI mini-cards for executive / kpi reports
+      if (p.kpis) {
+        const k = p.kpis;
+        kpiEl.innerHTML = `<div class="kpi-mini-grid">
+          <div class="kpi-mini"><div class="kpi-mini-label">Controls Tested</div><div class="kpi-mini-value">${k.total_controls_tested}</div></div>
+          <div class="kpi-mini"><div class="kpi-mini-label">Pass Rate</div><div class="kpi-mini-value">${k.pass_rate_pct}%</div></div>
+          <div class="kpi-mini"><div class="kpi-mini-label">Open Exceptions</div><div class="kpi-mini-value">${k.open_exceptions}</div></div>
+          <div class="kpi-mini"><div class="kpi-mini-label">Overall Risk</div><div class="kpi-mini-value" style="font-size:1rem">${k.overall_risk_rating}</div></div>
+        </div>`;
+      }
+      contentEl.innerHTML = `<div class="result-block">${JSON.stringify(p, null, 2)}</div>`;
+    }
+    document.getElementById('reportModal').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('reportModal').classList.remove('open');
+  }
+
+  // ── PDF Export ───────────────────────────────────────────────────────────────
+  function exportPDF() {
+    if (!_lastRun) return;
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
+    const margin = 40;
+    let y = 60;
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(18);
+    doc.text(_lastRun.name, margin, y);
+    y += 28;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(120, 120, 140);
+    doc.text(`Generated: ${new Date(_lastRun.created_at).toLocaleString()}   |   Report Type: ${_lastRun.report_type}`, margin, y);
+    doc.text('ACAP Agentic AI Audit Suite  |  SOX 302 & 404  |  PCAOB AS 2201  |  COSO 2013', margin, y + 14);
+    y += 40;
+
+    doc.setTextColor(30, 30, 50);
+    doc.setFontSize(9);
+    const payload = _lastRun.result_payload;
+
+    // KPIs section
+    if (payload && payload.kpis) {
+      const k = payload.kpis;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.text('Key Performance Indicators', margin, y);
+      y += 18;
+      doc.autoTable({
+        startY: y,
+        head: [['Metric', 'Value']],
+        body: [
+          ['Total Controls Tested', k.total_controls_tested],
+          ['Controls Passed', k.controls_passed],
+          ['Controls Failed', k.controls_failed],
+          ['Pass Rate', k.pass_rate_pct + '%'],
+          ['Open Exceptions', k.open_exceptions],
+          ['Critical Findings', k.critical_findings],
+          ['SOD Conflicts', k.sod_conflicts],
+          ['Open Alerts', k.open_alerts],
+          ['Overall Risk Rating', k.overall_risk_rating],
+        ],
+        styles: { fontSize: 9 },
+        headStyles: { fillColor: [43, 127, 255] },
+        margin: { left: margin, right: margin },
+      });
+      y = doc.lastAutoTable.finalY + 20;
+    }
+
+    // Compliance status
+    if (payload && payload.frameworks && payload.frameworks.length) {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.text('Compliance Framework Coverage', margin, y);
+      y += 4;
+      doc.autoTable({
+        startY: y,
+        head: [['Framework', 'Name', 'Mapped', 'Gaps', 'Coverage']],
+        body: payload.frameworks.map(f => [
+          f.framework_id, f.framework_name, f.fully_mapped, f.gaps, f.coverage_pct + '%'
+        ]),
+        styles: { fontSize: 9 },
+        headStyles: { fillColor: [43, 127, 255] },
+        margin: { left: margin, right: margin },
+      });
+      y = doc.lastAutoTable.finalY + 20;
+    }
+
+    // Footer
+    const pageH = doc.internal.pageSize.getHeight();
+    doc.setFontSize(8);
+    doc.setTextColor(150, 150, 170);
+    doc.text('Confidential — For internal audit use only.  Standards: SOX 404 · PCAOB AS 2201 · COSO 2013 · ISO 27001', margin, pageH - 24);
+
+    doc.save(`${_lastRun.report_type}_${Date.now()}.pdf`);
+    showSuccess('PDF exported.');
+  }
+
+  function exportJSON() {
+    if (!_lastRun || !_lastRun.result_payload) return;
+    const blob = new Blob([JSON.stringify(_lastRun.result_payload, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${_lastRun.report_type}_${Date.now()}.json`;
+    a.click();
+    showSuccess('JSON exported.');
+  }
+
+  // ── Run History ──────────────────────────────────────────────────────────────
+  async function loadHistory() {
+    const el = document.getElementById('runHistory');
+    el.innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
+    try {
+      const r = await fetch(`${API}/reports/runs?limit=30`, { headers: headers() });
+      const data = await r.json();
+      if (!data.length) {
+        el.innerHTML = '<div class="empty-state"><div class="empty-icon">📄</div>No reports generated yet. Click a Quick Generate card above.</div>';
+        return;
+      }
+      el.innerHTML = `<table>
+        <thead><tr><th>Report Name</th><th>Type</th><th>Status</th><th>Generated By</th><th>Generated At</th><th></th></tr></thead>
+        <tbody>
+          ${data.map(run => `<tr>
+            <td>${run.name}</td>
+            <td style="font-family:'JetBrains Mono',monospace;font-size:.75rem">${run.report_type}</td>
+            <td>${statusBadge(run.status)}</td>
+            <td>${run.generated_by || '—'}</td>
+            <td style="font-family:'JetBrains Mono',monospace;font-size:.75rem">${new Date(run.created_at).toLocaleString()}</td>
+            <td><button class="btn btn-outline" style="padding:4px 12px;font-size:.75rem"
+                onclick='viewRun(${JSON.stringify(run)})'>View</button></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>`;
+    } catch (e) {
+      el.innerHTML = '<div class="empty-state">Failed to load history — ensure API is running.</div>';
+    }
+  }
+
+  function viewRun(run) {
+    _lastRun = run;
+    openModal(run);
+  }
+
+  // Close modal on overlay click
+  document.getElementById('reportModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  loadHistory();
+</script>
+</body>
+</html>

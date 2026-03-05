@@ -17,6 +17,11 @@ _RLS_TABLES = [
     "findings", "management_responses", "retests",
     "control_evaluations", "sod_conflicts",
     "audit_exceptions",
+    # Phase 5 — Continuous Assurance & Governance
+    "governance_policies", "compliance_frameworks", "compliance_mappings",
+    "risk_register", "alert_rules", "compliance_alerts",
+    # Phase 6 — Enterprise Reporting
+    "report_definitions", "report_runs", "report_schedules",
 ]
 
 
