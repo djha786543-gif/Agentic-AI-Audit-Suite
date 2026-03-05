@@ -32,8 +32,9 @@ celery_app = Celery(
     broker=settings.CELERY_BROKER_URL,
     backend=settings.CELERY_RESULT_BACKEND,
     include=[
-        "worker.tasks",          # existing tasks module
-        "worker.integrity",      # integrity verifier (Phase 3 — safe to include now)
+        "worker.tasks",                   # existing tasks module
+        "worker.integrity",               # integrity verifier (Phase 3)
+        "worker.continuous_monitoring",   # Phase 5 — continuous assurance
     ],
 )
 
@@ -56,9 +57,10 @@ celery_app.conf.update(
 
     # ── Task routing ──────────────────────────────────────────
     task_routes={
-        "worker.tasks.execute_control_test":        {"queue": "extraction"},
-        "worker.tasks.run_watcher_cycle":           {"queue": "extraction"},
-        "worker.integrity.verify_recent_records":   {"queue": "evaluation"},
+        "worker.tasks.execute_control_test":                        {"queue": "extraction"},
+        "worker.tasks.run_watcher_cycle":                           {"queue": "extraction"},
+        "worker.integrity.verify_recent_records":                   {"queue": "evaluation"},
+        "worker.continuous_monitoring.run_monitoring_sweep":        {"queue": "evaluation"},
     },
 
     # ── Beat schedule (periodic tasks) ────────────────────────
@@ -67,6 +69,11 @@ celery_app.conf.update(
             "task": "worker.integrity.verify_recent_records",
             "schedule": 3600.0,          # every 60 minutes
             "kwargs": {"hours_lookback": 2},
+        },
+        # Phase 5 — Continuous Assurance: sweep alert rules every 30 minutes
+        "continuous-monitoring-sweep": {
+            "task": "worker.continuous_monitoring.run_monitoring_sweep",
+            "schedule": 1800.0,          # every 30 minutes
         },
     },
 )
