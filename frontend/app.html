@@ -11095,6 +11095,44 @@
 
     </div>
 
+    <!-- ══ VALIDATION GATE MODAL ══ -->
+    <div id="validationGateModal" style="display:none;position:fixed;inset:0;z-index:1100;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);align-items:center;justify-content:center;">
+      <div style="background:#fff;border:1px solid #e0dbd3;border-radius:14px;width:min(520px,94vw);box-shadow:0 20px 60px rgba(0,0,0,.2);animation:fadeIn .3s ease;overflow:hidden;">
+        <div style="padding:1.1rem 1.5rem .85rem;border-bottom:1px solid #ebe7e0;background:#faf7f2;display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;">
+          <div>
+            <div style="font-size:.88rem;font-weight:700;color:#16130e;font-family:'JetBrains Mono',monospace;letter-spacing:.02em;">🔍 Pre-Run Validation Gate</div>
+            <div style="font-size:.62rem;color:#8c8880;font-family:'JetBrains Mono',monospace;margin-top:.18rem;">Data quality checks before agent execution</div>
+          </div>
+          <button onclick="closeValidationGateModal()" aria-label="Close validation gate modal" style="width:26px;height:26px;border:1.5px solid #e0dbd3;border-radius:6px;background:transparent;color:#4a4540;cursor:pointer;font-size:.85rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">✕</button>
+        </div>
+        <div style="padding:1.25rem 1.5rem;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1.2rem;">
+            <div style="background:#f7f5f0;border:1px solid #e8e3da;border-radius:8px;padding:.8rem 1rem;">
+              <div style="font-size:.6rem;color:#8c8880;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem;">Schema Check</div>
+              <div id="vg-schema" style="font-size:.78rem;font-weight:600;color:#16130e;font-family:'JetBrains Mono',monospace;">—</div>
+            </div>
+            <div style="background:#f7f5f0;border:1px solid #e8e3da;border-radius:8px;padding:.8rem 1rem;">
+              <div style="font-size:.6rem;color:#8c8880;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem;">Null / Missing</div>
+              <div id="vg-null" style="font-size:.78rem;font-weight:600;color:#16130e;font-family:'JetBrains Mono',monospace;">—</div>
+            </div>
+            <div style="background:#f7f5f0;border:1px solid #e8e3da;border-radius:8px;padding:.8rem 1rem;">
+              <div style="font-size:.6rem;color:#8c8880;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem;">Duplicates</div>
+              <div id="vg-dup" style="font-size:.78rem;font-weight:600;color:#16130e;font-family:'JetBrains Mono',monospace;">—</div>
+            </div>
+            <div style="background:#f7f5f0;border:1px solid #e8e3da;border-radius:8px;padding:.8rem 1rem;">
+              <div style="font-size:.6rem;color:#8c8880;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem;">File Hash</div>
+              <div id="vg-hash" style="font-size:.78rem;font-weight:600;color:#16130e;font-family:'JetBrains Mono',monospace;word-break:break-all;">—</div>
+            </div>
+          </div>
+          <div id="vg-error-msg" style="display:none;background:#fff5f5;border:1px solid #fca5a5;border-radius:8px;padding:.75rem 1rem;margin-bottom:1rem;font-size:.75rem;color:#dc2626;font-family:'JetBrains Mono',monospace;"></div>
+          <div style="display:flex;gap:.75rem;justify-content:flex-end;">
+            <button onclick="closeValidationGateModal()" aria-label="Cancel and close validation gate" style="padding:.5rem 1.1rem;border:1.5px solid #e0dbd3;border-radius:8px;background:transparent;color:#4a4540;cursor:pointer;font-size:.78rem;font-weight:600;">Cancel</button>
+            <button onclick="closeValidationGateModal(); forceRunAudit();" aria-label="Proceed with audit" style="padding:.5rem 1.4rem;border:none;border-radius:8px;background:var(--accent,#00d4aa);color:#fff;cursor:pointer;font-size:.78rem;font-weight:700;">🚀 Proceed with Audit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script>
 
       // Dynamic API Base URL Configuration
@@ -13241,13 +13279,32 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
       // =====================================================
       // RUN AUDIT (single)
       // =====================================================
-      
-      
-      
-      
+
+      function closeValidationGateModal() {
+        var modal = document.getElementById('validationGateModal');
+        if (modal) modal.style.display = 'none';
+        var errMsg = document.getElementById('vg-error-msg');
+        if (errMsg) { errMsg.style.display = 'none'; errMsg.textContent = ''; }
+      }
+
       function runAudit() {
+          if (!STATE.file || !STATE.data || !STATE.data.length) {
+              var errMsg = '⚠️ No data loaded. Please upload a valid CSV, XLSX, XLS, JSON, XML, or TSV file before running the audit.';
+              alert(errMsg);
+              return;
+          }
+
           var isLive = document.getElementById('modeToggle') ? document.getElementById('modeToggle').checked : false;
-          
+
+          // Reset validation gate display values
+          var fields = { 'vg-schema': '—', 'vg-null': '—', 'vg-dup': '—', 'vg-hash': '—' };
+          Object.keys(fields).forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) el.textContent = fields[id];
+          });
+          var errEl = document.getElementById('vg-error-msg');
+          if (errEl) { errEl.style.display = 'none'; errEl.textContent = ''; }
+
           if (isLive && STATE.file && window.location.hostname === 'localhost') {
               // Pre-run validation API call (Local Backend)
               var formData = new FormData();
@@ -13255,25 +13312,38 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
               fetch(API_BASE + "/api/v1/engine/analyze/validate", {
                   method: "POST", body: formData
               })
-              .then(r => r.json())
-              .then(res => {
+              .then(function(r) {
+                  if (!r.ok) {
+                      return r.json().then(function(errBody) { throw new Error(errBody.detail || ('HTTP ' + r.status)); });
+                  }
+                  return r.json();
+              })
+              .then(function(res) {
                   var v = res.validation_summary || {};
-                  document.getElementById('vg-schema').innerHTML = v.schema_valid ? '✅ Validated' : '⚠️ Warning';
+                  var schemaEl = document.getElementById('vg-schema');
+                  var nullEl = document.getElementById('vg-null');
+                  var dupEl = document.getElementById('vg-dup');
+                  var hashEl = document.getElementById('vg-hash');
+                  if (schemaEl) schemaEl.innerHTML = v.schema_valid ? '✅ Validated' : '⚠️ Warning';
                   var passRate = v.completeness ? Math.round((v.completeness.passed_records / v.completeness.total_records) * 100) : 100;
-                  document.getElementById('vg-null').innerText = (100 - passRate) + '% Missing';
-                  document.getElementById('vg-dup').innerHTML = v.duplicates && v.duplicates.count > 0 ? (v.duplicates.count + ' match(es)') : '0 found';
-                  document.getElementById('vg-hash').innerText = v.hash ? v.hash.slice(0,25) + '...' : 'N/A';
+                  if (nullEl) nullEl.innerText = (100 - passRate) + '% Missing';
+                  if (dupEl) dupEl.innerHTML = v.duplicates && v.duplicates.count > 0 ? (v.duplicates.count + ' match(es)') : '0 found';
+                  if (hashEl) hashEl.innerText = v.hash ? v.hash.slice(0,25) + '...' : 'N/A';
                   document.getElementById('validationGateModal').style.display = 'flex';
-              }).catch(e => {
-                  forceRunAudit(); // fallback
+              }).catch(function(e) {
+                  console.warn("Validation API unavailable, running client-side fallback:", e);
+                  forceRunAudit(); // fallback to demo mode if backend is unreachable
               });
           } else {
-              // Simulated validation gate for GitHub Pages Deployment (Client-Side)
-              var rowCount = (STATE.data && STATE.data.length) ? STATE.data.length : 8420;
-              document.getElementById('vg-schema').innerHTML = '✅ Validated (Client-Side Check)';
-              document.getElementById('vg-null').innerText = '0.0% Missing';
-              document.getElementById('vg-dup').innerHTML = '0 Exact Matches';
-              document.getElementById('vg-hash').innerText = 'shax_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+              // Simulated validation gate for GitHub Pages / Demo Deployment (Client-Side)
+              var schemaEl = document.getElementById('vg-schema');
+              var nullEl = document.getElementById('vg-null');
+              var dupEl = document.getElementById('vg-dup');
+              var hashEl = document.getElementById('vg-hash');
+              if (schemaEl) schemaEl.innerHTML = '✅ Validated (Client-Side Check)';
+              if (nullEl) nullEl.innerText = '0.0% Missing';
+              if (dupEl) dupEl.innerHTML = '0 Exact Matches';
+              if (hashEl) hashEl.innerText = 'shax_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
               document.getElementById('validationGateModal').style.display = 'flex';
           }
       }
@@ -13308,10 +13378,15 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
                 method: "POST",
                 body: formData
               })
-                .then(r => r.json())
-                .then(res => {
+                .then(function(r) {
+                  if (!r.ok) {
+                    return r.json().then(function(errBody) { throw new Error(errBody.detail || ('HTTP ' + r.status)); });
+                  }
+                  return r.json();
+                })
+                .then(function(res) {
                   if (res.detail && !res.all_findings) {
-                    alert("Engine API Error: " + JSON.stringify(res.detail));
+                    alert("⚠️ Engine API Error: " + JSON.stringify(res.detail) + "\n\nReturning to upload step.");
                     goStep(2);
                     return;
                   }
@@ -13336,9 +13411,10 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
                   STATE.violations.forEach(function (v) { if (STATE.riskSummary[v.severity] !== undefined) STATE.riskSummary[v.severity]++ });
                   setTimeout(function () { goStep(4); renderResults(); showCopilotFab(); }, 500);
                 })
-                .catch(e => {
+                .catch(function(e) {
                   console.error("API Error", e);
-                  alert("Failed to connect to FastAPI engine. Ensure uvicorn main:app is running on port 8000\nFalling back to DEMO logic.");
+                  var userMsg = "⚠️ Could not connect to the FastAPI engine.\n\nPlease ensure the backend is running:\n  uvicorn main:app --reload\n\nError: " + (e && e.message ? e.message : String(e)) + "\n\nFalling back to client-side demo analysis.";
+                  alert(userMsg);
                   runFallbackDemo();
                 });
             } else {
