@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Help & Guide — Agentic AI Audit Suite</title>
+<title>Help & Documentation | Agentic AI Internal Audit Suite v4.0 ENTERPRISE</title>
+<meta name="description" content="Reference documentation for setup, workflows, troubleshooting, and static-mode limitations in the audit suite.">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -599,7 +600,7 @@
 </style>
 </head>
 <body>
-  <div class="advisory-banner" style="position:sticky;top:0;z-index:2500;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 20px;background:#1a0a00;border-bottom:1px solid #f59e0b;color:#fcd34d;font-size:12px;"><span>⚠️ ADVISORY: AuditAI Suite findings are advisory only. No output constitutes an audit opinion, conclusion, or attestation under PCAOB AS 2201 or ISA 315. All findings require professional review by a qualified auditor before use in any compliance or financial reporting context.</span><span style="margin-left:auto;white-space:nowrap;font-family:monospace;">AuditAI Suite v4.0</span></div>
+  <div class="advisory-banner" style="position:sticky;top:0;z-index:2500;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 20px;background:#1a0a00;border-bottom:1px solid #f59e0b;color:#fcd34d;font-size:12px;"><span>⚠️ ADVISORY: AuditAI Suite findings are advisory only. No output constitutes an audit opinion, conclusion, or attestation under PCAOB AS 2201 or ISA 315. All findings require professional review by a qualified auditor before use in any compliance or financial reporting context.</span><span style="margin-left:auto;white-space:nowrap;font-family:monospace;">AuditAI Suite v4.0 ENTERPRISE</span></div>
 
 <!-- BACK BAR -->
 <nav class="back-bar">
@@ -608,7 +609,7 @@
     Back to Suite
   </a>
   <span class="back-bar-title">Help &amp; Documentation</span>
-  <span class="version-badge">v2.0</span>
+  <span class="version-badge">v4.0 ENTERPRISE</span>
 </nav>
 
 <!-- HERO -->
@@ -922,7 +923,7 @@
           <div class="step-num">2</div>
           <div class="step-body">
             <div class="step-title">Log In with Your Credentials</div>
-            <div class="step-desc">Enter your enterprise email and password. If your organization uses SSO (Single Sign-On), click "Sign in with SSO" and enter your organization's domain. Multi-factor authentication (MFA) may be required per your security policy.</div>
+            <div class="step-desc">Enter your enterprise email and password. In this static client-side build, SSO sign-in is not active. Use local credentials for demo/testing flows, then configure enterprise SSO only when connected to a backend identity provider.</div>
           </div>
         </div>
         <div class="step">
@@ -943,7 +944,7 @@
           <div class="step-num">5</div>
           <div class="step-body">
             <div class="step-title">Run Your First Agent Task</div>
-            <div class="step-desc">In the Orchestrator chat panel, type a plain-language instruction like: <em>"Test all user access controls for the Finance module in SAP for Q4 2025"</em>. The Orchestrator will deploy the relevant agents and begin collecting evidence automatically.</div>
+            <div class="step-desc">In the Orchestrator-style chat panel, type a plain-language instruction like: <em>"Test all user access controls for the Finance module in SAP for Q4 2025"</em>. In static mode this is conceptual guidance and local assistant behavior; full orchestration requires a connected backend runtime.</div>
           </div>
         </div>
         <div class="step">
@@ -2049,7 +2050,7 @@
           How do I handle a situation where the Orchestrator misunderstands my instruction?
           <svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
-        <div class="faq-a">The Orchestrator will ask for clarification if it's uncertain. If it proceeds with an incorrect interpretation, you can type "Stop" or press Esc to halt the task. Then rephrase your instruction with more specificity — include the system name, time period, control domain, and any specific criteria. For example, instead of "check access", try "Review all active SAP FI module user accounts as of December 31, 2025 and flag anyone with both posting and approval access."</div>
+        <div class="faq-a">The Orchestrator-style assistant will ask for clarification if it's uncertain. If it proceeds with an incorrect interpretation, you can type "Stop" or press Esc to halt the task. Then rephrase your instruction with more specificity — include the system name, time period, control domain, and any specific criteria. For example, instead of "check access", try "Review all active SAP FI module user accounts as of December 31, 2025 and flag anyone with both posting and approval access." In static mode, this remains advisory and does not trigger backend automation jobs.</div>
       </div>
 
       <div class="faq-item">
@@ -2057,7 +2058,7 @@
           Can I schedule recurring audits to run automatically?
           <svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
-        <div class="faq-a">Yes. Under Settings → Scheduled Audits, you can configure recurring audit runs — daily, weekly, monthly, or quarterly. Automated runs will execute the specified agent tasks, generate results, and optionally email a summary to designated reviewers. This is especially useful for continuous monitoring of access controls and change management.</div>
+        <div class="faq-a">Scheduled recurring audits require backend orchestration services. In this static client-side build, you can run audits manually and export evidence, but background scheduling is not active until connected to an enterprise backend deployment.</div>
       </div>
 
       <div class="faq-item">
@@ -2220,6 +2221,7 @@
     <a href="itgc-controls.html" class="sn-item"><span class="sn-icon">🔒</span> ITGC Controls</a>
     <a href="itac-testing.html" class="sn-item"><span class="sn-icon">⚙️</span> ITAC Testing</a>
     <a href="settings.html" class="sn-item"><span class="sn-icon">⚙️</span> Settings</a>
+    <a href="uat.html" class="sn-item"><span class="sn-icon">🧪</span> UAT Console (Admin-only)</a>
     <a href="help.html" class="sn-item"><span class="sn-icon">📖</span> Help & Docs</a>
   </div>
   <div class="sn-fab">

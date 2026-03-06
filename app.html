@@ -1,5 +1,5 @@
 <!-- 
-  Agentic AI Internal Audit Suite v4.0 (ACAP)
+  Agentic AI Internal Audit Suite v4.0 ENTERPRISE (ACAP)
   Build: AIA-v4-2026 | ACAP Enterprise Edition
   Features: Universal IPE, AI Policy Configurator, PDF/DOCX/CSV Downloads,
             Security Architecture, Help Center, Session Analytics,
@@ -40,7 +40,8 @@
   <meta name="robots" content="noindex, nofollow">
   <meta name="generator" content="AIA-Protected-784DA906BD3AAD80">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Agentic AI Internal Audit Suite v4.0 (ACAP) — SOX 404 · PCAOB AS 2201</title>
+  <title>Agentic AI Internal Audit Suite v4.0 ENTERPRISE | AI-Powered SOX 404 Platform</title>
+  <meta name="description" content="Run AI-powered SOX 404 testing fully client-side with advisory findings, exports, policy controls, and governance evidence workflows.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -8543,7 +8544,7 @@
 </head>
 
 <body>
-  <div class="advisory-banner" style="position:sticky;top:0;z-index:2500;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 20px;background:#1a0a00;border-bottom:1px solid #f59e0b;color:#fcd34d;font-size:12px;"><span>⚠️ ADVISORY: AuditAI Suite findings are advisory only. No output constitutes an audit opinion, conclusion, or attestation under PCAOB AS 2201 or ISA 315. All findings require professional review by a qualified auditor before use in any compliance or financial reporting context.</span><span style="margin-left:auto;white-space:nowrap;font-family:monospace;">AuditAI Suite v4.0</span></div>
+  <div class="advisory-banner" style="position:sticky;top:0;z-index:2500;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 20px;background:#1a0a00;border-bottom:1px solid #f59e0b;color:#fcd34d;font-size:12px;"><span>⚠️ ADVISORY: AuditAI Suite findings are advisory only. No output constitutes an audit opinion, conclusion, or attestation under PCAOB AS 2201 or ISA 315. All findings require professional review by a qualified auditor before use in any compliance or financial reporting context.</span><span style="margin-left:auto;white-space:nowrap;font-family:monospace;">AuditAI Suite v4.0 ENTERPRISE</span></div>
 
   <!-- ══ ENTERPRISE ACCESS MODAL ══ -->
   <div id="enterpriseModal">
@@ -8663,10 +8664,10 @@
 
   <!-- ══ MASTER COMMAND NAV ══ -->
   <nav id="masterNav">
-    <a class="nav-brand" href="#" onclick="return false;">
+    <a class="nav-brand" href="index.html">
       <div class="nav-logo">AI</div>
       <span class="nav-title">AuditAI Suite</span>
-      <span class="nav-version">v4.0 ACAP</span>
+      <span class="nav-version">v4.0 ENTERPRISE</span>
     </a>
 
     <div class="nav-tabs">
@@ -8690,8 +8691,8 @@
     <div class="topbar">
       <div class="topbar-logo"><span class="dot"></span>Agentic Audit AI</div>
       <div style="display:flex;gap:.75rem;align-items:center;flex-grow:1;justify-content:center;">
-        <span class="topbar-badge">Universal ERP Engine v2.0</span>
-        <span class="topbar-badge" id="modeBanner" title="All processing runs in your browser. No server connection needed."
+        <span class="topbar-badge">Universal ERP Engine v4.0</span>
+        <span class="topbar-badge" id="modeBanner" title="This build runs fully in your browser. No backend needed."
           style="color:#2ecc71;background:rgba(46,204,113,.1);border-color:rgba(46,204,113,.25);font-weight:bold;">⚡
           CLIENT-SIDE — No Backend Required</span>
 
@@ -8699,7 +8700,7 @@
         <label
           style="display:flex;align-items:center;gap:.5rem;cursor:pointer;background:rgba(255,255,255,0.05);padding:0.25rem 0.75rem;border-radius:20px;font-size:0.8rem;">
           <input type="checkbox" id="modeToggle" checked onchange="toggleMode(this)">
-          <span id="modeToggleText" style="color:var(--text);font-weight:600;">LIVE MODE</span>
+          <span id="modeToggleText" style="color:var(--text);font-weight:600;">Client-Side Mode</span>
         </label>
       </div>
       <div style="display:flex;align-items:center;gap:1rem">
@@ -9297,6 +9298,7 @@
           <div class="spinner"></div>
           <h3 id="procTitle">Processing Audit...</h3>
           <p id="procAgent"></p>
+          <div id="audit-error-boundary" style="display:none;margin:.75rem auto 0;max-width:820px;padding:.65rem .85rem;border-radius:8px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);color:#fecaca;font-size:.75rem;"></div>
           <div class="proc-steps" id="procSteps">
             <div class="proc-step active" id="ps1">
               <div class="ps-icon"></div>Ingesting &amp; normalising data (Universal ERP resolver)...
@@ -9338,7 +9340,7 @@
             </div>
             <div class="cc-topbar-btns">
               <button class="cc-btn cc-btn-outline" onclick="exportCSV()">⬇ Export to Excel (.csv)</button>
-              <button class="cc-btn cc-btn-outline" onclick="downloadDashboardPDF()"
+              <button class="cc-btn cc-btn-outline" onclick="exportToPDF()"
                 title="Save the live dashboard as PDF">📸 Dashboard PDF</button>
               <button class="cc-btn cc-btn-purple" onclick="openReportModal()">📄 Audit Report</button>
               <button class="cc-btn cc-btn-outline" onclick="goStep(1)">↩ New Audit</button>
@@ -9671,9 +9673,12 @@
 
     <script>
 
-      // ── ACAP v4.0 Backend URL — core audit engine is fully client-side.
-      // BACKEND_URL is reserved for optional future server-side integrations only.
-      const BACKEND_URL = 'https://agentic-ai-audit-suite-production.up.railway.app';
+      // ACAP v4.0 constants and static deployment defaults.
+      const ACAP_VERSION = 'v4.0 ENTERPRISE';
+      const BUILD_MODE = 'client-side';
+      const MODEL_VERSION = 'claude-sonnet-4-20250514';
+      // Backend integrations are optional; static deployments run with null backend.
+      const BACKEND_URL = null;
 /* =========================================================
 Agentic AI Internal Audit Suite — Proprietary Software
 Unauthorised copying, modification, distribution, or
@@ -9710,6 +9715,61 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         batchFiles: [],   // [{name, size, data, headers, violations, riskSummary}]
         batchViolations: []
       };
+      window._activeRules = [];
+      window._lastFindings = [];
+      window._lastRunId = null;
+      window._lastModelVersion = MODEL_VERSION;
+
+      function showToast(msg, level) {
+        var existing = document.getElementById('appToast');
+        if (existing) existing.remove();
+        var color = level === 'error' ? '#ef4444' : (level === 'warn' ? '#f59e0b' : '#4ade80');
+        var toast = document.createElement('div');
+        toast.id = 'appToast';
+        toast.style.cssText = 'position:fixed;bottom:1.5rem;right:1.5rem;z-index:6000;background:#111827;color:#e5e7eb;padding:.7rem 1rem;border-radius:10px;border:1px solid rgba(255,255,255,.12);box-shadow:0 12px 28px rgba(0,0,0,.45);font-size:.78rem;font-weight:600';
+        toast.innerHTML = '<span style="color:' + color + ';margin-right:.35rem">●</span>' + msg;
+        document.body.appendChild(toast);
+        setTimeout(function () {
+          toast.style.opacity = '0';
+          toast.style.transition = 'opacity .25s ease';
+          setTimeout(function () { if (toast.parentNode) toast.remove(); }, 260);
+        }, 2400);
+      }
+
+      function ensureResultMetaSlots() {
+        var container = document.querySelector('.cc-topbar-left');
+        if (!container) return;
+        if (!document.getElementById('run-id-display')) {
+          var runEl = document.createElement('span');
+          runEl.id = 'run-id-display';
+          runEl.className = 'cc-chip';
+          runEl.textContent = 'Run ID: --';
+          container.appendChild(runEl);
+        }
+        if (!document.getElementById('model-version-display')) {
+          var modelEl = document.createElement('span');
+          modelEl.id = 'model-version-display';
+          modelEl.className = 'cc-chip';
+          modelEl.textContent = 'Model: ' + (window._lastModelVersion || MODEL_VERSION);
+          container.appendChild(modelEl);
+        }
+      }
+
+      function shouldApplyRule(ruleId) {
+        if (!window._activeRules || window._activeRules.length === 0) return true;
+        if (!ruleId) return true;
+        return window._activeRules.indexOf(ruleId) !== -1;
+      }
+
+      function filterAgentRulesForPolicy(rules) {
+        if (!Array.isArray(rules)) return [];
+        if (!window._activeRules || window._activeRules.length === 0) return rules;
+        var filtered = rules.filter(function (r) {
+          var key = (r && (r.id || r.ruleId || r.code || r.name)) || null;
+          return shouldApplyRule(key);
+        });
+        return filtered.length ? filtered : rules;
+      }
 
       // =====================================================
       // AGENT DATA SPECIFICATIONS
@@ -11818,6 +11878,12 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
       
       
       function runAudit() {
+          try {
+          var eb = document.getElementById('audit-error-boundary');
+          if (eb) {
+            eb.style.display = 'none';
+            eb.textContent = '';
+          }
           // ACAP v4.0: Always run fully client-side validation gate (no backend calls)
           var vgModal = document.getElementById('validationGateModal');
           if (vgModal) {
@@ -11834,9 +11900,23 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
             // Validation gate modal not present — proceed directly to audit engine
             forceRunAudit();
           }
+          } catch (err) {
+            console.error('runAudit failed', err);
+            showToast('Audit failed to start. Check your file/mapping and retry.', 'error');
+            var proc = document.getElementById('procTitle');
+            if (proc) proc.textContent = 'Audit start failed';
+            var eb = document.getElementById('audit-error-boundary');
+            if (eb) {
+              eb.style.display = 'block';
+              eb.textContent = 'Error boundary: ' + (err && err.message ? err.message : 'Unknown error while starting audit.');
+            }
+          }
       }
 
       function forceRunAudit() {
+        try {
+        var runId = 'RUN-' + Date.now();
+        window._lastRunId = runId;
         goStep(3);
         document.getElementById('procTitle').textContent = 'Processing Audit...';
         var ag = AGENTS[STATE.agent];
@@ -11891,19 +11971,53 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
                 };
               });
             } else {
-              STATE.violations = ag.detect(STATE.data, STATE.mapping, ag.rules || []);
+              STATE.violations = ag.detect(STATE.data, STATE.mapping, filterAgentRulesForPolicy(ag.rules || []));
             }
           } else {
-            STATE.violations = ag.detect(STATE.data, STATE.mapping, ag.rules || []);
+            STATE.violations = ag.detect(STATE.data, STATE.mapping, filterAgentRulesForPolicy(ag.rules || []));
           }
           // ---> END INTEGATED PROTOTYPE LOGIC INTERCEPT <---
 
           STATE.riskSummary = { Critical: 0, High: 0, Medium: 0, Low: 0 };
           STATE.violations.forEach(function (v) { if (STATE.riskSummary[v.severity] !== undefined) STATE.riskSummary[v.severity]++ });
+          window._lastFindings = (STATE.violations || []).slice();
+          var modelMap = {
+            sod: 'acap-sod-v4.0',
+            access: 'acap-access-v4.0',
+            change: 'acap-change-v4.0',
+            txn: 'acap-itac-v4.0',
+            iface: 'acap-interface-v4.0',
+            itops: 'acap-itops-v4.0'
+          };
+          window._lastModelVersion = modelMap[STATE.agent] || MODEL_VERSION;
+          ensureResultMetaSlots();
+          var runEl = document.getElementById('run-id-display');
+          var modelEl = document.getElementById('model-version-display');
+          if (runEl) runEl.textContent = 'Run ID: ' + runId;
+          if (modelEl) modelEl.textContent = 'Model: ' + window._lastModelVersion;
+          window.dispatchEvent(new CustomEvent('auditComplete', {
+            detail: {
+              runId: runId,
+              findings: window._lastFindings,
+              modelVersion: window._lastModelVersion,
+              summary: STATE.riskSummary
+            }
+          }));
           setTimeout(function () { goStep(4); renderResults(); showCopilotFab(); }, 500);
         }
 
         next();
+        } catch (err) {
+          console.error('forceRunAudit failed', err);
+          showToast('Audit execution failed. Please retry with a valid dataset.', 'error');
+          var proc = document.getElementById('procTitle');
+          if (proc) proc.textContent = 'Audit processing failed';
+          var eb = document.getElementById('audit-error-boundary');
+          if (eb) {
+            eb.style.display = 'block';
+            eb.textContent = 'Error boundary: ' + (err && err.message ? err.message : 'Unknown error during audit processing.');
+          }
+        }
       }
 
       // =====================================================
@@ -11976,6 +12090,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
 
       // ─── MAIN DASHBOARD RENDER ──────────────────────────────────────────────────
       function renderResults() {
+        ensureResultMetaSlots();
         var ag = AGENTS[STATE.agent];
         var vio = STATE.violations;
         var rs = STATE.riskSummary;
@@ -12452,8 +12567,8 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         // ── Download bar ──
         body += '<div class="cc-dl-bar">';
         body += '<button class="cc-dl-btn cc-dl-pdf" id="dlPdfBtn" onclick="downloadReportPDF()"><span id="dlPdfSpinner" class="cc-dl-spinner"></span>⬇ Download PDF</button>';
-        body += '<button class="cc-dl-btn cc-dl-docx" id="dlDocxBtn" onclick="downloadReportDOCX()"><span id="dlDocxSpinner" class="cc-dl-spinner"></span>⬇ Download Word (.docx)</button>';
-        body += '<button class="cc-dl-btn cc-dl-print" onclick="window.print()">🖨 Print</button><button class="cc-dl-btn" style="background:#15803d;color:#fff;min-width:130px" onclick="exportCSV()">&#x2b07; Export CSV</button><button class="cc-dl-btn" style="background:#0891b2;color:#fff;min-width:150px" onclick="downloadDashboardPDF()">&#x1f4ca; Dashboard PDF</button>';
+        body += '<button class="cc-dl-btn cc-dl-docx" id="dlDocxBtn" onclick="exportToDocx()"><span id="dlDocxSpinner" class="cc-dl-spinner"></span>⬇ Download Word (.docx)</button>';
+        body += '<button class="cc-dl-btn cc-dl-print" onclick="window.print()">🖨 Print</button><button class="cc-dl-btn" style="background:#15803d;color:#fff;min-width:130px" onclick="exportToCSV()">&#x2b07; Export CSV</button><button class="cc-dl-btn" style="background:#0891b2;color:#fff;min-width:150px" onclick="exportToPDF()">&#x1f4ca; Dashboard PDF</button>';
         body += '</div>';
 
         document.getElementById('ccRptBody').innerHTML = body;
@@ -12470,6 +12585,62 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
 
       // Keep exportCSV working
       function exportCSV() {
+        return exportToCSV();
+      }
+
+      function exportToCSV() {
+        var findings = window._lastFindings || STATE.violations || [];
+        if (!findings.length) {
+          showToast('No findings to export yet.', 'warn');
+          return;
+        }
+        var runId = window._lastRunId || ('RUN-' + Date.now());
+        var headers = [
+          'run_id', 'finding_id', 'severity', 'entity', 'rule', 'description',
+          'recommendation', 'model_version', 'disclaimer'
+        ];
+        var disclaimer = 'AI-generated findings are advisory only and not a substitute for professional judgment.';
+        var rows = findings.map(function (f, idx) {
+          return [
+            runId,
+            f.id || ('F-' + (idx + 1)),
+            f.severity || 'Unknown',
+            f.entity || 'N/A',
+            f.rule || 'N/A',
+            (f.detail || f.scenario || '').replace(/\n/g, ' '),
+            (f.risk || f.field2 || '').replace(/\n/g, ' '),
+            window._lastModelVersion || MODEL_VERSION,
+            disclaimer
+          ];
+        });
+        var csv = [headers.join(',')].concat(rows.map(function (r) {
+          return r.map(function (v) { return '"' + String(v || '').replace(/"/g, '""') + '"'; }).join(',');
+        })).join('\n');
+        var blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'audit_findings_' + runId + '.csv';
+        a.click();
+      }
+
+      function exportToPDF() {
+        if (!window.html2canvas || !window.jspdf || !window.jspdf.jsPDF) {
+          showToast('PDF library not loaded. Try a hard refresh and retry.', 'error');
+          return;
+        }
+        downloadDashboardPDF();
+      }
+
+      function exportToDocx() {
+        if (!window.docx) {
+          showToast('DOCX library not loaded. Try a hard refresh and retry.', 'error');
+          return;
+        }
+        downloadReportDOCX();
+      }
+
+      // Legacy implementation retained for compatibility with older links.
+      function exportCSVLegacy() {
         if (!STATE.violations.length) return;
         var ag = AGENTS[STATE.agent];
         var csv = 'Rule ID,Entity,Rule,Severity,Fraud Scenario,FS Impact\n';
@@ -13111,7 +13282,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         POLICY_RULES.forEach(function (rule, idx) {
           var sevClass = rule.sev === 'Critical' ? 'prs-c' : rule.sev === 'High' ? 'prs-h' : 'prs-m';
           var item = document.createElement('div');
-          item.className = 'policy-rule-item' + (rule.enabled ? ' selected' : '');
+          item.className = 'policy-rule-item policy-rule-checkbox' + (rule.enabled ? ' selected' : '');
           item.setAttribute('data-idx', idx);
           item.onclick = function () { togglePolicyRule(idx, item); };
           item.innerHTML = '<div class="pr-check">' + (rule.enabled ? '✓' : '') + '</div>' +
@@ -13145,7 +13316,9 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
       }
 
       function applyPolicyConfig() {
-        var active = POLICY_RULES.filter(function (r) { return r.enabled; }).length;
+        var activeRules = POLICY_RULES.filter(function (r) { return r.enabled; });
+        var active = activeRules.length;
+        window._activeRules = activeRules.map(function (r) { return r.id; });
         closePolicyConfigurator();
         // Show brief confirmation
         var chip = document.getElementById('ccChipScan');
@@ -13683,6 +13856,13 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         return ctx;
       }
 
+      function buildCopilotSystemPrompt() {
+        return 'You are an AI audit copilot supporting SOX 404 / PCAOB AS 2201 testing.\n' +
+          'Use only provided findings context and clearly label assumptions.\n' +
+          'Always include remediation-oriented recommendations and mention that outputs are advisory only.\n\n' +
+          buildAuditContext();
+      }
+
       async function sendCopilotMessage() {
         var input = document.getElementById('copilotInput');
         var msgs = document.getElementById('copilotMsgs');
@@ -13708,7 +13888,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
           msgs.scrollTop = msgs.scrollHeight;
           return;
         }
-        var systemPrompt = 'You are an expert AI Audit Copilot embedded in an internal audit tool. You have full context of the current audit session. Answer questions concisely and professionally, focusing on actionable insights under SOX 404 / PCAOB AS 2201. Use **bold** for key terms. Keep responses under 300 words unless asked for more.\n\n' + buildAuditContext();
+        var systemPrompt = buildCopilotSystemPrompt();
         COPILOT.history.push({ role: 'user', content: userMsg });
         if (COPILOT.history.length > 20) COPILOT.history = COPILOT.history.slice(-20);
         try {
@@ -13740,6 +13920,14 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         btn.disabled = false;
         msgs.scrollTop = msgs.scrollHeight;
       }
+
+      window.addEventListener('auditComplete', function (evt) {
+        var status = document.getElementById('copilot-context-status');
+        if (!status) return;
+        var findings = (evt.detail && evt.detail.findings) ? evt.detail.findings.length : 0;
+        var run = evt.detail && evt.detail.runId ? evt.detail.runId : '--';
+        status.textContent = 'Context synced: ' + findings + ' finding(s), run ' + run;
+      });
 
 
       // ═══════════════════════════════════════════════════════════
@@ -13898,6 +14086,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         <div>
           <div class="cc-cop-hdr-title">AI Audit Copilot</div>
           <div class="cc-cop-hdr-sub">Ask questions about your findings</div>
+          <div id="copilot-context-status" style="font-size:.62rem;color:#9ca3af;margin-top:.2rem;">Context awaiting latest run</div>
         </div>
         <button class="cc-cop-hdr-close" onclick="toggleCopilot()">✕</button>
       </div>
@@ -14307,7 +14496,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
                 <div style="font-size:11px;color:var(--dim);font-style:italic;">No findings available. Run an audit
                   first.</div>
               </div>
-              <button class="btn" style="font-size:10px;margin-top:6px;" onclick="refreshWpFindings()">↻ Refresh
+              <button class="btn" id="btn-refresh-findings" style="font-size:10px;margin-top:6px;" onclick="refreshWpFindings()">↻ Refresh
                 Findings</button>
             </div>
           </div>
@@ -14978,7 +15167,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
   <script>
 
       // Dynamic API Base URL Configuration (ACAP v4.0 — core engine is client-side)
-      var API_BASE = BACKEND_URL;
+      var API_BASE = BACKEND_URL || '';
 
 
     // ── Global State ──────────────────────────────────────────────────
@@ -15455,7 +15644,9 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
     function refreshWpFindings() {
       var container = document.getElementById('wpFindingsList');
       if (!container) return;
-      var violations = (typeof STATE !== 'undefined' && STATE.violations) ? STATE.violations : [];
+      var violations = window._lastFindings && window._lastFindings.length
+        ? window._lastFindings
+        : ((typeof STATE !== 'undefined' && STATE.violations) ? STATE.violations : []);
       var controls = RACM_STATE.controls.filter(function (c) { return c.mappedAgent; });
       var items = [];
       violations.slice(0, 10).forEach(function (v, i) {
@@ -15628,7 +15819,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
   <script>
 
       // Dynamic API Base URL Configuration (ACAP v4.0 — core engine is client-side)
-      var API_BASE = BACKEND_URL;
+      var API_BASE = BACKEND_URL || '';
 
     // ── Enterprise Modal JS ────────────────────────────────────────────
     function openEnterpriseModal() {
@@ -15688,7 +15879,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         (message || 'No message provided.'),
         '',
         '---------------------------',
-        'Sent from AuditAI Suite v4.0 (ACAP)',
+        'Sent from AuditAI Suite v4.0 ENTERPRISE (ACAP)',
         'Timestamp: ' + new Date().toISOString()
       ];
       var body = encodeURIComponent(bodyLines.join('\n'));
@@ -15808,6 +15999,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
       <a href="itgc-controls.html" class="sn-item"><span class="sn-icon">🔒</span> ITGC Controls</a>
       <a href="itac-testing.html" class="sn-item"><span class="sn-icon">⚙️</span> ITAC Testing</a>
       <a href="settings.html" class="sn-item"><span class="sn-icon">⚙️</span> Settings</a>
+    <a href="uat.html" class="sn-item"><span class="sn-icon">🧪</span> UAT Console (Admin-only)</a>
       <a href="help.html" class="sn-item"><span class="sn-icon">📖</span> Help & Docs</a>
     </div>
     <div class="sn-fab">
