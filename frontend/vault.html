@@ -533,7 +533,7 @@
                             <i class="fas fa-server text-slate-500"></i> Secure Data Ledger
                         </h2>
                         <span id="filtered-count"
-                            class="text-[10px] font-bold text-slate-500 bg-white/5 px-2 py-1 rounded">Showing 0
+                            class="text-[10px] font-bold text-slate-500 bg-white/5 px-2 py-1 rounded">Showing <span id="vault-record-count">0</span>
                             entries</span>
                     </div>
 
@@ -554,7 +554,7 @@
                                     <th class="py-4 px-6 border-b border-white/5 text-right">Verification</th>
                                 </tr>
                             </thead>
-                            <tbody id="table-body" class="divide-y divide-white/5 text-sm">
+                            <tbody id="vault-tbody" class="divide-y divide-white/5 text-sm">
                                 <tr>
                                     <td colspan="6" class="p-32 text-center">
                                         <i class="fas fa-circle-notch fa-spin text-3xl text-blue-500/50 mb-4 block"></i>
@@ -605,29 +605,80 @@
         const originFilter = document.getElementById('originFilter');
         const sortFilter = document.getElementById('sortFilter');
         const dateFilter = document.getElementById('dateFilter');
-        const tbody = document.getElementById('table-body');
+        const tbody = document.querySelector('table tbody');
         const refreshBtn = document.getElementById('refreshBtn');
         const demoBanner = document.getElementById('demo-mode-banner');
 
-        function getDemoVaultData() {
-            return [
-                { id: 'VLT-2026-0881', recorded_at: '2026-03-09T08:12:24Z', source_system: 'SAP S/4HANA', ai_confidence_score: 98, hash_sequence: '8f2a4b9d7e3c1fa0...', verification_status: 'Verified' },
-                { id: 'VLT-2026-0882', recorded_at: '2026-03-09T08:29:41Z', source_system: 'ServiceNow', ai_confidence_score: 96, hash_sequence: '1d7f99a8c3b4e6d2...', verification_status: 'Verified' },
-                { id: 'VLT-2026-0883', recorded_at: '2026-03-09T09:03:08Z', source_system: 'Workday', ai_confidence_score: 94, hash_sequence: 'cb8a13f76d9024be...', verification_status: 'Verified' },
-                { id: 'VLT-2026-0884', recorded_at: '2026-03-09T09:22:55Z', source_system: 'Azure AD', ai_confidence_score: 92, hash_sequence: '4aa10ef4dd97b6c3...', verification_status: 'Verified' },
-                { id: 'VLT-2026-0885', recorded_at: '2026-03-09T10:11:17Z', source_system: 'File System', ai_confidence_score: 90, hash_sequence: 'd3a7461fc55eb129...', verification_status: 'Verified' },
-                { id: 'VLT-2026-0886', recorded_at: '2026-03-09T10:38:49Z', source_system: 'SAP S/4HANA', ai_confidence_score: 99, hash_sequence: 'aa489fe05c1378db...', verification_status: 'Verified' },
-                { id: 'VLT-2026-0887', recorded_at: '2026-03-09T11:06:33Z', source_system: 'ServiceNow', ai_confidence_score: 95, hash_sequence: '70c19b2d8f4e3a61...', verification_status: 'Verified' },
-                { id: 'VLT-2026-0888', recorded_at: '2026-03-09T11:47:02Z', source_system: 'Workday', ai_confidence_score: 93, hash_sequence: 'ff19c7a8d42e65b0...', verification_status: 'Verified' },
-                { id: 'VLT-2026-0889', recorded_at: '2026-03-09T12:25:44Z', source_system: 'Azure AD', ai_confidence_score: 91, hash_sequence: '3c8db09541faee27...', verification_status: 'Verified' },
-                { id: 'VLT-2026-0890', recorded_at: '2026-03-09T13:14:09Z', source_system: 'File System', ai_confidence_score: 89, hash_sequence: 'be7f0e4c6a311d98...', verification_status: 'Verified' },
-                { id: 'VLT-2026-0891', recorded_at: '2026-03-09T14:01:37Z', source_system: 'SAP', ai_confidence_score: 41, hash_sequence: '91fd8ab3e72c4d50...', verification_status: 'TAMPERED' },
-                { id: 'VLT-2026-0892', recorded_at: '2026-03-09T15:26:18Z', source_system: 'ServiceNow', ai_confidence_score: 97, hash_sequence: 'e82a11c7bb040f6d...', verification_status: 'Verified' },
-                { id: 'VLT-2026-0893', recorded_at: '2026-03-10T08:18:06Z', source_system: 'Workday', ai_confidence_score: 88, hash_sequence: '6a12f4d3ee91bc70...', verification_status: 'Pending' },
-                { id: 'VLT-2026-0894', recorded_at: '2026-03-10T09:42:29Z', source_system: 'Azure AD', ai_confidence_score: 95, hash_sequence: '05d1be842fc9aa37...', verification_status: 'Verified' },
-                { id: 'VLT-2026-0895', recorded_at: '2026-03-10T10:57:53Z', source_system: 'File System', ai_confidence_score: 94, hash_sequence: 'f3478d9b24cae651...', verification_status: 'Verified' }
-            ];
-        }
+                function loadDemoVaultData() {
+                      var tbodyEl = document.querySelector('table tbody');
+                    if (!tbodyEl) {
+                        tbodyEl = document.querySelector('table tbody');
+                    }
+                    if (!tbodyEl) {
+                        console.warn('[Vault] Cannot find tbody - demo data not injected');
+                        return;
+                    }
+
+                    var DEMO = [
+                        {id:'VLT-2026-0891',dt:'2026-03-09 08:14:22',src:'SAP S/4HANA',conf:41, hash:'a3f9e2c11b8d74f0',status:'TAMPERED'},
+                        {id:'VLT-2026-0892',dt:'2026-03-09 08:15:07',src:'ServiceNow',conf:97, hash:'8b2d4f7e9a1c3e5d',status:'VERIFIED'},
+                        {id:'VLT-2026-0893',dt:'2026-03-09 09:22:41',src:'Workday HCM',conf:95, hash:'1c4e7a9b2d5f8e0a',status:'VERIFIED'},
+                        {id:'VLT-2026-0894',dt:'2026-03-09 10:05:18',src:'Azure AD',conf:99, hash:'5f3a8c1e4b7d9f2a',status:'VERIFIED'},
+                        {id:'VLT-2026-0895',dt:'2026-03-09 11:34:55',src:'SAP S/4HANA',conf:92, hash:'7e2b5d9f1a4c8e3b',status:'VERIFIED'},
+                        {id:'VLT-2026-0896',dt:'2026-03-09 12:01:33',src:'File System',conf:88, hash:'9d1f4a7c2e5b8d0f',status:'VERIFIED'},
+                        {id:'VLT-2026-0897',dt:'2026-03-09 13:47:09',src:'ServiceNow',conf:94, hash:'2a8e3b6f9c1d5a7e',status:'VERIFIED'},
+                        {id:'VLT-2026-0898',dt:'2026-03-09 14:22:47',src:'Workday HCM',conf:91, hash:'4b6d9a2c5e8f1b3d',status:'VERIFIED'},
+                        {id:'VLT-2026-0899',dt:'2026-03-09 15:18:30',src:'SAP S/4HANA',conf:96, hash:'6c1e4b7d9a3f5c2e',status:'VERIFIED'},
+                        {id:'VLT-2026-0900',dt:'2026-03-09 16:55:14',src:'Azure AD',conf:98, hash:'8f4a7b2e5d9c1a6f',status:'PENDING'},
+                        {id:'VLT-2026-0901',dt:'2026-03-10 07:58:02',src:'SAP S/4HANA',conf:93, hash:'1e5c8f3b6d9a2e4c',status:'VERIFIED'},
+                        {id:'VLT-2026-0902',dt:'2026-03-10 08:03:17',src:'ServiceNow',conf:97, hash:'3b7e1a4d8c2f6b9e',status:'VERIFIED'},
+                        {id:'VLT-2026-0903',dt:'2026-03-10 08:11:44',src:'Workday HCM',conf:90, hash:'5d9c2f6a1e4b8d3c',status:'VERIFIED'},
+                        {id:'VLT-2026-0904',dt:'2026-03-10 08:25:39',src:'SAP S/4HANA',conf:99, hash:'7a3f6c9e2b5d1a8f',status:'VERIFIED'},
+                        {id:'VLT-2026-0905',dt:'2026-03-10 08:49:01',src:'File System',conf:95, hash:'9e1b4d7f3a6c2e9b',status:'VERIFIED'}
+                    ];
+
+                    allVaultData = DEMO.map(function(r) {
+                        return {
+                            id: r.id,
+                            recorded_at: new Date(r.dt.replace(' ', 'T') + 'Z').toISOString(),
+                            source_system: r.src,
+                            ai_confidence_score: r.conf,
+                            hash_sequence: r.hash + '...',
+                            verification_status: r.status
+                        };
+                    });
+                    totalRunsCount = DEMO.length;
+
+                    tbodyEl.innerHTML = '';
+                    DEMO.forEach(function(r) {
+                        var sc = r.status === 'TAMPERED' ? '#ef4444'
+                                     : r.status === 'PENDING' ? '#f59e0b'
+                                     : '#22c55e';
+                        var ic = r.status === 'TAMPERED' ? '⚠️'
+                                     : r.status === 'PENDING' ? '⏳'
+                                     : '✅';
+                        var cc = r.conf < 60 ? '#ef4444' : r.conf < 85 ? '#f59e0b' : '#22c55e';
+                        var rowStyle = r.status === 'TAMPERED'
+                            ? 'background:rgba(239,68,68,0.08);border-left:3px solid #ef4444;'
+                            : '';
+                        var tr = document.createElement('tr');
+                        tr.setAttribute('style', rowStyle);
+                        tr.innerHTML =
+                            '<td style="font-family:monospace;font-size:12px;">' + r.id + '</td>' +
+                            '<td style="font-family:monospace;font-size:11px;opacity:0.7;">' + r.dt + '</td>' +
+                            '<td>' + r.src + '</td>' +
+                            '<td style="color:' + cc + ';font-weight:600;">' + r.conf + '%</td>' +
+                            '<td style="font-family:monospace;font-size:11px;opacity:0.55;">' + r.hash + '...</td>' +
+                            '<td style="color:' + sc + ';font-weight:700;">' + ic + ' ' + r.status + '</td>';
+                        tbodyEl.appendChild(tr);
+                    });
+
+                    var countEl = document.getElementById('vault-record-count');
+                    if (countEl) countEl.textContent = '15';
+                    var label = document.getElementById('filtered-count');
+                    if (label) label.innerHTML = 'Showing <span id="vault-record-count">15</span> entries';
+                    console.log('[Vault] Demo data loaded - 15 records (1 TAMPERED, 1 PENDING, 13 VERIFIED)');
+                }
 
         // Draw / Update Chart
         function updateChart(data) {
@@ -705,7 +756,7 @@
             }
             if (sortFilter.value === 'OLDEST') filtered.reverse();
 
-            document.getElementById('filtered-count').innerText = `Showing ${filtered.length} entries`;
+            document.getElementById('filtered-count').innerHTML = `Showing <span id="vault-record-count">${filtered.length}</span> entries`;
             updateChart(filtered);
 
             if (filtered.length === 0) {
@@ -768,8 +819,7 @@
             } catch (e) {
                 console.error('Engine disconnected', e);
                 isDemoMode = true;
-                allVaultData = getDemoVaultData();
-                totalRunsCount = allVaultData.length;
+                loadDemoVaultData();
                 demoBanner.classList.remove('hidden');
                 updateDashboardState(false);
             }
@@ -937,11 +987,33 @@
             fetchSystemData().then(() => setTimeout(() => refreshBtn.querySelector('i').classList.remove('fa-spin'), 500));
         });
 
-        // Init & Polling
-        fetchSystemData();
-        syncIntelligence();
-        setInterval(fetchSystemData, 3500);
-        setInterval(syncIntelligence, 5000);
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Attempt backend fetch first, fall back to demo data after 2.5s
+                    var demoTimer = setTimeout(function() {
+                        var tbodyRef = document.getElementById('vault-tbody') ||
+                                       document.querySelector('table tbody');
+                        var firstCell = tbodyRef ? tbodyRef.querySelector('td') : null;
+                        var hasRealData = firstCell &&
+                                                         !firstCell.textContent.includes('Establishing') &&
+                                                         !firstCell.textContent.includes('0');
+                        if (!hasRealData) {
+                            loadDemoVaultData();
+                        }
+                    }, 2500);
+
+                    // If there's an existing fetch that succeeds, cancel the timer
+                    window._cancelDemoTimer = function() { clearTimeout(demoTimer); };
+
+                    // Init & Polling
+                    fetchSystemData().then(function() {
+                        if (allVaultData && allVaultData.length > 0 && window._cancelDemoTimer) {
+                            window._cancelDemoTimer();
+                        }
+                    });
+                    syncIntelligence();
+                    setInterval(fetchSystemData, 3500);
+                    setInterval(syncIntelligence, 5000);
+                });
     </script>
 
     <!-- GLOBAL SUITE NAVIGATOR -->

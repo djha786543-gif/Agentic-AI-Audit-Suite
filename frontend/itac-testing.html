@@ -69,7 +69,7 @@
     <section class="table-wrap">
       <table>
         <thead><tr><th>Control ID</th><th>Type</th><th>Application</th><th>Test Procedure</th><th>Last Result</th><th>Risk Rating</th><th>Action</th></tr></thead>
-        <tbody id="itacRows"></tbody>
+        <tbody id="itac-tbody"></tbody>
       </table>
     </section>
   </main>
@@ -92,42 +92,56 @@
   </div>
 
   <script>
-    const controls = [
-      ['ITAC-IN-001','Input','SAP AP','Verify duplicate invoice rule blocks duplicate vendor+invoice pairs.','Pass','High'],
-      ['ITAC-IN-002','Input','Workday HR','Verify mandatory employee fields block incomplete onboarding records.','Pass','Medium'],
-      ['ITAC-PR-001','Processing','SAP MM','Validate three-way match logic for PO, receipt, and invoice.','Fail','High'],
-      ['ITAC-PR-002','Processing','Payroll Engine','Recompute payroll for sampled employees and compare to system result.','Pass','High'],
-      ['ITAC-OUT-001','Output','SAP FI','Reconcile report distribution list to authorized recipients.','Not Tested','Medium'],
-      ['ITAC-OUT-002','Output','Close Console','Check output completeness against source transaction count.','Pass','Medium'],
-      ['ITAC-IF-001','Interface','ERP to GL','Validate transfer completeness and hash totals between ERP and GL.','Pass','High'],
-      ['ITAC-IF-002','Interface','Payroll to GL','Reconcile payroll summary feed to GL journal postings.','Fail','High'],
-      ['ITAC-AA-001','Application Access','Treasury Payments','Test approval limits by role with above-threshold transaction attempts.','Pass','High'],
-      ['ITAC-AA-002','Application Access','GL Journal','Test restricted journal types against non-authorized role.','Pass','Medium']
+    var ITAC_CONTROLS = [
+      {id:'ITAC-I-001', type:'Input', app:'SAP S/4HANA', procedure:'Duplicate invoice detection — system checks supplier+amount+date before posting', result:'Pass', risk:'HIGH'},
+      {id:'ITAC-I-002', type:'Input', app:'SAP S/4HANA', procedure:'Mandatory field validation — required fields enforced before GL posting allowed', result:'Pass', risk:'MEDIUM'},
+      {id:'ITAC-P-001', type:'Processing', app:'SAP S/4HANA', procedure:'Three-way match (PO-GR-Invoice) — enforced before payment release', result:'Pass', risk:'CRITICAL'},
+      {id:'ITAC-P-002', type:'Processing', app:'Workday', procedure:'Payroll calculation accuracy — gross-to-net validated against policy tables', result:'Pass', risk:'HIGH'},
+      {id:'ITAC-O-001', type:'Output', app:'SAP S/4HANA', procedure:'Report distribution access control — financial reports restricted to authorized recipients', result:'Pass', risk:'HIGH'},
+      {id:'ITAC-O-002', type:'Output', app:'Oracle EBS', procedure:'Output completeness reconciliation — report totals reconcile to source system', result:'FAIL', risk:'MEDIUM'},
+      {id:'ITAC-IF-001',type:'Interface', app:'SAP → Oracle',procedure:'ERP-to-GL interface completeness — all SAP transactions reconcile to GL sub-ledger',result:'Pass', risk:'CRITICAL'},
+      {id:'ITAC-IF-002',type:'Interface', app:'Workday → SAP',procedure:'Payroll system reconciliation — Workday totals match SAP cost center postings', result:'Pass', risk:'HIGH'},
+      {id:'ITAC-AA-001',type:'App Access', app:'SAP S/4HANA', procedure:'Payment approval limits — dual auth enforced for payments exceeding $50K', result:'Pass', risk:'CRITICAL'},
+      {id:'ITAC-AA-002',type:'App Access', app:'SAP S/4HANA', procedure:'GL journal entry restrictions — manual JE posting restricted to authorized accounts',result:'Pass', risk:'HIGH'}
     ];
 
-    const tbody = document.getElementById('itacRows');
-    function resultClass(result) {
-      if (result === 'Pass') return 'tag-pass';
-      if (result === 'Fail') return 'tag-fail';
-      return 'tag-not';
+    function renderITACTable(data) {
+      var tbody = document.getElementById('itac-tbody') ||
+                  document.querySelector('table tbody');
+      if (!tbody) {
+        console.warn('[ITAC] Cannot find tbody');
+        return;
+      }
+      tbody.innerHTML = '';
+      data.forEach(function(c) {
+        var riskColor = c.risk === 'CRITICAL' ? '#ef4444'
+                      : c.risk === 'HIGH' ? '#f97316'
+                      : c.risk === 'MEDIUM' ? '#eab308'
+                      : '#22c55e';
+        var resultColor = c.result === 'FAIL' ? '#ef4444'
+                        : c.result === 'Pass' ? '#22c55e'
+                        : '#94a3b8';
+        var resultIcon = c.result === 'FAIL' ? '❌' : '✅';
+        var failNote = c.id === 'ITAC-O-002'
+          ? '<div style="font-size:10px;color:#f87171;margin-top:3px;">Output shortfall $4,200 — escalation required</div>'
+          : '';
+        var tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td style="font-family:monospace;font-size:12px;font-weight:600;">' + c.id + '</td>' +
+          '<td><span style="background:rgba(99,102,241,0.15);color:#a5b4fc;padding:2px 8px;border-radius:10px;font-size:11px;">' + c.type + '</span></td>' +
+          '<td style="font-size:12px;opacity:0.8;">' + c.app + '</td>' +
+          '<td style="font-size:12px;">' + c.procedure + failNote + '</td>' +
+          '<td style="color:' + resultColor + ';font-weight:700;">' + resultIcon + ' ' + c.result + '</td>' +
+          '<td style="color:' + riskColor + ';font-weight:700;font-size:12px;">' + c.risk + '</td>' +
+          '<td><a href="app.html" style="background:rgba(99,102,241,0.2);color:#a5b4fc;padding:4px 10px;border-radius:6px;font-size:11px;text-decoration:none;border:1px solid rgba(99,102,241,0.3);">Run Test</a></td>';
+        tr.style.background = c.result === 'FAIL' ? 'rgba(239,68,68,0.05)' : '';
+        tbody.appendChild(tr);
+      });
     }
-    function riskClass(risk) {
-      if (risk === 'High') return 'risk-high';
-      if (risk === 'Medium') return 'risk-medium';
-      return 'risk-low';
-    }
-    tbody.innerHTML = controls.map(c => `
-      <tr>
-        <td><strong>${c[0]}</strong></td>
-        <td>${c[1]}</td>
-        <td>${c[2]}</td>
-        <td>${c[3]}</td>
-        <td class="${resultClass(c[4])}">${c[4]}</td>
-        <td class="${riskClass(c[5])}">${c[5]}</td>
-        <td><button class="run-btn">Run ITAC Test</button></td>
-      </tr>`).join('');
 
-    document.getElementById('runAll').addEventListener('click', () => alert('Running all ITAC tests...'));
+    document.addEventListener('DOMContentLoaded', function() {
+      renderITACTable(ITAC_CONTROLS);
+    });
   </script>
 </body>
 </html>
