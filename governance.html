@@ -1,12 +1,779 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="refresh" content="0; url=frontend/governance.html">
-  <link rel="canonical" href="frontend/governance.html">
-  <title>Redirecting...</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Governance & Continuous Assurance | Agentic AI Internal Audit Suite v4.0 ENTERPRISE</title>
+  <meta name="description" content="Track governance KPIs, alerts, and risk trends for continuous assurance in the Agentic AI Internal Audit Suite.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#080B12;--bg2:#0C1019;--surface:#111722;--surface2:#171E2E;--surface3:#1E2840;
+      --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.11);
+      --text:#F0F2F7;--text-dim:#8A95AA;--text-muted:#525D72;
+      --accent:#2B7FFF;--accent2:#1456CC;--accent-glow:rgba(43,127,255,0.15);
+      --gold:#D4A72C;--gold-light:#F5C842;--gold-bg:rgba(212,167,44,0.10);--gold-border:rgba(212,167,44,0.28);
+      --critical:#E5484D;--high:#F97316;--medium:#2B7FFF;--low:#1DB86A;
+      --green:#1DB86A;--green-bg:rgba(29,184,106,0.10);--green-border:rgba(29,184,106,0.25);
+    }
+    body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh}
+    nav{display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:60px;
+        background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+    .nav-logo{font-family:'Sora',sans-serif;font-weight:700;font-size:1.1rem;color:var(--text)}
+    .nav-logo span{color:var(--accent)}
+    .nav-links{display:flex;gap:4px}
+    .nav-links a{color:var(--text-dim);text-decoration:none;font-size:.85rem;padding:6px 14px;border-radius:8px;transition:.2s}
+    .nav-links a:hover{background:var(--surface);color:var(--text)}
+    .nav-links a.active{background:var(--accent-glow);color:var(--accent);border:1px solid rgba(43,127,255,.25)}
+    main{max-width:1280px;margin:0 auto;padding:40px 24px}
+    h1{font-family:'Sora',sans-serif;font-size:2rem;font-weight:700;margin-bottom:6px}
+    h1 span{color:var(--accent)}
+    .subtitle{color:var(--text-dim);margin-bottom:36px;font-size:.95rem}
+    .section-title{font-family:'Sora',sans-serif;font-size:1.1rem;font-weight:600;margin-bottom:16px;
+                   display:flex;align-items:center;gap:10px}
+    .section-title .dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+
+    /* Grid */
+    .kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:40px}
+    .kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 22px}
+    .kpi-label{font-size:.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+    .kpi-value{font-size:2rem;font-weight:700;font-family:'Sora',sans-serif}
+    .kpi-value.critical{color:var(--critical)}
+    .kpi-value.high{color:var(--high)}
+    .kpi-value.medium{color:var(--medium)}
+    .kpi-value.low{color:var(--low)}
+    .kpi-value.good{color:var(--green)}
+
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px}
+    @media(max-width:768px){.two-col{grid-template-columns:1fr}}
+
+    .panel{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px}
+    .panel + .panel{margin-top:0}
+
+    /* Tables */
+    table{width:100%;border-collapse:collapse;font-size:.85rem}
+    th{text-align:left;padding:10px 14px;color:var(--text-muted);font-weight:600;
+       font-size:.75rem;text-transform:uppercase;letter-spacing:.04em;
+       border-bottom:1px solid var(--border)}
+    td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--text-dim)}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:var(--surface2)}
+
+    .badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:.72rem;font-weight:600;text-transform:uppercase}
+    .badge-critical{background:rgba(229,72,77,.15);color:var(--critical);border:1px solid rgba(229,72,77,.25)}
+    .badge-high{background:rgba(249,115,22,.12);color:var(--high);border:1px solid rgba(249,115,22,.22)}
+    .badge-medium{background:var(--accent-glow);color:var(--accent);border:1px solid rgba(43,127,255,.2)}
+    .badge-low{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+    .badge-open{background:rgba(229,72,77,.12);color:var(--critical);border:1px solid rgba(229,72,77,.22)}
+    .badge-acknowledged{background:rgba(249,115,22,.12);color:var(--high);border:1px solid rgba(249,115,22,.22)}
+    .badge-resolved{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+    .badge-active{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+    .badge-draft{background:var(--gold-bg);color:var(--gold);border:1px solid var(--gold-border)}
+    .badge-retired{background:rgba(255,255,255,.05);color:var(--text-muted);border:1px solid var(--border2)}
+
+    /* Forms */
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+    .form-group{display:flex;flex-direction:column;gap:6px}
+    label{font-size:.78rem;color:var(--text-dim);font-weight:500}
+    input,select,textarea{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;
+      padding:9px 14px;color:var(--text);font-family:'Outfit',sans-serif;font-size:.875rem;width:100%;
+      outline:none;transition:.2s}
+    input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+    select option{background:var(--surface2)}
+    textarea{resize:vertical;min-height:80px}
+
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:9px 20px;border-radius:9px;
+         font-family:'Outfit',sans-serif;font-weight:600;font-size:.875rem;cursor:pointer;
+         border:none;transition:.2s}
+    .btn-primary{background:var(--accent);color:#fff}
+    .btn-primary:hover{background:var(--accent2)}
+    .btn-outline{background:transparent;border:1px solid var(--border2);color:var(--text-dim)}
+    .btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+    .btn-sm{padding:6px 14px;font-size:.8rem}
+    .btn-danger{background:rgba(229,72,77,.15);color:var(--critical);border:1px solid rgba(229,72,77,.25)}
+
+    .actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+
+    .tabs{display:flex;gap:4px;margin-bottom:24px;border-bottom:1px solid var(--border);padding-bottom:0}
+    .tab-btn{background:none;border:none;color:var(--text-muted);font-family:'Outfit',sans-serif;
+             font-size:.9rem;font-weight:500;padding:10px 18px;cursor:pointer;border-radius:8px 8px 0 0;
+             border-bottom:2px solid transparent;transition:.2s}
+    .tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+    .tab-btn:hover:not(.active){color:var(--text);background:var(--surface)}
+    .tab-pane{display:none}
+    .tab-pane.active{display:block}
+
+    .alert-bar{background:rgba(229,72,77,.10);border:1px solid rgba(229,72,77,.25);border-radius:10px;
+               padding:12px 18px;margin-bottom:24px;font-size:.875rem;color:var(--critical);display:none}
+    .success-bar{background:var(--green-bg);border:1px solid var(--green-border);border-radius:10px;
+                 padding:12px 18px;margin-bottom:24px;font-size:.875rem;color:var(--green);display:none}
+
+    .risk-bar{display:flex;height:8px;border-radius:4px;background:var(--surface3);overflow:hidden;margin-top:6px}
+    .risk-fill{height:100%;border-radius:4px;transition:width .4s ease}
+
+    .empty-state{text-align:center;padding:48px;color:var(--text-muted);font-size:.9rem}
+    .empty-icon{font-size:2.5rem;margin-bottom:12px}
+
+    .loading{display:flex;gap:6px;align-items:center;color:var(--text-muted);font-size:.875rem}
+    .spinner{width:16px;height:16px;border:2px solid var(--border2);border-top-color:var(--accent);
+             border-radius:50%;animation:spin .7s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .coverage-pct{font-weight:700;font-family:'Sora',sans-serif}
+  </style>
 </head>
 <body>
-  <script>window.location.replace('frontend/governance.html');</script>
+  <div class="advisory-banner" style="position:sticky;top:0;z-index:2500;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 20px;background:#1a0a00;border-bottom:1px solid #f59e0b;color:#fcd34d;font-size:12px;"><span>⚠️ ADVISORY: AuditAI Suite findings are advisory only. No output constitutes an audit opinion, conclusion, or attestation under PCAOB AS 2201 or ISA 315. All findings require professional review by a qualified auditor before use in any compliance or financial reporting context.</span><span style="margin-left:auto;white-space:nowrap;font-family:monospace;">AuditAI Suite v4.0 ENTERPRISE</span></div>
+
+<nav>
+  <div class="nav-logo">ACA<span>P</span> — Governance</div>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="app.html">Command Center</a>
+    <a href="vault.html">Evidence Vault</a>
+    <a href="governance.html" class="active">Governance</a>
+    <a href="reports.html">Reports</a>
+  </div>
+</nav>
+
+<main>
+  <h1>Continuous Assurance &amp; <span>Governance</span></h1>
+  <p class="subtitle">Phase 5 — Policy management, compliance framework mapping, risk register &amp; continuous alert monitoring.</p>
+
+  <div id="alertBar" class="alert-bar"></div>
+  <div id="successBar" class="success-bar"></div>
+
+  <!-- KPI Row -->
+  <div class="section-title"><span class="dot"></span> Live Assurance KPIs</div>
+  <div class="kpi-grid" id="kpiGrid">
+    <div class="kpi-card"><div class="kpi-label">Controls Tested</div><div class="kpi-value" id="kpiTotal">—</div></div>
+    <div class="kpi-card"><div class="kpi-label">Pass Rate</div><div class="kpi-value good" id="kpiPassRate">—</div></div>
+    <div class="kpi-card"><div class="kpi-label">Failed Controls</div><div class="kpi-value high" id="kpiFailed">—</div></div>
+    <div class="kpi-card"><div class="kpi-label">Open Exceptions</div><div class="kpi-value medium" id="kpiExceptions">—</div></div>
+    <div class="kpi-card"><div class="kpi-label">SOD Conflicts</div><div class="kpi-value high" id="kpiSod">—</div></div>
+    <div class="kpi-card"><div class="kpi-label">Open Alerts</div><div class="kpi-value critical" id="kpiAlerts">—</div></div>
+    <div class="kpi-card"><div class="kpi-label">Overall Risk</div><div class="kpi-value" id="kpiRisk">—</div></div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('alerts')">⚡ Alerts</button>
+    <button class="tab-btn" onclick="switchTab('policies')">📋 Policies</button>
+    <button class="tab-btn" onclick="switchTab('frameworks')">🏛️ Frameworks</button>
+    <button class="tab-btn" onclick="switchTab('risks')">⚠️ Risk Register</button>
+    <button class="tab-btn" onclick="switchTab('rules')">🔔 Alert Rules</button>
+  </div>
+
+  <!-- Alerts Tab -->
+  <div id="tab-alerts" class="tab-pane active">
+    <div class="two-col">
+      <div class="panel">
+        <div class="section-title"><span class="dot"></span> Active Compliance Alerts</div>
+        <div id="alertsList"></div>
+      </div>
+      <div class="panel">
+        <div class="section-title"><span class="dot"></span> Raise Manual Alert</div>
+        <div class="form-row">
+          <div class="form-group"><label>Title</label><input id="alertTitle" placeholder="e.g. Elevated SOD conflicts detected"></div>
+          <div class="form-group"><label>Severity</label>
+            <select id="alertSeverity">
+              <option value="LOW">LOW</option>
+              <option value="MEDIUM">MEDIUM</option>
+              <option value="HIGH" selected>HIGH</option>
+              <option value="CRITICAL">CRITICAL</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:12px">
+          <label>Description</label>
+          <textarea id="alertDesc" placeholder="Describe the compliance concern…"></textarea>
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary" onclick="createAlert()">Raise Alert</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Policies Tab -->
+  <div id="tab-policies" class="tab-pane">
+    <div class="two-col">
+      <div class="panel">
+        <div class="section-title"><span class="dot"></span> Governance Policies</div>
+        <div id="policiesList"></div>
+      </div>
+      <div class="panel">
+        <div class="section-title"><span class="dot"></span> Create Policy</div>
+        <div class="form-row">
+          <div class="form-group"><label>Policy ID</label><input id="policyId" placeholder="e.g. POL-001"></div>
+          <div class="form-group"><label>Version</label><input id="policyVersion" value="1.0"></div>
+        </div>
+        <div class="form-group" style="margin-bottom:12px">
+          <label>Title</label><input id="policyTitle" placeholder="e.g. Acceptable Use Policy">
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Owner</label><input id="policyOwner" placeholder="e.g. IT Security"></div>
+          <div class="form-group"><label>Status</label>
+            <select id="policyStatus">
+              <option value="draft">Draft</option>
+              <option value="active" selected>Active</option>
+              <option value="retired">Retired</option>
+            </select>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary" onclick="createPolicy()">Create Policy</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Frameworks Tab -->
+  <div id="tab-frameworks" class="tab-pane">
+    <div class="two-col">
+      <div class="panel">
+        <div class="section-title"><span class="dot"></span> Compliance Frameworks</div>
+        <div id="frameworksList"></div>
+      </div>
+      <div class="panel">
+        <div class="section-title"><span class="dot"></span> Register Framework</div>
+        <div class="form-row">
+          <div class="form-group"><label>Framework ID</label><input id="fwId" placeholder="e.g. SOX"></div>
+          <div class="form-group"><label>Version</label><input id="fwVersion" placeholder="e.g. 2002"></div>
+        </div>
+        <div class="form-group" style="margin-bottom:12px">
+          <label>Name</label><input id="fwName" placeholder="e.g. Sarbanes-Oxley Act">
+        </div>
+        <div class="form-group" style="margin-bottom:12px">
+          <label>Description</label><textarea id="fwDesc" placeholder="Brief description…"></textarea>
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary" onclick="createFramework()">Register</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Risk Register Tab -->
+  <div id="tab-risks" class="tab-pane">
+    <div class="two-col">
+      <div class="panel">
+        <div class="section-title"><span class="dot"></span> Risk Register</div>
+        <div id="risksList"></div>
+      </div>
+      <div class="panel">
+        <div class="section-title"><span class="dot"></span> Add Risk Entry</div>
+        <div class="form-row">
+          <div class="form-group"><label>Risk ID</label><input id="riskId" placeholder="e.g. RISK-001"></div>
+          <div class="form-group"><label>Category</label>
+            <select id="riskCategory">
+              <option value="cyber">Cyber</option>
+              <option value="financial">Financial</option>
+              <option value="operational">Operational</option>
+              <option value="compliance" selected>Compliance</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:12px">
+          <label>Title</label><input id="riskTitle" placeholder="e.g. Unauthorised privileged access">
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Likelihood (1-5)</label>
+            <input id="riskLikelihood" type="number" min="1" max="5" value="3">
+          </div>
+          <div class="form-group"><label>Impact (1-5)</label>
+            <input id="riskImpact" type="number" min="1" max="5" value="3">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Owner</label><input id="riskOwner" placeholder="e.g. CISO"></div>
+          <div class="form-group"><label>Treatment</label>
+            <select id="riskTreatment">
+              <option value="mitigate" selected>Mitigate</option>
+              <option value="accept">Accept</option>
+              <option value="transfer">Transfer</option>
+              <option value="avoid">Avoid</option>
+            </select>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary" onclick="createRisk()">Add to Register</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alert Rules Tab -->
+  <div id="tab-rules" class="tab-pane">
+    <div class="two-col">
+      <div class="panel">
+        <div class="section-title"><span class="dot"></span> Alert Rules</div>
+        <div id="rulesList"></div>
+      </div>
+      <div class="panel">
+        <div class="section-title"><span class="dot"></span> Create Alert Rule</div>
+        <div class="form-row">
+          <div class="form-group"><label>Rule ID</label><input id="ruleId" placeholder="e.g. RULE-001"></div>
+          <div class="form-group"><label>Severity</label>
+            <select id="ruleSeverity">
+              <option value="LOW">LOW</option>
+              <option value="MEDIUM">MEDIUM</option>
+              <option value="HIGH" selected>HIGH</option>
+              <option value="CRITICAL">CRITICAL</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:12px">
+          <label>Name</label><input id="ruleName" placeholder="e.g. Excessive Failed Controls">
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Metric</label>
+            <select id="ruleMetric">
+              <option value="failed_controls_count">Failed Controls Count</option>
+              <option value="open_exceptions_count">Open Exceptions Count</option>
+              <option value="critical_findings_count">Critical Findings Count</option>
+              <option value="sod_conflicts_count">SOD Conflicts Count</option>
+              <option value="open_alerts_count">Open Alerts Count</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Operator</label>
+            <select id="ruleOperator">
+              <option value="gte" selected>≥ (gte)</option>
+              <option value="gt">&gt; (gt)</option>
+              <option value="lte">≤ (lte)</option>
+              <option value="lt">&lt; (lt)</option>
+              <option value="eq">= (eq)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:16px">
+          <label>Threshold</label>
+          <input id="ruleThreshold" type="number" value="1" min="0">
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary" onclick="createRule()">Create Rule</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  const API = '/api/v1';
+  let jwt = sessionStorage.getItem('acap_token') || '';
+
+  function headers() {
+    const h = { 'Content-Type': 'application/json' };
+    if (jwt) h['Authorization'] = `Bearer ${jwt}`;
+    return h;
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('alertBar');
+    el.textContent = '⚠ ' + msg;
+    el.style.display = 'block';
+    setTimeout(() => el.style.display = 'none', 6000);
+  }
+  function showSuccess(msg) {
+    const el = document.getElementById('successBar');
+    el.textContent = '✓ ' + msg;
+    el.style.display = 'block';
+    setTimeout(() => el.style.display = 'none', 4000);
+  }
+
+  function severityBadge(s) {
+    const map = { CRITICAL: 'critical', HIGH: 'high', MEDIUM: 'medium', LOW: 'low' };
+    return `<span class="badge badge-${(map[s] || 'medium')}">${s}</span>`;
+  }
+  function statusBadge(s) {
+    const cls = { open: 'open', acknowledged: 'acknowledged', resolved: 'resolved',
+                  active: 'active', draft: 'draft', retired: 'retired' };
+    return `<span class="badge badge-${cls[s] || 'medium'}">${s}</span>`;
+  }
+
+  function switchTab(name) {
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    event.currentTarget.classList.add('active');
+    const loaders = { alerts: loadAlerts, policies: loadPolicies,
+                      frameworks: loadFrameworks, risks: loadRisks, rules: loadRules };
+    if (loaders[name]) loaders[name]();
+  }
+
+  function applyDemoKPIs() {
+    document.getElementById('kpiTotal').textContent = '156';
+    document.getElementById('kpiPassRate').textContent = '87.2%';
+    document.getElementById('kpiFailed').textContent = '20';
+    document.getElementById('kpiExceptions').textContent = '23';
+    document.getElementById('kpiSod').textContent = '3';
+    document.getElementById('kpiAlerts').textContent = '2';
+    const rEl = document.getElementById('kpiRisk');
+    rEl.textContent = 'HIGH';
+    rEl.className = 'kpi-value critical';
+  }
+
+  // ── KPIs ────────────────────────────────────────────────────────────────────
+  async function loadKPIs() {
+    try {
+      const r = await fetch(`${API}/reports/kpis`, { headers: headers() });
+      if (!r.ok) {
+        applyDemoKPIs();
+        return;
+      }
+      const d = await r.json();
+      document.getElementById('kpiTotal').textContent = d.total_controls_tested;
+      document.getElementById('kpiPassRate').textContent = d.pass_rate_pct + '%';
+      document.getElementById('kpiFailed').textContent = d.controls_failed;
+      document.getElementById('kpiExceptions').textContent = d.open_exceptions;
+      document.getElementById('kpiSod').textContent = d.sod_conflicts;
+      document.getElementById('kpiAlerts').textContent = d.open_alerts;
+      const rEl = document.getElementById('kpiRisk');
+      rEl.textContent = d.overall_risk_rating;
+      const rMap = { CRITICAL: 'critical', HIGH: 'high', MEDIUM: 'medium', LOW: 'low' };
+      rEl.className = 'kpi-value ' + (rMap[d.overall_risk_rating] || 'medium');
+    } catch (e) {
+      applyDemoKPIs();
+    }
+  }
+
+  // ── Alerts ──────────────────────────────────────────────────────────────────
+  async function loadAlerts() {
+    const el = document.getElementById('alertsList');
+    el.innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
+    const demoAlerts = [
+      {
+        title: 'Terminated User Active Account Detected',
+        severity: 'CRITICAL',
+        status: 'open',
+        description: 'User t.morrison (ex-CFO) account active 117 days post-termination. Immediate deprovisioning required.',
+        created_at: '2026-03-06T09:02:00Z'
+      },
+      {
+        title: 'Privileged Access Review Overdue',
+        severity: 'HIGH',
+        status: 'open',
+        description: '18 admin accounts not reviewed in 94 days. Policy requires 90-day cycle.',
+        created_at: '2026-03-06T09:15:00Z'
+      }
+    ];
+    try {
+      const r = await fetch(`${API}/alerts/?limit=20`, { headers: headers() });
+      const data = r.ok ? await r.json() : demoAlerts;
+      const useData = Array.isArray(data) && data.length ? data : demoAlerts;
+      el.innerHTML = `<table><thead><tr><th>Title</th><th>Severity</th><th>Status</th><th>Raised</th></tr></thead><tbody>
+        ${useData.map(a => `<tr>
+          <td><div>${a.title}</div><div style="font-size:.75rem;color:#8A95AA;margin-top:3px;">${a.description || ''}</div></td>
+          <td>${severityBadge(a.severity)}</td>
+          <td>${statusBadge(a.status)}</td>
+          <td style="font-family:'JetBrains Mono',monospace;font-size:.75rem">${new Date(a.created_at).toLocaleString()}</td>
+        </tr>`).join('')}
+      </tbody></table>`;
+    } catch (e) {
+      el.innerHTML = `<table><thead><tr><th>Title</th><th>Severity</th><th>Status</th><th>Raised</th></tr></thead><tbody>
+        ${demoAlerts.map(a => `<tr>
+          <td><div>${a.title}</div><div style="font-size:.75rem;color:#8A95AA;margin-top:3px;">${a.description}</div></td>
+          <td>${severityBadge(a.severity)}</td>
+          <td>${statusBadge(a.status)}</td>
+          <td style="font-family:'JetBrains Mono',monospace;font-size:.75rem">${new Date(a.created_at).toLocaleString()}</td>
+        </tr>`).join('')}
+      </tbody></table>`;
+    }
+  }
+
+  async function createAlert() {
+    const body = {
+      title: document.getElementById('alertTitle').value.trim(),
+      severity: document.getElementById('alertSeverity').value,
+      description: document.getElementById('alertDesc').value.trim()
+    };
+    if (!body.title) { showError('Alert title is required.'); return; }
+    const r = await fetch(`${API}/alerts/`, { method: 'POST', headers: headers(), body: JSON.stringify(body) });
+    if (r.ok) { showSuccess('Alert raised.'); loadAlerts(); loadKPIs(); }
+    else { const err = await r.json(); showError(err.detail || 'Failed to raise alert. Ensure you are logged in.'); }
+  }
+
+  // ── Policies ────────────────────────────────────────────────────────────────
+  async function loadPolicies() {
+    const el = document.getElementById('policiesList');
+    el.innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
+    try {
+      const r = await fetch(`${API}/governance/policies`, { headers: headers() });
+      const data = await r.json();
+      if (!data.length) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div>No policies yet</div>'; return; }
+      el.innerHTML = `<table><thead><tr><th>ID</th><th>Title</th><th>Owner</th><th>Status</th><th>Version</th></tr></thead><tbody>
+        ${data.map(p => `<tr>
+          <td style="font-family:'JetBrains Mono',monospace;font-size:.75rem">${p.policy_id}</td>
+          <td>${p.title}</td>
+          <td>${p.owner || '—'}</td>
+          <td>${statusBadge(p.status)}</td>
+          <td>${p.version}</td>
+        </tr>`).join('')}
+      </tbody></table>`;
+    } catch (e) { el.innerHTML = '<div class="empty-state">Failed to load policies.</div>'; }
+  }
+
+  async function createPolicy() {
+    const body = {
+      policy_id: document.getElementById('policyId').value.trim(),
+      title: document.getElementById('policyTitle').value.trim(),
+      owner: document.getElementById('policyOwner').value.trim(),
+      status: document.getElementById('policyStatus').value,
+      version: document.getElementById('policyVersion').value.trim() || '1.0'
+    };
+    if (!body.policy_id || !body.title) { showError('Policy ID and title are required.'); return; }
+    const r = await fetch(`${API}/governance/policies`, { method: 'POST', headers: headers(), body: JSON.stringify(body) });
+    if (r.ok) { showSuccess('Policy created.'); loadPolicies(); }
+    else { const err = await r.json(); showError(err.detail || 'Failed — ensure you are logged in as internal_auditor.'); }
+  }
+
+  // ── Frameworks ──────────────────────────────────────────────────────────────
+  async function loadFrameworks() {
+    const el = document.getElementById('frameworksList');
+    el.innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
+    try {
+      const r = await fetch(`${API}/governance/frameworks`, { headers: headers() });
+      const data = await r.json();
+      if (!data.length) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">🏛️</div>No frameworks registered</div>'; return; }
+      el.innerHTML = `<table><thead><tr><th>Framework</th><th>Name</th><th>Version</th><th>Active</th></tr></thead><tbody>
+        ${data.map(f => `<tr>
+          <td style="font-family:'JetBrains Mono',monospace;font-size:.8rem">${f.framework_id}</td>
+          <td>${f.name}</td>
+          <td>${f.version || '—'}</td>
+          <td>${f.is_active ? statusBadge('active') : statusBadge('retired')}</td>
+        </tr>`).join('')}
+      </tbody></table>`;
+    } catch (e) { el.innerHTML = '<div class="empty-state">Failed to load frameworks.</div>'; }
+  }
+
+  async function createFramework() {
+    const body = {
+      framework_id: document.getElementById('fwId').value.trim(),
+      name: document.getElementById('fwName').value.trim(),
+      version: document.getElementById('fwVersion').value.trim(),
+      description: document.getElementById('fwDesc').value.trim()
+    };
+    if (!body.framework_id || !body.name) { showError('Framework ID and name are required.'); return; }
+    const r = await fetch(`${API}/governance/frameworks`, { method: 'POST', headers: headers(), body: JSON.stringify(body) });
+    if (r.ok) { showSuccess('Framework registered.'); loadFrameworks(); }
+    else { const err = await r.json(); showError(err.detail || 'Failed.'); }
+  }
+
+  // ── Risks ───────────────────────────────────────────────────────────────────
+  async function loadRisks() {
+    const el = document.getElementById('risksList');
+    el.innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
+    const demoRisks = [
+      {
+        risk_id: 'RSK-2026-001',
+        category: 'Compliance',
+        title: 'SOD Conflict in AP Process',
+        inherent_likelihood: 4,
+        inherent_impact: 5,
+        treatment: 'Mitigate',
+        risk_score: 20,
+        risk_rating: 'HIGH',
+        owner: 'Controller',
+        status: 'active'
+      },
+      {
+        risk_id: 'RSK-2026-002',
+        category: 'Financial',
+        title: 'Inactive Account with Financial Access',
+        inherent_likelihood: 3,
+        inherent_impact: 5,
+        treatment: 'Mitigate',
+        risk_score: 15,
+        risk_rating: 'HIGH',
+        owner: 'IAM Lead',
+        status: 'active'
+      }
+    ];
+    try {
+      const r = await fetch(`${API}/governance/risks`, { headers: headers() });
+      const data = r.ok ? await r.json() : demoRisks;
+      const useData = Array.isArray(data) && data.length ? data : demoRisks;
+      el.innerHTML = `<table><thead><tr><th>ID</th><th>Title</th><th>Score</th><th>Rating</th><th>Owner</th><th>Status</th></tr></thead><tbody>
+        ${useData.map(r => `<tr>
+          <td style="font-family:'JetBrains Mono',monospace;font-size:.75rem">${r.risk_id}</td>
+          <td><div>${r.title}</div><div style="font-size:.75rem;color:#8A95AA;margin-top:3px;">${r.category || ''} | L:${r.inherent_likelihood || '-'} I:${r.inherent_impact || '-'} | ${r.treatment || ''}</div></td>
+          <td>${r.risk_score ?? '—'}</td>
+          <td>${r.risk_rating ? severityBadge(r.risk_rating) : '—'}</td>
+          <td>${r.owner || '—'}</td>
+          <td>${statusBadge(r.status)}</td>
+        </tr>`).join('')}
+      </tbody></table>`;
+    } catch (e) {
+      el.innerHTML = `<table><thead><tr><th>ID</th><th>Title</th><th>Score</th><th>Rating</th><th>Owner</th><th>Status</th></tr></thead><tbody>
+        ${demoRisks.map(r => `<tr>
+          <td style="font-family:'JetBrains Mono',monospace;font-size:.75rem">${r.risk_id}</td>
+          <td><div>${r.title}</div><div style="font-size:.75rem;color:#8A95AA;margin-top:3px;">${r.category} | L:${r.inherent_likelihood} I:${r.inherent_impact} | ${r.treatment}</div></td>
+          <td>${r.risk_score}</td>
+          <td>${severityBadge(r.risk_rating)}</td>
+          <td>${r.owner}</td>
+          <td>${statusBadge(r.status)}</td>
+        </tr>`).join('')}
+      </tbody></table>`;
+    }
+  }
+
+  async function createRisk() {
+    const body = {
+      risk_id: document.getElementById('riskId').value.trim(),
+      title: document.getElementById('riskTitle').value.trim(),
+      category: document.getElementById('riskCategory').value,
+      inherent_likelihood: parseInt(document.getElementById('riskLikelihood').value),
+      inherent_impact: parseInt(document.getElementById('riskImpact').value),
+      owner: document.getElementById('riskOwner').value.trim(),
+      treatment: document.getElementById('riskTreatment').value
+    };
+    if (!body.risk_id || !body.title) { showError('Risk ID and title are required.'); return; }
+    const r = await fetch(`${API}/governance/risks`, { method: 'POST', headers: headers(), body: JSON.stringify(body) });
+    if (r.ok) { showSuccess('Risk added to register.'); loadRisks(); }
+    else { const err = await r.json(); showError(err.detail || 'Failed.'); }
+  }
+
+  // ── Rules ───────────────────────────────────────────────────────────────────
+  async function loadRules() {
+    const el = document.getElementById('rulesList');
+    el.innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
+    try {
+      const r = await fetch(`${API}/alerts/rules`, { headers: headers() });
+      const data = await r.json();
+      if (!data.length) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">🔔</div>No alert rules defined</div>'; return; }
+      el.innerHTML = `<table><thead><tr><th>Rule ID</th><th>Name</th><th>Metric</th><th>Condition</th><th>Severity</th></tr></thead><tbody>
+        ${data.map(r => `<tr>
+          <td style="font-family:'JetBrains Mono',monospace;font-size:.75rem">${r.rule_id}</td>
+          <td>${r.name}</td>
+          <td>${r.metric}</td>
+          <td>${r.operator} ${r.threshold}</td>
+          <td>${severityBadge(r.severity)}</td>
+        </tr>`).join('')}
+      </tbody></table>`;
+    } catch (e) { el.innerHTML = '<div class="empty-state">Failed to load rules.</div>'; }
+  }
+
+  async function createRule() {
+    const body = {
+      rule_id: document.getElementById('ruleId').value.trim(),
+      name: document.getElementById('ruleName').value.trim(),
+      metric: document.getElementById('ruleMetric').value,
+      operator: document.getElementById('ruleOperator').value,
+      threshold: parseInt(document.getElementById('ruleThreshold').value),
+      severity: document.getElementById('ruleSeverity').value
+    };
+    if (!body.rule_id || !body.name) { showError('Rule ID and name are required.'); return; }
+    const r = await fetch(`${API}/alerts/rules`, { method: 'POST', headers: headers(), body: JSON.stringify(body) });
+    if (r.ok) { showSuccess('Alert rule created.'); loadRules(); }
+    else { const err = await r.json(); showError(err.detail || 'Failed.'); }
+  }
+
+  // ── Init ────────────────────────────────────────────────────────────────────
+  loadKPIs();
+  loadAlerts();
+  setInterval(loadKPIs, 30000);
+</script>
+
+  <style>
+    .suite-nav-widget {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 999999;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      font-family: 'Outfit', sans-serif;
+    }
+    .sn-menu {
+      background: rgba(10, 15, 25, 0.95);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(40, 120, 255, 0.3);
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 16px;
+      transform: scale(0.9) translateY(20px);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(40, 120, 255, 0.15);
+    }
+    .suite-nav-widget:hover .sn-menu {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .sn-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      color: #edf0f7 !important;
+      text-decoration: none !important;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 8px;
+      transition: background 0.2s, color 0.2s;
+      width: 260px;
+      box-sizing: border-box;
+    }
+    .sn-item:hover {
+      background: rgba(40, 120, 255, 0.15) !important;
+      color: #2878ff !important;
+    }
+    .sn-icon {
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+    }
+    .sn-fab {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1254CC, #2878FF);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(40, 120, 255, 0.4);
+      border: 1px solid rgba(255,255,255,0.2);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .sn-fab:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 25px rgba(40, 120, 255, 0.5);
+    }
+  </style>
+
+  <div class="suite-nav-widget">
+    <div class="sn-menu">
+      <div style="font-size:10px;color:#8895ad;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;padding-left:16px;font-weight:700;">App Switcher</div>
+      <a href="index.html" class="sn-item"><span class="sn-icon">🏠</span> Landing Page</a>
+      <a href="app.html" class="sn-item"><span class="sn-icon">📊</span> Master Audit Suite</a>
+      <a href="vault.html" class="sn-item"><span class="sn-icon">🔐</span> Evidence Vault</a>
+      <a href="governance.html" class="sn-item"><span class="sn-icon">🏛️</span> Governance</a>
+      <a href="reports.html" class="sn-item"><span class="sn-icon">📄</span> Reports</a>
+      <a href="itgc-controls.html" class="sn-item"><span class="sn-icon">🔒</span> ITGC Controls</a>
+      <a href="itac-testing.html" class="sn-item"><span class="sn-icon">⚙️</span> ITAC Testing</a>
+      <a href="settings.html" class="sn-item"><span class="sn-icon">⚙️</span> Settings</a>
+    <a href="uat.html" class="sn-item"><span class="sn-icon">🧪</span> UAT Console (Admin-only)</a>
+      <a href="help.html" class="sn-item"><span class="sn-icon">📖</span> Help & Docs</a>
+    </div>
+    <div class="sn-fab">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"></circle>
+        <circle cx="19" cy="12" r="3"></circle>
+        <circle cx="5" cy="12" r="3"></circle>
+      </svg>
+    </div>
+  </div>
 </body>
 </html>

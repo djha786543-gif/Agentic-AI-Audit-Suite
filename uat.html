@@ -1,12 +1,881 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="refresh" content="0; url=frontend/uat.html">
-  <link rel="canonical" href="frontend/uat.html">
-  <title>Redirecting...</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UAT Console (Admin-only) | Agentic AI Internal Audit Suite v4.0 ENTERPRISE</title>
+  <meta name="description" content="Admin-only UAT console for monitoring enterprise test runs, readiness gates, and patch workflows.">
+  <style>
+    :root {
+      --bg: #0b1320;
+      --panel: #121d2f;
+      --panel-2: #16253c;
+      --ink: #e8f0ff;
+      --muted: #9ab0d1;
+      --line: #28405f;
+      --accent: #2d9bff;
+      --ok: #1fbf75;
+      --warn: #f1b74a;
+      --bad: #f15b6c;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Trebuchet MS", sans-serif;
+      background: radial-gradient(1200px 700px at 20% -5%, #1a2c48 0%, var(--bg) 50%, #09101a 100%);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    .wrap {
+      width: min(1240px, 96vw);
+      margin: 24px auto 40px;
+    }
+
+    .hero {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.4rem, 2.6vw, 2.1rem);
+      letter-spacing: 0.02em;
+    }
+
+    .sub {
+      color: var(--muted);
+      margin-top: 6px;
+      font-size: 0.95rem;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .runbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+
+    .runbar select,
+    .runbar input {
+      border: 1px solid var(--line);
+      background: #0e1a2a;
+      color: var(--ink);
+      border-radius: 8px;
+      padding: 8px 10px;
+    }
+
+    button {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, #1c304f, #14253d);
+      color: var(--ink);
+      border-radius: 10px;
+      padding: 9px 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button:hover { border-color: #3f70a9; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, var(--panel-2), var(--panel));
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .k { color: var(--muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.07em; }
+    .v { margin-top: 6px; font-size: 1.3rem; font-weight: 700; }
+
+    .ok { color: var(--ok); }
+    .warn { color: var(--warn); }
+    .bad { color: var(--bad); }
+
+    .chip {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      border: 1px solid var(--line);
+    }
+
+    .chip-ok { color: #baf4d7; background: rgba(31, 191, 117, 0.12); border-color: rgba(31, 191, 117, 0.4); }
+    .chip-warn { color: #ffe5b3; background: rgba(241, 183, 74, 0.12); border-color: rgba(241, 183, 74, 0.45); }
+    .chip-bad { color: #ffc0c8; background: rgba(241, 91, 108, 0.14); border-color: rgba(241, 91, 108, 0.45); }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 12px;
+    }
+
+    .panel {
+      background: linear-gradient(180deg, var(--panel-2), var(--panel));
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .panel h2 {
+      margin: 0;
+      padding: 11px 12px;
+      font-size: 0.96rem;
+      border-bottom: 1px solid var(--line);
+      background: #102036;
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+    th, td {
+      text-align: left;
+      padding: 9px 10px;
+      border-bottom: 1px solid rgba(120, 160, 210, 0.16);
+      font-size: 0.85rem;
+      vertical-align: top;
+    }
+
+    th { color: #b8cbeb; font-weight: 700; font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    tr:hover { background: rgba(45, 155, 255, 0.08); }
+
+    .mono { font-family: Consolas, Menlo, monospace; font-size: 0.78rem; }
+
+    #reportJson {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #0e1a2a;
+      color: #bdd0ed;
+      max-height: 360px;
+      overflow: auto;
+      white-space: pre-wrap;
+      font-family: Consolas, Menlo, monospace;
+      font-size: 0.77rem;
+    }
+
+    @media (max-width: 980px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+      .layout { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
-  <script>window.location.replace('frontend/uat.html');</script>
+  <div class="advisory-banner" style="position:sticky;top:0;z-index:2500;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 20px;background:#1a0a00;border-bottom:1px solid #f59e0b;color:#fcd34d;font-size:12px;"><span>⚠️ ADVISORY: AuditAI Suite findings are advisory only. No output constitutes an audit opinion, conclusion, or attestation under PCAOB AS 2201 or ISA 315. All findings require professional review by a qualified auditor before use in any compliance or financial reporting context.</span><span style="margin-left:auto;white-space:nowrap;font-family:monospace;">AuditAI Suite v4.0 ENTERPRISE</span></div>
+  <div class="wrap">
+    <div class="hero">
+      <div>
+        <h1>UAT Console (Admin-only)</h1>
+        <div class="sub">Restricted operational console for admin users. View run history, compare latest runs, and manage UAT automation controls.</div>
+      </div>
+      <div class="sub" id="dirHint">Loading reports...</div>
+    </div>
+
+    <div class="toolbar">
+      <button id="refreshBtn">Refresh Reports</button>
+      <button id="compareBtn">Compare Latest 2 Runs</button>
+      <button id="planBtn">Phase 2 Plan</button>
+      <button id="patchBtn">Generate Patch</button>
+      <button id="applyBtn">Apply Patch</button>
+      <a href="index.html"><button>Back To Portal</button></a>
+    </div>
+
+    <div class="runbar">
+      <label>Scale</label>
+      <select id="runScale">
+        <option value="small">small</option>
+        <option value="medium">medium</option>
+        <option value="deep" selected>deep</option>
+      </select>
+      <label>Seed</label>
+      <input id="runSeed" type="number" value="42" min="0" step="1" />
+      <label>Autopilot Mode</label>
+      <select id="autopilotMode">
+        <option value="advisory" selected>advisory (generate only)</option>
+        <option value="apply">apply (generate + apply)</option>
+        <option value="manual_approval">manual_approval (token per cycle)</option>
+      </select>
+      <label>Approval Token</label>
+      <input id="autopilotToken" type="text" placeholder="auto-generated if blank" style="min-width:180px;" />
+      <button id="startRunBtn">Start UAT Run</button>
+      <button id="stopRunBtn">Stop Run</button>
+      <button id="refreshRunBtn">Refresh Run Status</button>
+      <button id="startAutopilotBtn">Start Autopilot</button>
+      <button id="stopAutopilotBtn">Stop Autopilot</button>
+      <button id="refreshAutopilotBtn">Refresh Autopilot</button>
+      <button id="approveAutopilotBtn">Approve Cycle</button>
+    </div>
+
+    <div class="grid" id="kpiGrid">
+      <div class="card"><div class="k">Reports</div><div class="v" id="kReports">-</div></div>
+      <div class="card"><div class="k">Latest Failed Steps</div><div class="v bad" id="kFailed">-</div></div>
+      <div class="card"><div class="k">Latest Success Rate</div><div class="v warn" id="kRate">-</div></div>
+      <div class="card"><div class="k">Latest P95 Latency</div><div class="v" id="kP95">-</div></div>
+    </div>
+
+    <div class="panel" style="margin-bottom:12px;">
+      <h2>Readiness Gate (First Industry Use Case)</h2>
+      <div style="padding:12px; display:grid; gap:8px;">
+        <div>
+          <span id="readinessChip" class="chip chip-bad">Not Evaluated</span>
+          <span id="readinessSummary" style="margin-left:8px; color:#bdd0ed; font-size:0.85rem;">Load reports to evaluate readiness.</span>
+        </div>
+        <div style="color:#9ab0d1; font-size:0.82rem;">
+          <strong>Industry-ready threshold:</strong> total failures <= 2%, transport disconnects (status 0) = 0, server errors (5xx) <= 1%, p95 latency <= 1000 ms.
+        </div>
+        <div style="color:#9ab0d1; font-size:0.82rem;">
+          <strong>Pilot-ready threshold:</strong> total failures <= 8%, transport disconnects <= 1%, server errors <= 3%, p95 latency <= 1500 ms.
+        </div>
+      </div>
+    </div>
+
+    <div class="layout">
+      <div class="panel">
+        <h2>Recent UAT Reports</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>File</th>
+              <th>Failed / Total</th>
+              <th>Success %</th>
+              <th>P95 ms</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="reportsBody"></tbody>
+        </table>
+      </div>
+
+      <div class="panel">
+        <h2>Top Failures (Selected Report)</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Endpoint</th>
+              <th>Count</th>
+            </tr>
+          </thead>
+          <tbody id="failuresBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:12px;">
+      <h2>Latest Comparison / Selected Report Snippet</h2>
+      <div id="reportJson">Select a report or click Compare Latest 2 Runs.</div>
+    </div>
+
+    <div class="panel" style="margin-top:12px;">
+      <h2>UAT Runner Status</h2>
+      <div id="runStatus" style="padding:12px; color:#bdd0ed; font-family:Consolas, Menlo, monospace; font-size:0.8rem;">
+        Waiting for status...
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:12px;">
+      <h2>Phase 2 Auto Improvement</h2>
+      <div id="phase2Status" style="padding:12px; color:#bdd0ed; font-family:Consolas, Menlo, monospace; font-size:0.8rem;">
+        Run "Phase 2 Plan" to inspect latest failures and get recommended patch recipes.
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:12px;">
+      <h2>Phase 2 Autopilot Status</h2>
+      <div id="autopilotStatus" style="padding:12px; color:#bdd0ed; font-family:Consolas, Menlo, monospace; font-size:0.8rem;">
+        Autopilot is idle.
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:12px;">
+      <h2>UAT Closure Guide</h2>
+      <div style="padding:12px; color:#bdd0ed; font-size:0.84rem; line-height:1.45;">
+        1. Click <strong>Start UAT Run</strong> with <code>small</code> scale first to validate service stability.
+        <br>2. Click <strong>Refresh Reports</strong> and open the latest report.
+        <br>3. If status <code>0</code> appears in top failures, stabilize runtime first (avoid reload mode, verify DB health).
+        <br>4. If <code>500</code> dominates, fix backend exceptions before tuning performance.
+        <br>5. Use <strong>Compare Latest 2 Runs</strong> to confirm failed steps and 5xx counts trend downward.
+        <br>6. Promote to <code>medium/deep</code> only after small scale is stable.
+        <br>7. Close UAT when readiness gate reaches <strong>Industry Ready</strong> on at least 3 consecutive runs.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let latestGeneratedPatch = null;
+
+    function setButtonBusy(buttonId, busy, busyLabel, idleLabel) {
+      const btn = document.getElementById(buttonId);
+      if (!btn) return;
+      btn.disabled = busy;
+      btn.dataset.idleLabel = btn.dataset.idleLabel || idleLabel || btn.textContent;
+      btn.textContent = busy ? busyLabel : (btn.dataset.idleLabel || idleLabel || btn.textContent);
+      btn.style.opacity = busy ? '0.7' : '1';
+    }
+
+    function setPhase2Status(message, payload) {
+      const el = document.getElementById('phase2Status');
+      if (!el) return;
+      let text = String(message || '');
+      if (payload !== undefined) {
+        text += `\n\n${JSON.stringify(payload, null, 2)}`;
+      }
+      el.textContent = text;
+    }
+
+    function setApplyButtonEnabled(enabled) {
+      const applyBtn = document.getElementById('applyBtn');
+      if (!applyBtn) return;
+      applyBtn.disabled = !enabled;
+      applyBtn.style.opacity = enabled ? '1' : '0.55';
+      applyBtn.title = enabled ? 'Apply latest generated patch' : 'No patch to apply';
+    }
+
+    async function jget(path) {
+      const res = await fetch(path);
+      if (!res.ok) throw new Error(`${path} -> ${res.status}`);
+      return res.json();
+    }
+
+    async function jpost(path, payload) {
+      const res = await fetch(path, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload || {}),
+      });
+      if (!res.ok) {
+        let details = `${path} -> ${res.status}`;
+        try {
+          const body = await res.json();
+          details += ` ${JSON.stringify(body)}`;
+        } catch (err) {
+          details += ' (non-json error body)';
+        }
+        throw new Error(details);
+      }
+      return res.json();
+    }
+
+    function fmtPct(v) {
+      if (v === null || v === undefined) return '-';
+      return `${Number(v).toFixed(2)}%`;
+    }
+
+    function fmtNum(v) {
+      if (v === null || v === undefined) return '-';
+      return `${v}`;
+    }
+
+    function countByStatus(topFailures, code) {
+      if (!Array.isArray(topFailures)) return 0;
+      let total = 0;
+      for (const item of topFailures) {
+        const endpoint = String(item.endpoint || '');
+        if (endpoint.endsWith(`-> ${code}`)) {
+          total += Number(item.count || 0);
+        }
+      }
+      return total;
+    }
+
+    function evaluateReadiness(latest) {
+      if (!latest || !latest.summary) {
+        return {
+          level: 'Not Evaluated',
+          chipClass: 'chip-bad',
+          summary: 'No latest report available.',
+        };
+      }
+
+      const total = Number(latest.summary.total_steps || 0);
+      const failed = Number(latest.summary.failed_steps || 0);
+      const failPct = total > 0 ? (failed / total) * 100 : 100;
+      const p95 = Number(latest.summary.p95_latency_ms || 0);
+      const status0 = countByStatus(latest.top_failures || [], 0);
+      const status5xx = countByStatus(latest.top_failures || [], 500) +
+        countByStatus(latest.top_failures || [], 502) +
+        countByStatus(latest.top_failures || [], 503) +
+        countByStatus(latest.top_failures || [], 504);
+      const status0Pct = total > 0 ? (status0 / total) * 100 : 100;
+      const status5xxPct = total > 0 ? (status5xx / total) * 100 : 100;
+
+      const industryReady =
+        failPct <= 2 &&
+        status0 === 0 &&
+        status5xxPct <= 1 &&
+        p95 <= 1000;
+
+      const pilotReady =
+        failPct <= 8 &&
+        status0Pct <= 1 &&
+        status5xxPct <= 3 &&
+        p95 <= 1500;
+
+      if (industryReady) {
+        return {
+          level: 'Industry Ready',
+          chipClass: 'chip-ok',
+          summary: `fail=${failPct.toFixed(2)}%, status0=${status0}, 5xx=${status5xx} (${status5xxPct.toFixed(2)}%), p95=${p95}ms`,
+        };
+      }
+
+      if (pilotReady) {
+        return {
+          level: 'Pilot Ready',
+          chipClass: 'chip-warn',
+          summary: `fail=${failPct.toFixed(2)}%, status0=${status0}, 5xx=${status5xx} (${status5xxPct.toFixed(2)}%), p95=${p95}ms`,
+        };
+      }
+
+      return {
+        level: 'Not Ready',
+        chipClass: 'chip-bad',
+        summary: `fail=${failPct.toFixed(2)}%, status0=${status0}, 5xx=${status5xx} (${status5xxPct.toFixed(2)}%), p95=${p95}ms`,
+      };
+    }
+
+    function renderReadiness(reports) {
+      const latest = reports && reports.length ? reports[0] : null;
+      const evalResult = evaluateReadiness(latest);
+      const chip = document.getElementById('readinessChip');
+      const summary = document.getElementById('readinessSummary');
+
+      chip.className = `chip ${evalResult.chipClass}`;
+      chip.textContent = evalResult.level;
+      summary.textContent = evalResult.summary;
+    }
+
+    function renderKPIs(reports) {
+      const latest = reports[0];
+      document.getElementById('kReports').textContent = reports.length;
+      document.getElementById('kFailed').textContent = latest ? `${fmtNum(latest.summary.failed_steps)} / ${fmtNum(latest.summary.total_steps)}` : '-';
+      document.getElementById('kRate').textContent = latest ? fmtPct(latest.summary.success_rate_pct) : '-';
+      document.getElementById('kP95').textContent = latest ? fmtNum(latest.summary.p95_latency_ms) : '-';
+    }
+
+    function renderTopFailures(topFailures) {
+      const body = document.getElementById('failuresBody');
+      body.innerHTML = '';
+      if (!topFailures || topFailures.length === 0) {
+        body.innerHTML = '<tr><td colspan="2">No failure data</td></tr>';
+        return;
+      }
+      for (const f of topFailures) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td class="mono">${f.endpoint}</td><td>${f.count}</td>`;
+        body.appendChild(tr);
+      }
+    }
+
+    async function loadReportDetails(file) {
+      const data = await jget(`/api/v1/uat/reports/${encodeURIComponent(file)}`);
+      const report = data.report || {};
+      document.getElementById('reportJson').textContent = JSON.stringify({
+        file: data.file,
+        run_id: report.run_id,
+        started_at: report.started_at,
+        finished_at: report.finished_at,
+        summary: report.summary,
+        improvement_candidates: report.improvement_candidates,
+      }, null, 2);
+    }
+
+    async function loadReports() {
+      const data = await jget('/api/v1/uat/reports?limit=40');
+      const reports = data.reports || [];
+
+      document.getElementById('dirHint').textContent = `Reports dir: ${data.reports_dir}`;
+      renderKPIs(reports);
+      renderReadiness(reports);
+
+      const body = document.getElementById('reportsBody');
+      body.innerHTML = '';
+
+      if (reports.length === 0) {
+        body.innerHTML = '<tr><td colspan="5">No UAT reports found. Run UAT first.</td></tr>';
+        renderTopFailures([]);
+        document.getElementById('reportJson').textContent = 'No reports yet.';
+        return;
+      }
+
+      reports.forEach((r, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="mono">${r.file}</td>
+          <td>${fmtNum(r.summary.failed_steps)} / ${fmtNum(r.summary.total_steps)}</td>
+          <td>${fmtPct(r.summary.success_rate_pct)}</td>
+          <td>${fmtNum(r.summary.p95_latency_ms)}</td>
+          <td><button data-file="${r.file}">Open</button></td>
+        `;
+        body.appendChild(tr);
+
+        if (idx === 0) {
+          renderTopFailures(r.top_failures || []);
+          document.getElementById('reportJson').textContent = JSON.stringify(r, null, 2);
+        }
+      });
+
+      body.querySelectorAll('button[data-file]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const file = btn.getAttribute('data-file');
+          const selected = reports.find((x) => x.file === file);
+          renderTopFailures((selected && selected.top_failures) || []);
+          await loadReportDetails(file);
+        });
+      });
+    }
+
+    async function compareLatest() {
+      try {
+        const data = await jget('/api/v1/uat/compare/latest');
+        document.getElementById('reportJson').textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        document.getElementById('reportJson').textContent = `Compare failed: ${err}`;
+      }
+    }
+
+    async function refreshRunStatus() {
+      try {
+        const data = await jget('/api/v1/uat/run/status');
+        document.getElementById('runStatus').textContent = JSON.stringify(data, null, 2);
+        if (!data.running && data.latest_report) {
+          loadReports();
+        }
+      } catch (err) {
+        document.getElementById('runStatus').textContent = `Run status failed: ${err}`;
+      }
+    }
+
+    async function startRun() {
+      try {
+        const scale = document.getElementById('runScale').value;
+        const seed = Number(document.getElementById('runSeed').value || 42);
+        const data = await jpost('/api/v1/uat/run/start', {
+          scale,
+          seed,
+          base_url: window.location.origin,
+        });
+        document.getElementById('runStatus').textContent = JSON.stringify(data, null, 2);
+        await refreshRunStatus();
+      } catch (err) {
+        const msg = `Run start failed: ${err}`;
+        document.getElementById('runStatus').textContent = msg;
+        alert(msg);
+      }
+    }
+
+    async function stopRun() {
+      try {
+        const data = await jpost('/api/v1/uat/run/stop', {});
+        document.getElementById('runStatus').textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        document.getElementById('runStatus').textContent = `Run stop failed: ${err}`;
+      }
+    }
+
+    async function runPhase2Plan() {
+      try {
+        const data = await jpost('/api/v1/uat/phase2/plan', {});
+        document.getElementById('phase2Status').textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        document.getElementById('phase2Status').textContent = `Plan failed: ${err}`;
+      }
+    }
+
+    async function refreshAutopilotStatus() {
+      try {
+        const data = await jget('/api/v1/uat/phase2/autopilot/status');
+        document.getElementById('autopilotStatus').textContent = JSON.stringify(data, null, 2);
+        const tokenInput = document.getElementById('autopilotToken');
+        if (tokenInput && !tokenInput.value && data && data.approval_token) {
+          tokenInput.value = data.approval_token;
+        }
+      } catch (err) {
+        document.getElementById('autopilotStatus').textContent = `Autopilot status failed: ${err}`;
+      }
+    }
+
+    async function startAutopilot() {
+      setButtonBusy('startAutopilotBtn', true, 'Starting...', 'Start Autopilot');
+      try {
+        const scale = document.getElementById('runScale').value;
+        const seed = Number(document.getElementById('runSeed').value || 42);
+        const mode = document.getElementById('autopilotMode').value || 'advisory';
+        const token = (document.getElementById('autopilotToken').value || '').trim();
+        const data = await jpost('/api/v1/uat/phase2/autopilot/start', {
+          scale,
+          seed,
+          mode,
+          approval_timeout_seconds: 600,
+          approval_token: token || undefined,
+          max_cycles: 5,
+          poll_seconds: 1.0,
+          base_url: window.location.origin,
+        });
+        document.getElementById('autopilotStatus').textContent = JSON.stringify(data, null, 2);
+        if (data && data.approval_token) {
+          document.getElementById('autopilotToken').value = data.approval_token;
+        }
+        setPhase2Status(`Autopilot started in ${mode} mode. Monitoring status until stop condition.`, data);
+        if (mode === 'manual_approval' && data && data.approval_token) {
+          alert(`Manual approval mode enabled. Token: ${data.approval_token}`);
+        }
+      } catch (err) {
+        document.getElementById('autopilotStatus').textContent = `Autopilot start failed: ${err}`;
+        alert(`Autopilot start failed: ${err}`);
+      } finally {
+        setButtonBusy('startAutopilotBtn', false, 'Starting...', 'Start Autopilot');
+      }
+    }
+
+    async function approveAutopilotCycle() {
+      setButtonBusy('approveAutopilotBtn', true, 'Approving...', 'Approve Cycle');
+      try {
+        const token = (document.getElementById('autopilotToken').value || '').trim();
+        if (!token) {
+          throw new Error('Approval token is required. Start manual_approval autopilot first.');
+        }
+
+        const status = await jget('/api/v1/uat/phase2/autopilot/status');
+        const cycle = Number(status.pending_cycle || status.current_cycle || 0);
+        if (!cycle) {
+          throw new Error('No pending cycle found to approve.');
+        }
+
+        const data = await jpost('/api/v1/uat/phase2/autopilot/approve', {
+          token,
+          cycle,
+        });
+        document.getElementById('autopilotStatus').textContent = JSON.stringify(data, null, 2);
+        setPhase2Status(`Cycle ${cycle} approval sent successfully.`, data);
+      } catch (err) {
+        document.getElementById('autopilotStatus').textContent = `Autopilot approval failed: ${err}`;
+        alert(`Autopilot approval failed: ${err}`);
+      } finally {
+        setButtonBusy('approveAutopilotBtn', false, 'Approving...', 'Approve Cycle');
+      }
+    }
+
+    async function stopAutopilot() {
+      setButtonBusy('stopAutopilotBtn', true, 'Stopping...', 'Stop Autopilot');
+      try {
+        const data = await jpost('/api/v1/uat/phase2/autopilot/stop', {});
+        document.getElementById('autopilotStatus').textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        document.getElementById('autopilotStatus').textContent = `Autopilot stop failed: ${err}`;
+        alert(`Autopilot stop failed: ${err}`);
+      } finally {
+        setButtonBusy('stopAutopilotBtn', false, 'Stopping...', 'Stop Autopilot');
+      }
+    }
+
+    async function generatePhase2Patch() {
+      setButtonBusy('patchBtn', true, 'Generating...', 'Generate Patch');
+      try {
+        const data = await jpost('/api/v1/uat/phase2/patch', { recipe_id: 'retry_hardening_uat_agent_v1' });
+        if (data.already_applied) {
+          latestGeneratedPatch = null;
+          setApplyButtonEnabled(false);
+          setPhase2Status(
+            'Patch status: already applied. No apply step is required. Run UAT again and compare latest runs.',
+            data
+          );
+          alert('Generate Patch completed: retry hardening is already applied in this workspace.');
+          return;
+        }
+
+        latestGeneratedPatch = data.patch_file || null;
+        setApplyButtonEnabled(Boolean(latestGeneratedPatch));
+        setPhase2Status('Patch file generated successfully.', data);
+        if (latestGeneratedPatch) {
+          alert(`Generate Patch completed: ${latestGeneratedPatch}`);
+        }
+      } catch (err) {
+        setApplyButtonEnabled(false);
+        setPhase2Status(`Patch generation failed: ${err}`);
+        alert(`Generate Patch failed: ${err}`);
+      } finally {
+        setButtonBusy('patchBtn', false, 'Generating...', 'Generate Patch');
+      }
+    }
+
+    async function applyPhase2Patch() {
+      setButtonBusy('applyBtn', true, 'Applying...', 'Apply Patch');
+      try {
+        if (!latestGeneratedPatch) {
+          setPhase2Status(
+            'No patch pending apply. Click Generate Patch first. If response says already applied, skip apply and run UAT again.'
+          );
+          return;
+        }
+
+        const check = await jpost('/api/v1/uat/phase2/apply', {
+          patch_file: latestGeneratedPatch,
+          confirm: false,
+        });
+
+        if (!check.check_passed) {
+          setPhase2Status('Patch check failed. Review details below.', check);
+          alert('Apply Patch check failed. See details in the Phase 2 panel.');
+          return;
+        }
+
+        const ok = window.confirm('Patch check passed. Apply patch to workspace now?');
+        if (!ok) {
+          setPhase2Status('Patch apply cancelled after validation.', check);
+          return;
+        }
+
+        const applied = await jpost('/api/v1/uat/phase2/apply', {
+          patch_file: latestGeneratedPatch,
+          confirm: true,
+        });
+        setApplyButtonEnabled(false);
+        latestGeneratedPatch = null;
+        setPhase2Status('Patch applied successfully.', applied);
+        alert('Apply Patch completed successfully.');
+      } catch (err) {
+        setPhase2Status(`Apply failed: ${err}`);
+        alert(`Apply Patch failed: ${err}`);
+      } finally {
+        setButtonBusy('applyBtn', false, 'Applying...', 'Apply Patch');
+      }
+    }
+
+    document.getElementById('refreshBtn').addEventListener('click', () => loadReports());
+    document.getElementById('compareBtn').addEventListener('click', () => compareLatest());
+    document.getElementById('startRunBtn').addEventListener('click', () => startRun());
+    document.getElementById('stopRunBtn').addEventListener('click', () => stopRun());
+    document.getElementById('refreshRunBtn').addEventListener('click', () => refreshRunStatus());
+    document.getElementById('startAutopilotBtn').addEventListener('click', () => startAutopilot());
+    document.getElementById('stopAutopilotBtn').addEventListener('click', () => stopAutopilot());
+    document.getElementById('refreshAutopilotBtn').addEventListener('click', () => refreshAutopilotStatus());
+    document.getElementById('approveAutopilotBtn').addEventListener('click', () => approveAutopilotCycle());
+    document.getElementById('planBtn').addEventListener('click', () => runPhase2Plan());
+    document.getElementById('patchBtn').addEventListener('click', () => generatePhase2Patch());
+    document.getElementById('applyBtn').addEventListener('click', () => applyPhase2Patch());
+
+    setInterval(() => refreshRunStatus(), 4000);
+    setInterval(() => refreshAutopilotStatus(), 4000);
+    refreshRunStatus();
+    refreshAutopilotStatus();
+    setApplyButtonEnabled(false);
+
+    loadReports().catch((err) => {
+      document.getElementById('reportJson').textContent = `Load error: ${err}`;
+    });
+  </script>
+
+  <style>
+    .suite-nav-widget {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 999999;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      font-family: "Segoe UI", "Trebuchet MS", sans-serif;
+    }
+    .sn-menu {
+      background: rgba(10, 15, 25, 0.95);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(40, 120, 255, 0.3);
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 16px;
+      transform: scale(0.9) translateY(20px);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(40, 120, 255, 0.15);
+    }
+    .suite-nav-widget:hover .sn-menu {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .sn-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      color: #edf0f7 !important;
+      text-decoration: none !important;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 8px;
+      transition: background 0.2s, color 0.2s;
+      width: 260px;
+      box-sizing: border-box;
+    }
+    .sn-item:hover {
+      background: rgba(40, 120, 255, 0.15) !important;
+      color: #2878ff !important;
+    }
+    .sn-icon {
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+    }
+    .sn-fab {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1254CC, #2878FF);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(40, 120, 255, 0.4);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+  </style>
+
+  <div class="suite-nav-widget">
+    <div class="sn-menu">
+      <div style="font-size:10px;color:#8895ad;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;padding-left:16px;font-weight:700;">App Switcher</div>
+      <a href="index.html" class="sn-item"><span class="sn-icon">🏠</span> Landing Page</a>
+      <a href="app.html" class="sn-item"><span class="sn-icon">📊</span> Master Audit Suite</a>
+      <a href="vault.html" class="sn-item"><span class="sn-icon">🔐</span> Evidence Vault</a>
+      <a href="governance.html" class="sn-item"><span class="sn-icon">🏛️</span> Governance</a>
+      <a href="reports.html" class="sn-item"><span class="sn-icon">📄</span> Reports</a>
+      <a href="itgc-controls.html" class="sn-item"><span class="sn-icon">🔒</span> ITGC Controls</a>
+      <a href="itac-testing.html" class="sn-item"><span class="sn-icon">⚙️</span> ITAC Testing</a>
+      <a href="settings.html" class="sn-item"><span class="sn-icon">⚙️</span> Settings</a>
+      <a href="uat.html" class="sn-item"><span class="sn-icon">🧪</span> UAT Console (Admin-only)</a>
+      <a href="help.html" class="sn-item"><span class="sn-icon">📖</span> Help & Docs</a>
+    </div>
+    <div class="sn-fab">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"></circle>
+        <circle cx="19" cy="12" r="3"></circle>
+        <circle cx="5" cy="12" r="3"></circle>
+      </svg>
+    </div>
+  </div>
 </body>
 </html>
