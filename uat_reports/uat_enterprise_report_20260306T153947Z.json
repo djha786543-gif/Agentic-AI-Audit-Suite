@@ -1,0 +1,1639 @@
+{
+  "run_id": "20260306T153947Z",
+  "started_at": "2026-03-06T15:39:47.464848+00:00",
+  "config": {
+    "base_url": "http://127.0.0.1:8000",
+    "username": "admin",
+    "scale": "small",
+    "seed": 42
+  },
+  "steps": [
+    {
+      "name": "auth_login",
+      "method": "POST",
+      "path": "/auth/login",
+      "status_code": 200,
+      "latency_ms": 21.4,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/auth/login",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_evidence_0",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 862.72,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_1",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 671.46,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_2",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 674.68,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_3",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 674.02,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_4",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 672.7,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_5",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 687.42,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_6",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 677.21,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_7",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 679.34,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_8",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 696.7,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_9",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 709.29,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_10",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 701.03,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_11",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 687.9,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_12",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 680.69,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_13",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 695.25,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_14",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 673.21,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_15",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 690.94,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_16",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 697.04,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_17",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 676.23,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_18",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 686.72,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_19",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 688.69,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_control_eval_0",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 710.87,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_control_eval_1",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 679.94,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_control_eval_2",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 683.15,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_control_eval_3",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 691.66,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_control_eval_4",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 702.04,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_control_eval_5",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 680.68,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_control_eval_6",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 685.45,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_control_eval_7",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 667.1,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_control_eval_8",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 663.49,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_control_eval_9",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 709.07,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_control_eval_10",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 680.32,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_control_eval_11",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 675.45,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_sod_0",
+      "method": "POST",
+      "path": "/evaluation/sod",
+      "status_code": 500,
+      "latency_ms": 677.7,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/sod",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_sod_1",
+      "method": "POST",
+      "path": "/evaluation/sod",
+      "status_code": 500,
+      "latency_ms": 682.25,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/sod",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_sod_2",
+      "method": "POST",
+      "path": "/evaluation/sod",
+      "status_code": 500,
+      "latency_ms": 677.98,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/sod",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_sod_3",
+      "method": "POST",
+      "path": "/evaluation/sod",
+      "status_code": 500,
+      "latency_ms": 689.99,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/sod",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_sod_4",
+      "method": "POST",
+      "path": "/evaluation/sod",
+      "status_code": 500,
+      "latency_ms": 748.8,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/sod",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_sod_5",
+      "method": "POST",
+      "path": "/evaluation/sod",
+      "status_code": 500,
+      "latency_ms": 672.98,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/sod",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "list_controls_for_exceptions",
+      "method": "GET",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 662.12,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_framework_SOX404",
+      "method": "POST",
+      "path": "/governance/frameworks",
+      "status_code": 500,
+      "latency_ms": 705.46,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/frameworks",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_framework_ISO27001",
+      "method": "POST",
+      "path": "/governance/frameworks",
+      "status_code": 500,
+      "latency_ms": 699.76,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/frameworks",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_framework_COBIT2019",
+      "method": "POST",
+      "path": "/governance/frameworks",
+      "status_code": 500,
+      "latency_ms": 718.52,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/frameworks",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_policy_0",
+      "method": "POST",
+      "path": "/governance/policies",
+      "status_code": 500,
+      "latency_ms": 699.85,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/policies",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_policy_1",
+      "method": "POST",
+      "path": "/governance/policies",
+      "status_code": 500,
+      "latency_ms": 689.98,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/policies",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_policy_2",
+      "method": "POST",
+      "path": "/governance/policies",
+      "status_code": 500,
+      "latency_ms": 679.91,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/policies",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_mapping_0",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 500,
+      "latency_ms": 691.13,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/mappings",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_mapping_1",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 500,
+      "latency_ms": 710.28,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/mappings",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_mapping_2",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 500,
+      "latency_ms": 700.47,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/mappings",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_mapping_3",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 500,
+      "latency_ms": 702.09,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/mappings",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_mapping_4",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 500,
+      "latency_ms": 701.41,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/mappings",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_mapping_5",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 500,
+      "latency_ms": 682.57,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/mappings",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_mapping_6",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 500,
+      "latency_ms": 685.07,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/mappings",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_mapping_7",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 500,
+      "latency_ms": 702.02,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/mappings",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_risk_0",
+      "method": "POST",
+      "path": "/governance/risks",
+      "status_code": 500,
+      "latency_ms": 790.28,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/risks",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_risk_1",
+      "method": "POST",
+      "path": "/governance/risks",
+      "status_code": 500,
+      "latency_ms": 665.43,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/risks",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_risk_2",
+      "method": "POST",
+      "path": "/governance/risks",
+      "status_code": 500,
+      "latency_ms": 681.36,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/risks",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_risk_3",
+      "method": "POST",
+      "path": "/governance/risks",
+      "status_code": 500,
+      "latency_ms": 674.94,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/risks",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_risk_4",
+      "method": "POST",
+      "path": "/governance/risks",
+      "status_code": 500,
+      "latency_ms": 679.29,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/risks",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_risk_5",
+      "method": "POST",
+      "path": "/governance/risks",
+      "status_code": 500,
+      "latency_ms": 686.25,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/risks",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_alert_rule_0",
+      "method": "POST",
+      "path": "/alerts/rules",
+      "status_code": 500,
+      "latency_ms": 692.36,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/rules",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_alert_rule_1",
+      "method": "POST",
+      "path": "/alerts/rules",
+      "status_code": 500,
+      "latency_ms": 676.37,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/rules",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_alert_rule_2",
+      "method": "POST",
+      "path": "/alerts/rules",
+      "status_code": 500,
+      "latency_ms": 699.63,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/rules",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_alert_0",
+      "method": "POST",
+      "path": "/alerts/",
+      "status_code": 500,
+      "latency_ms": 692.98,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_alert_1",
+      "method": "POST",
+      "path": "/alerts/",
+      "status_code": 500,
+      "latency_ms": 682.97,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_alert_2",
+      "method": "POST",
+      "path": "/alerts/",
+      "status_code": 500,
+      "latency_ms": 672.01,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_alert_3",
+      "method": "POST",
+      "path": "/alerts/",
+      "status_code": 500,
+      "latency_ms": 668.25,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_alert_4",
+      "method": "POST",
+      "path": "/alerts/",
+      "status_code": 500,
+      "latency_ms": 694.03,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_alert_5",
+      "method": "POST",
+      "path": "/alerts/",
+      "status_code": 500,
+      "latency_ms": 684.38,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "engine_health",
+      "method": "GET",
+      "path": "/engine/health",
+      "status_code": 200,
+      "latency_ms": 8.03,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/health",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "engine_analyze_sod",
+      "method": "POST",
+      "path": "/engine/analyze/sod",
+      "status_code": 200,
+      "latency_ms": 18.59,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/analyze/sod",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "run_report_executive_summary",
+      "method": "POST",
+      "path": "/reports/runs",
+      "status_code": 500,
+      "latency_ms": 662.42,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/reports/runs",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "run_report_compliance_status",
+      "method": "POST",
+      "path": "/reports/runs",
+      "status_code": 500,
+      "latency_ms": 687.15,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/reports/runs",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "run_report_kpi_dashboard",
+      "method": "POST",
+      "path": "/reports/runs",
+      "status_code": 500,
+      "latency_ms": 707.44,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/reports/runs",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "run_report_audit_findings",
+      "method": "POST",
+      "path": "/reports/runs",
+      "status_code": 500,
+      "latency_ms": 686.24,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/reports/runs",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "run_report_sod_matrix",
+      "method": "POST",
+      "path": "/reports/runs",
+      "status_code": 500,
+      "latency_ms": 674.62,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/reports/runs",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "run_report_risk_register",
+      "method": "POST",
+      "path": "/reports/runs",
+      "status_code": 500,
+      "latency_ms": 676.67,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/reports/runs",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "run_report_continuous_assurance",
+      "method": "POST",
+      "path": "/reports/runs",
+      "status_code": 500,
+      "latency_ms": 695.65,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/reports/runs",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "ai_audit_analyze_0_users_toxic_sod",
+      "method": "POST",
+      "path": "/engine/analyze",
+      "status_code": 200,
+      "latency_ms": 42.9,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/analyze",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "ai_audit_verdict_0",
+      "method": "PATCH",
+      "path": "/engine/findings/cb2d8e16-ba33-477a-8e98-4040f52b79d0/verdict",
+      "status_code": 500,
+      "latency_ms": 690.63,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/findings/cb2d8e16-ba33-477a-8e98-4040f52b79d0/verdict",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "ai_audit_analyze_1_users_dormant_privileged",
+      "method": "POST",
+      "path": "/engine/analyze",
+      "status_code": 200,
+      "latency_ms": 46.39,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/analyze",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "ai_audit_verdict_1",
+      "method": "PATCH",
+      "path": "/engine/findings/63896312-d036-4032-9ab7-4ef79b6afdf9/verdict",
+      "status_code": 500,
+      "latency_ms": 689.57,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/findings/63896312-d036-4032-9ab7-4ef79b6afdf9/verdict",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "ai_audit_analyze_2_changes_self_approval",
+      "method": "POST",
+      "path": "/engine/analyze",
+      "status_code": 200,
+      "latency_ms": 25.06,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/analyze",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "ai_audit_verdict_2",
+      "method": "PATCH",
+      "path": "/engine/findings/b485e9c5-d8f5-496b-94b0-24099a878178/verdict",
+      "status_code": 500,
+      "latency_ms": 694.26,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/findings/b485e9c5-d8f5-496b-94b0-24099a878178/verdict",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "ai_audit_analyze_3_transactions_three_way_bypass",
+      "method": "POST",
+      "path": "/engine/analyze",
+      "status_code": 200,
+      "latency_ms": 10.98,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/analyze",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "ai_audit_analyze_4_interfaces_recon_mismatch",
+      "method": "POST",
+      "path": "/engine/analyze",
+      "status_code": 200,
+      "latency_ms": 20.71,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/analyze",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "ai_audit_verdict_4",
+      "method": "PATCH",
+      "path": "/engine/findings/70eb04b5-ee66-4d9c-aa48-2a19bffaa118/verdict",
+      "status_code": 500,
+      "latency_ms": 707.27,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/findings/70eb04b5-ee66-4d9c-aa48-2a19bffaa118/verdict",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "ai_audit_analyze_5_users_toxic_sod",
+      "method": "POST",
+      "path": "/engine/analyze",
+      "status_code": 200,
+      "latency_ms": 221.41,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/analyze",
+        "attempts": 2
+      }
+    },
+    {
+      "name": "ai_audit_verdict_5",
+      "method": "PATCH",
+      "path": "/engine/findings/5a4a3ba3-b742-418d-a386-24c7f00ae1e1/verdict",
+      "status_code": 500,
+      "latency_ms": 684.34,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/findings/5a4a3ba3-b742-418d-a386-24c7f00ae1e1/verdict",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "ai_audit_validate_invalid_schema",
+      "method": "POST",
+      "path": "/engine/analyze/validate",
+      "status_code": 200,
+      "latency_ms": 10.24,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/analyze/validate",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "ai_audit_accuracy",
+      "method": "GET",
+      "path": "/engine/accuracy",
+      "status_code": 500,
+      "latency_ms": 681.38,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/accuracy",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "snapshot_vault_summary",
+      "method": "GET",
+      "path": "/audit/vault/summary",
+      "status_code": 500,
+      "latency_ms": 690.93,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/vault/summary",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "snapshot_controls",
+      "method": "GET",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 728.18,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "snapshot_sod",
+      "method": "GET",
+      "path": "/evaluation/sod",
+      "status_code": 500,
+      "latency_ms": 687.54,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/sod",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "snapshot_exceptions",
+      "method": "GET",
+      "path": "/evaluation/exceptions",
+      "status_code": 500,
+      "latency_ms": 682.89,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/exceptions",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "snapshot_risks",
+      "method": "GET",
+      "path": "/governance/risks",
+      "status_code": 500,
+      "latency_ms": 692.99,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/risks",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "snapshot_alerts",
+      "method": "GET",
+      "path": "/alerts/",
+      "status_code": 500,
+      "latency_ms": 693.26,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "snapshot_dashboard",
+      "method": "GET",
+      "path": "/reports/dashboard",
+      "status_code": 500,
+      "latency_ms": 683.53,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/reports/dashboard",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "snapshot_kpis",
+      "method": "GET",
+      "path": "/reports/kpis",
+      "status_code": 500,
+      "latency_ms": 691.39,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/reports/kpis",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "snapshot_report_runs",
+      "method": "GET",
+      "path": "/reports/runs",
+      "status_code": 500,
+      "latency_ms": 688.66,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/reports/runs",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "snapshot_engine_accuracy",
+      "method": "GET",
+      "path": "/engine/accuracy",
+      "status_code": 500,
+      "latency_ms": 685.08,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/accuracy",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    }
+  ],
+  "summary": {
+    "total_steps": 101,
+    "failed_steps": 91,
+    "success_rate_pct": 9.9,
+    "p95_latency_ms": 717.75,
+    "created_counts": {
+      "evidence_ids": 0,
+      "control_ids": 0,
+      "exception_ids": 0,
+      "framework_ids": 0,
+      "policy_ids": 0,
+      "mapping_ids": 0,
+      "risk_ids": 0,
+      "alert_rule_ids": 0,
+      "alert_ids": 0,
+      "report_run_ids": 0,
+      "ai_audit_case_ids": 6
+    },
+    "improvement_candidates": 1
+  },
+  "improvement_candidates": [
+    {
+      "type": "api_failures",
+      "severity": "high",
+      "summary": "91 API steps failed during UAT run",
+      "evidence": [
+        {
+          "name": "seed_evidence_0",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 500,
+          "latency_ms": 862.72,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+            "attempts": 3
+          },
+          "error": "Unexpected status: 500"
+        },
+        {
+          "name": "seed_evidence_1",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 500,
+          "latency_ms": 671.46,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+            "attempts": 3
+          },
+          "error": "Unexpected status: 500"
+        },
+        {
+          "name": "seed_evidence_2",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 500,
+          "latency_ms": 674.68,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+            "attempts": 3
+          },
+          "error": "Unexpected status: 500"
+        },
+        {
+          "name": "seed_evidence_3",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 500,
+          "latency_ms": 674.02,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+            "attempts": 3
+          },
+          "error": "Unexpected status: 500"
+        },
+        {
+          "name": "seed_evidence_4",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 500,
+          "latency_ms": 672.7,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+            "attempts": 3
+          },
+          "error": "Unexpected status: 500"
+        },
+        {
+          "name": "seed_evidence_5",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 500,
+          "latency_ms": 687.42,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+            "attempts": 3
+          },
+          "error": "Unexpected status: 500"
+        },
+        {
+          "name": "seed_evidence_6",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 500,
+          "latency_ms": 677.21,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+            "attempts": 3
+          },
+          "error": "Unexpected status: 500"
+        },
+        {
+          "name": "seed_evidence_7",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 500,
+          "latency_ms": 679.34,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+            "attempts": 3
+          },
+          "error": "Unexpected status: 500"
+        },
+        {
+          "name": "seed_evidence_8",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 500,
+          "latency_ms": 696.7,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+            "attempts": 3
+          },
+          "error": "Unexpected status: 500"
+        },
+        {
+          "name": "seed_evidence_9",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 500,
+          "latency_ms": 709.29,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+            "attempts": 3
+          },
+          "error": "Unexpected status: 500"
+        },
+        {
+          "name": "seed_evidence_10",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 500,
+          "latency_ms": 701.03,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+            "attempts": 3
+          },
+          "error": "Unexpected status: 500"
+        },
+        {
+          "name": "seed_evidence_11",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 500,
+          "latency_ms": 687.9,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+            "attempts": 3
+          },
+          "error": "Unexpected status: 500"
+        },
+        {
+          "name": "seed_evidence_12",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 500,
+          "latency_ms": 680.69,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+            "attempts": 3
+          },
+          "error": "Unexpected status: 500"
+        },
+        {
+          "name": "seed_evidence_13",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 500,
+          "latency_ms": 695.25,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+            "attempts": 3
+          },
+          "error": "Unexpected status: 500"
+        },
+        {
+          "name": "seed_evidence_14",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 500,
+          "latency_ms": 673.21,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+            "attempts": 3
+          },
+          "error": "Unexpected status: 500"
+        },
+        {
+          "name": "seed_evidence_15",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 500,
+          "latency_ms": 690.94,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+            "attempts": 3
+          },
+          "error": "Unexpected status: 500"
+        },
+        {
+          "name": "seed_evidence_16",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 500,
+          "latency_ms": 697.04,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+            "attempts": 3
+          },
+          "error": "Unexpected status: 500"
+        },
+        {
+          "name": "seed_evidence_17",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 500,
+          "latency_ms": 676.23,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+            "attempts": 3
+          },
+          "error": "Unexpected status: 500"
+        },
+        {
+          "name": "seed_evidence_18",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 500,
+          "latency_ms": 686.72,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+            "attempts": 3
+          },
+          "error": "Unexpected status: 500"
+        },
+        {
+          "name": "seed_evidence_19",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 500,
+          "latency_ms": 688.69,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+            "attempts": 3
+          },
+          "error": "Unexpected status: 500"
+        }
+      ]
+    }
+  ],
+  "artifacts": {
+    "snapshots": {
+      "vault_summary": "Internal Server Error",
+      "controls": "Internal Server Error",
+      "sod": "Internal Server Error",
+      "exceptions": "Internal Server Error",
+      "risks": "Internal Server Error",
+      "alerts": "Internal Server Error",
+      "dashboard": "Internal Server Error",
+      "kpis": "Internal Server Error",
+      "report_runs": "Internal Server Error",
+      "engine_accuracy": "Internal Server Error"
+    },
+    "created_objects": {
+      "evidence_ids": [],
+      "control_ids": [],
+      "exception_ids": [],
+      "framework_ids": [],
+      "policy_ids": [],
+      "mapping_ids": [],
+      "risk_ids": [],
+      "alert_rule_ids": [],
+      "alert_ids": [],
+      "report_run_ids": [],
+      "ai_audit_case_ids": [
+        "AIAUD-53947Z-000",
+        "AIAUD-53947Z-001",
+        "AIAUD-53947Z-002",
+        "AIAUD-53947Z-003",
+        "AIAUD-53947Z-004",
+        "AIAUD-53947Z-005"
+      ]
+    }
+  },
+  "finished_at": "2026-03-06T15:40:50.793100+00:00"
+}

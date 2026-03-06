@@ -42,3 +42,10 @@ Traceback (most recent call last):
     for i in range(0, len(uri_bytes)):
              ^^^^^^^^^^^^^^^^^^^^^^^^
 KeyboardInterrupt
+
+[2026-03-06T15:39:47.149481] START C:\Users\DJ\Desktop\Agentic-AI-Audit-Suite\.venv\Scripts\python.exe C:\Users\DJ\Desktop\Agentic-AI-Audit-Suite\agents\uat_enterprise_agent.py --base-url http://127.0.0.1:8000 --scale small --seed 42
+[UAT] Starting enterprise UAT agent against http://127.0.0.1:8000 (scale=small, seed=42)
+[UAT] Completed
+[UAT] Report: uat_reports\uat_enterprise_report_20260306T153947Z.json
+[UAT] Steps: 101 | Failed: 91 | P95(ms): 717.75
+[UAT] Improvement candidates: 1
