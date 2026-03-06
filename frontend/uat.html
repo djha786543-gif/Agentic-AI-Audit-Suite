@@ -302,6 +302,14 @@
   <script>
     let latestGeneratedPatch = null;
 
+    function setApplyButtonEnabled(enabled) {
+      const applyBtn = document.getElementById('applyBtn');
+      if (!applyBtn) return;
+      applyBtn.disabled = !enabled;
+      applyBtn.style.opacity = enabled ? '1' : '0.55';
+      applyBtn.title = enabled ? 'Apply latest generated patch' : 'No patch to apply';
+    }
+
     async function jget(path) {
       const res = await fetch(path);
       if (!res.ok) throw new Error(`${path} -> ${res.status}`);
@@ -527,8 +535,11 @@
           base_url: window.location.origin,
         });
         document.getElementById('runStatus').textContent = JSON.stringify(data, null, 2);
+        await refreshRunStatus();
       } catch (err) {
-        document.getElementById('runStatus').textContent = `Run start failed: ${err}`;
+        const msg = `Run start failed: ${err}`;
+        document.getElementById('runStatus').textContent = msg;
+        alert(msg);
       }
     }
 
@@ -553,9 +564,20 @@
     async function generatePhase2Patch() {
       try {
         const data = await jpost('/api/v1/uat/phase2/patch', { recipe_id: 'retry_hardening_uat_agent_v1' });
-        latestGeneratedPatch = data.patch_file;
+        if (data.already_applied) {
+          latestGeneratedPatch = null;
+          setApplyButtonEnabled(false);
+          document.getElementById('phase2Status').textContent =
+            'Patch status: already applied. No apply step is required. Run UAT again and compare latest runs.\n\n' +
+            JSON.stringify(data, null, 2);
+          return;
+        }
+
+        latestGeneratedPatch = data.patch_file || null;
+        setApplyButtonEnabled(Boolean(latestGeneratedPatch));
         document.getElementById('phase2Status').textContent = JSON.stringify(data, null, 2);
       } catch (err) {
+        setApplyButtonEnabled(false);
         document.getElementById('phase2Status').textContent = `Patch generation failed: ${err}`;
       }
     }
@@ -563,7 +585,8 @@
     async function applyPhase2Patch() {
       try {
         if (!latestGeneratedPatch) {
-          document.getElementById('phase2Status').textContent = 'No patch generated in this session. Click Generate Patch first.';
+          document.getElementById('phase2Status').textContent =
+            'No patch pending apply. Click Generate Patch first. If response says already applied, skip apply and run UAT again.';
           return;
         }
 
@@ -587,6 +610,8 @@
           patch_file: latestGeneratedPatch,
           confirm: true,
         });
+        setApplyButtonEnabled(false);
+        latestGeneratedPatch = null;
         document.getElementById('phase2Status').textContent = JSON.stringify(applied, null, 2);
       } catch (err) {
         document.getElementById('phase2Status').textContent = `Apply failed: ${err}`;
@@ -604,6 +629,7 @@
 
     setInterval(() => refreshRunStatus(), 4000);
     refreshRunStatus();
+    setApplyButtonEnabled(false);
 
     loadReports().catch((err) => {
       document.getElementById('reportJson').textContent = `Load error: ${err}`;

@@ -33,6 +33,7 @@ _RUNNER_STATE: Dict[str, Any] = {
     "exit_code": None,
     "command": None,
     "log_path": None,
+    "last_error": None,
 }
 
 
@@ -105,6 +106,7 @@ def _runner_status() -> Dict[str, Any]:
         "exit_code": exit_code,
         "command": _RUNNER_STATE.get("command"),
         "log_path": _RUNNER_STATE.get("log_path"),
+        "last_error": _RUNNER_STATE.get("last_error"),
         "latest_report": latest_report,
     }
 
@@ -517,12 +519,24 @@ def start_uat_run(payload: Dict[str, Any] = Body(default={})) -> Dict[str, Any]:
     log_fp.write(f"\n[{datetime.utcnow().isoformat()}] START {' '.join(cmd)}\n")
     log_fp.flush()
 
-    proc = subprocess.Popen(
-        cmd,
-        cwd=repo_root,
-        stdout=log_fp,
-        stderr=log_fp,
-    )
+    try:
+        proc = subprocess.Popen(
+            cmd,
+            cwd=repo_root,
+            stdout=log_fp,
+            stderr=log_fp,
+        )
+    except Exception as exc:
+        _RUNNER_STATE["last_error"] = f"Failed to launch UAT process: {exc}"
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "message": "Failed to launch UAT process",
+                "error": str(exc),
+                "command": cmd,
+                "repo_root": str(repo_root),
+            },
+        )
 
     _RUNNER_STATE["process"] = proc
     _RUNNER_STATE["started_at"] = datetime.utcnow().isoformat()
@@ -530,6 +544,7 @@ def start_uat_run(payload: Dict[str, Any] = Body(default={})) -> Dict[str, Any]:
     _RUNNER_STATE["exit_code"] = None
     _RUNNER_STATE["command"] = cmd
     _RUNNER_STATE["log_path"] = str(log_path)
+    _RUNNER_STATE["last_error"] = None
 
     return {
         "started": True,
