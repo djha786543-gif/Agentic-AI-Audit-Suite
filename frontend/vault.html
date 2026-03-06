@@ -253,7 +253,8 @@
     </style>
 </head>
 
-<body class="p-4 md:p-8 lg:p-12 overflow-x-hidden">
+<body>
+  <div class="advisory-banner" style="position:sticky;top:0;z-index:2500;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 20px;background:#1a0a00;border-bottom:1px solid #f59e0b;color:#fcd34d;font-size:12px;"><span>⚠️ ADVISORY: AuditAI Suite findings are advisory only. No output constitutes an audit opinion, conclusion, or attestation under PCAOB AS 2201 or ISA 315. All findings require professional review by a qualified auditor before use in any compliance or financial reporting context.</span><span style="margin-left:auto;white-space:nowrap;font-family:monospace;">AuditAI Suite v4.0</span></div>
     <div class="max-w-[1800px] mx-auto">
         <!-- HEADER -->
         <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-6">
@@ -535,6 +536,10 @@
                             entries</span>
                     </div>
 
+                    <div id="demo-mode-banner" class="hidden mx-6 mt-4 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-[11px] font-bold uppercase tracking-wide text-amber-300">
+                        DEMO MODE — Showing sample vault records. Connect backend for live cryptographic ingestion.
+                    </div>
+
                     <div class="overflow-x-auto flex-1 h-[600px] xl:h-[700px]">
                         <table class="w-full text-left whitespace-nowrap min-w-[1000px]">
                             <thead
@@ -587,6 +592,7 @@
         let chartInstance = null;
         let intelligenceData = null;
         let currentFindings = [];
+        let isDemoMode = false;
 
         // API Base - tries local first, then tunnel
         const API_BASE = 'https://stupid-tips-train.loca.lt';
@@ -600,6 +606,27 @@
         const dateFilter = document.getElementById('dateFilter');
         const tbody = document.getElementById('table-body');
         const refreshBtn = document.getElementById('refreshBtn');
+        const demoBanner = document.getElementById('demo-mode-banner');
+
+        function getDemoVaultData() {
+            return [
+                { id: 'VLT-2026-0881', recorded_at: '2026-03-09T08:12:24Z', source_system: 'SAP S/4HANA', ai_confidence_score: 98, hash_sequence: '8f2a4b9d7e3c1fa0...', verification_status: 'Verified' },
+                { id: 'VLT-2026-0882', recorded_at: '2026-03-09T08:29:41Z', source_system: 'ServiceNow', ai_confidence_score: 96, hash_sequence: '1d7f99a8c3b4e6d2...', verification_status: 'Verified' },
+                { id: 'VLT-2026-0883', recorded_at: '2026-03-09T09:03:08Z', source_system: 'Workday', ai_confidence_score: 94, hash_sequence: 'cb8a13f76d9024be...', verification_status: 'Verified' },
+                { id: 'VLT-2026-0884', recorded_at: '2026-03-09T09:22:55Z', source_system: 'Azure AD', ai_confidence_score: 92, hash_sequence: '4aa10ef4dd97b6c3...', verification_status: 'Verified' },
+                { id: 'VLT-2026-0885', recorded_at: '2026-03-09T10:11:17Z', source_system: 'File System', ai_confidence_score: 90, hash_sequence: 'd3a7461fc55eb129...', verification_status: 'Verified' },
+                { id: 'VLT-2026-0886', recorded_at: '2026-03-09T10:38:49Z', source_system: 'SAP S/4HANA', ai_confidence_score: 99, hash_sequence: 'aa489fe05c1378db...', verification_status: 'Verified' },
+                { id: 'VLT-2026-0887', recorded_at: '2026-03-09T11:06:33Z', source_system: 'ServiceNow', ai_confidence_score: 95, hash_sequence: '70c19b2d8f4e3a61...', verification_status: 'Verified' },
+                { id: 'VLT-2026-0888', recorded_at: '2026-03-09T11:47:02Z', source_system: 'Workday', ai_confidence_score: 93, hash_sequence: 'ff19c7a8d42e65b0...', verification_status: 'Verified' },
+                { id: 'VLT-2026-0889', recorded_at: '2026-03-09T12:25:44Z', source_system: 'Azure AD', ai_confidence_score: 91, hash_sequence: '3c8db09541faee27...', verification_status: 'Verified' },
+                { id: 'VLT-2026-0890', recorded_at: '2026-03-09T13:14:09Z', source_system: 'File System', ai_confidence_score: 89, hash_sequence: 'be7f0e4c6a311d98...', verification_status: 'Verified' },
+                { id: 'VLT-2026-0891', recorded_at: '2026-03-09T14:01:37Z', source_system: 'SAP', ai_confidence_score: 41, hash_sequence: '91fd8ab3e72c4d50...', verification_status: 'TAMPERED' },
+                { id: 'VLT-2026-0892', recorded_at: '2026-03-09T15:26:18Z', source_system: 'ServiceNow', ai_confidence_score: 97, hash_sequence: 'e82a11c7bb040f6d...', verification_status: 'Verified' },
+                { id: 'VLT-2026-0893', recorded_at: '2026-03-10T08:18:06Z', source_system: 'Workday', ai_confidence_score: 88, hash_sequence: '6a12f4d3ee91bc70...', verification_status: 'Pending' },
+                { id: 'VLT-2026-0894', recorded_at: '2026-03-10T09:42:29Z', source_system: 'Azure AD', ai_confidence_score: 95, hash_sequence: '05d1be842fc9aa37...', verification_status: 'Verified' },
+                { id: 'VLT-2026-0895', recorded_at: '2026-03-10T10:57:53Z', source_system: 'File System', ai_confidence_score: 94, hash_sequence: 'f3478d9b24cae651...', verification_status: 'Verified' }
+            ];
+        }
 
         // Draw / Update Chart
         function updateChart(data) {
@@ -688,7 +715,7 @@
             }
 
             tbody.innerHTML = filtered.map(log => {
-                const shortId = log.id ? log.id.split('-')[0] : 'N/A';
+                const recordId = log.id || 'N/A';
                 let dateStr = 'Unknown', timeStr = '';
                 if (log.timestamp || log.recorded_at) {
                     const d = new Date(log.recorded_at || log.timestamp);
@@ -702,13 +729,17 @@
                     else if (confScore >= 70) { confColor = 'text-yellow-400'; confIcon = 'fa-exclamation-circle'; }
                     else { confColor = 'text-red-400'; confIcon = 'fa-triangle-exclamation'; }
                 }
-                const isVerified = log.hash_verified !== false;
-                const statusHtml = isVerified
-                    ? `<span class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)] flex items-center justify-end gap-1.5 w-fit ml-auto"><i class="fas fa-shield-check"></i> Verified</span>`
-                    : `<span class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase bg-red-500/10 text-red-400 border border-red-500/20 shadow-[0_0_10px_rgba(239,68,68,0.1)] flex items-center justify-end gap-1.5 w-fit ml-auto"><i class="fas fa-exclamation-triangle"></i> Tampered</span>`;
+                const explicitStatus = (log.verification_status || '').toLowerCase();
+                const statusKey = explicitStatus || (log.hash_verified === false ? 'tampered' : 'verified');
+                let statusHtml = `<span class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)] flex items-center justify-end gap-1.5 w-fit ml-auto"><i class="fas fa-shield-check"></i> Verified</span>`;
+                if (statusKey === 'tampered') {
+                    statusHtml = `<span class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase bg-red-500/10 text-red-400 border border-red-500/20 shadow-[0_0_10px_rgba(239,68,68,0.1)] flex items-center justify-end gap-1.5 w-fit ml-auto"><i class="fas fa-triangle-exclamation"></i> TAMPERED</span>`;
+                } else if (statusKey === 'pending') {
+                    statusHtml = `<span class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase bg-amber-500/10 text-amber-300 border border-amber-500/20 shadow-[0_0_10px_rgba(245,158,11,0.1)] flex items-center justify-end gap-1.5 w-fit ml-auto"><i class="fas fa-clock"></i> Pending</span>`;
+                }
                 return `
                     <tr class="hover:bg-white/5 transition-colors group cursor-pointer border-l-2 border-transparent hover:border-l-blue-500">
-                        <td class="py-4 px-6 font-mono text-[10px] text-blue-400 font-bold">#${shortId}</td>
+                        <td class="py-4 px-6 font-mono text-[10px] text-blue-400 font-bold">${recordId}</td>
                         <td class="py-4 px-6 font-mono text-[10px] text-slate-300"><div class="flex flex-col"><span class="font-black tracking-widest uppercase text-[9px] text-slate-500">${dateStr}</span><span>${timeStr}</span></div></td>
                         <td class="py-4 px-6 font-black uppercase text-[10px] text-slate-200 tracking-wider">${log.source_system}</td>
                         <td class="py-4 px-6 text-[11px] font-black"><div class="flex items-center gap-2 ${confColor}"><i class="fas ${confIcon}"></i> ${confScore}${confScore !== '--' ? '%' : ''}</div></td>
@@ -725,11 +756,20 @@
                 const vaultRes = await fetch(API_BASE + '/api/v1/audit/vault', { headers: API_HEADERS });
                 if (!vaultRes.ok) throw new Error('Vault fetch failed');
                 allVaultData = await vaultRes.json();
+                if (!Array.isArray(allVaultData) || allVaultData.length === 0) {
+                    throw new Error('Vault returned no records');
+                }
                 const runsRes = await fetch(API_BASE + '/api/v1/audit/runs/count', { headers: API_HEADERS });
                 if (runsRes.ok) { totalRunsCount = (await runsRes.json()).count; }
+                isDemoMode = false;
+                demoBanner.classList.add('hidden');
                 updateDashboardState(true);
             } catch (e) {
                 console.error('Engine disconnected', e);
+                isDemoMode = true;
+                allVaultData = getDemoVaultData();
+                totalRunsCount = allVaultData.length;
+                demoBanner.classList.remove('hidden');
                 updateDashboardState(false);
             }
         }
@@ -746,9 +786,19 @@
                 countText.innerText = totalRunsCount;
                 renderTable();
             } else {
-                pill.innerHTML = '<i class="fas fa-circle text-red-500"></i> Engine Offline';
-                pill.className = 'glass px-6 py-2.5 rounded-full text-[10px] font-black uppercase flex items-center gap-2 border border-red-500/40 text-red-500 shadow-[0_0_15px_rgba(239,68,68,0.15)] transition-all';
-                scoreText.innerText = '--%'; scoreBar.style.width = '0%';
+                if (isDemoMode) {
+                    pill.innerHTML = '<i class="fas fa-flask-vial text-amber-400"></i> DEMO MODE';
+                    pill.className = 'glass px-6 py-2.5 rounded-full text-[10px] font-black uppercase flex items-center gap-2 border border-amber-500/40 text-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.15)] transition-all';
+                    scoreText.innerText = '93%';
+                    scoreBar.style.width = '93%';
+                    countText.innerText = totalRunsCount;
+                    renderTable();
+                } else {
+                    pill.innerHTML = '<i class="fas fa-circle text-red-500"></i> Engine Offline';
+                    pill.className = 'glass px-6 py-2.5 rounded-full text-[10px] font-black uppercase flex items-center gap-2 border border-red-500/40 text-red-500 shadow-[0_0_15px_rgba(239,68,68,0.15)] transition-all';
+                    scoreText.innerText = '--%';
+                    scoreBar.style.width = '0%';
+                }
             }
         }
 
@@ -984,7 +1034,11 @@
             <a href="index.html" class="sn-item"><span class="sn-icon">🏠</span> Landing Page</a>
             <a href="app.html" class="sn-item"><span class="sn-icon">📊</span> Master Audit Suite</a>
             <a href="vault.html" class="sn-item"><span class="sn-icon">🔐</span> Evidence Vault</a>
-            <a href="uat.html" class="sn-item"><span class="sn-icon">🧪</span> UAT Insights</a>
+            <a href="governance.html" class="sn-item"><span class="sn-icon">🏛️</span> Governance</a>
+            <a href="reports.html" class="sn-item"><span class="sn-icon">📄</span> Reports</a>
+            <a href="itgc-controls.html" class="sn-item"><span class="sn-icon">🔒</span> ITGC Controls</a>
+            <a href="itac-testing.html" class="sn-item"><span class="sn-icon">⚙️</span> ITAC Testing</a>
+            <a href="settings.html" class="sn-item"><span class="sn-icon">⚙️</span> Settings</a>
             <a href="help.html" class="sn-item"><span class="sn-icon">📖</span> Help & Docs</a>
         </div>
         <div class="sn-fab">

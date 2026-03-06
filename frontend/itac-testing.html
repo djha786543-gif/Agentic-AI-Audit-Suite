@@ -1,2 +1,131 @@
-﻿<!doctype html><html><head><meta charset="utf-8"><title>ITAC Testing</title></head><body>
-<h1>ITAC Testing</h1><p><a href="app.html">Back</a></p></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ITAC Testing - AuditAI Suite v4.0</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--ink:#070A10;--ink2:#0B0F1A;--ink3:#101828;--ink4:#161F32;--b1:rgba(255,255,255,.06);--b2:rgba(255,255,255,.1);--tx1:#EDF0F7;--tx2:#8895AD;--tx3:#505D75;--blue:#2878FF;--blue2:#1254CC;--red:#E03E43;--orange:#F07020;--green:#18B86A;--fd:'Sora',sans-serif;--fb:'Outfit',system-ui,sans-serif;--fm:'JetBrains Mono',monospace}
+    body{background:var(--ink);color:var(--tx1);font-family:var(--fb);min-height:100vh}
+    .advisory-banner{position:sticky;top:0;z-index:2500;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 20px;background:#1a0a00;border-bottom:1px solid #f59e0b;color:#fcd34d;font-size:12px}
+    .advisory-right{margin-left:auto;white-space:nowrap;font-family:var(--fm)}
+    .nav{position:sticky;top:33px;z-index:900;height:62px;background:rgba(7,10,16,.88);backdrop-filter:blur(18px);border-bottom:1px solid var(--b1);display:flex;align-items:center;padding:0 24px}
+    .nav-inner{max-width:1200px;width:100%;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
+    .brand{display:flex;gap:10px;align-items:center}.mark{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--blue),var(--blue2));display:grid;place-items:center;font-family:var(--fm);font-size:11px}.name{font-family:var(--fd);font-size:15px;font-weight:700}
+    .links{display:flex;gap:18px;list-style:none}.links a{font-size:13px;color:var(--tx2);text-decoration:none}.links a:hover,.links a.on{color:var(--tx1)}
+    .wrap{max-width:1200px;margin:0 auto;padding:28px 24px 80px}
+    h1{font-family:var(--fd);font-size:2rem}.sub{margin-top:6px;color:var(--tx2)}
+    .intro{margin-top:18px;background:var(--ink3);border:1px solid var(--b1);border-radius:12px;padding:16px}
+    .intro ul{margin-top:8px;padding-left:18px;color:var(--tx2)}
+    .warning{margin-top:16px;background:rgba(240,112,32,.12);border:1px solid rgba(240,112,32,.32);border-radius:10px;padding:10px 12px;color:#f8c27a;font-size:13px;font-weight:600}
+    .actions{display:flex;justify-content:flex-end;margin:16px 0}
+    .btn{border:none;border-radius:10px;padding:10px 14px;font-weight:600;cursor:pointer}
+    .btn-primary{background:var(--blue);color:#fff}.btn-primary:hover{background:var(--blue2)}
+    .run-btn{background:transparent;border:1px solid var(--b2);color:var(--tx2);padding:7px 10px;border-radius:8px;font-size:12px;cursor:pointer}.run-btn:hover{border-color:var(--blue);color:var(--blue)}
+    .table-wrap{overflow:auto;border:1px solid var(--b1);border-radius:12px;background:var(--ink3)}
+    table{width:100%;border-collapse:collapse;min-width:1200px}
+    th,td{padding:12px;border-bottom:1px solid var(--b1);text-align:left;font-size:13px;vertical-align:top}
+    th{font-family:var(--fm);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3)}
+    .tag-pass{color:var(--green);font-weight:700}.tag-fail{color:var(--red);font-weight:700}.tag-not{color:var(--orange);font-weight:700}
+    .risk-high{color:var(--red);font-weight:700}.risk-medium{color:var(--orange);font-weight:700}.risk-low{color:var(--green);font-weight:700}
+    .suite-nav-widget{position:fixed;bottom:30px;right:30px;z-index:999999;display:flex;flex-direction:column;align-items:flex-end;font-family:var(--fb)}
+    .sn-menu{background:rgba(10,15,25,.95);backdrop-filter:blur(16px);border:1px solid rgba(40,120,255,.3);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:4px;margin-bottom:16px;transform:scale(.9) translateY(20px);opacity:0;pointer-events:none;transition:all .3s cubic-bezier(.175,.885,.32,1.275)}
+    .suite-nav-widget:hover .sn-menu{transform:scale(1) translateY(0);opacity:1;pointer-events:auto}
+    .sn-item{display:flex;align-items:center;gap:12px;padding:10px 16px;color:#edf0f7!important;text-decoration:none!important;font-size:14px;font-weight:600;border-radius:8px;width:260px}.sn-item:hover{background:rgba(40,120,255,.15)!important;color:#2878ff!important}
+    .sn-icon{font-size:16px;width:20px;text-align:center}.sn-fab{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#1254CC,#2878FF);display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.2)}
+  </style>
+</head>
+<body>
+  <div class="advisory-banner">
+    <span>⚠️ ADVISORY: AuditAI Suite findings are advisory only. No output constitutes an audit opinion, conclusion, or attestation under PCAOB AS 2201 or ISA 315. All findings require professional review by a qualified auditor before use in any compliance or financial reporting context.</span>
+    <span class="advisory-right">AuditAI Suite v4.0</span>
+  </div>
+
+  <header class="nav"><div class="nav-inner"><div class="brand"><div class="mark">AI</div><div class="name">AuditAI Suite</div></div><ul class="links"><li><a href="index.html">Landing</a></li><li><a href="app.html">Master Audit Suite</a></li><li><a href="itac-testing.html" class="on">ITAC Testing</a></li></ul></div></header>
+
+  <main class="wrap">
+    <h1>ITAC Testing Matrix</h1>
+    <p class="sub">Control testing matrix for application-level automated controls.</p>
+
+    <section class="intro">
+      <p>ITAC testing covers five control types used to support financial reporting integrity:</p>
+      <ul>
+        <li><strong>Input Controls:</strong> Validate data entry quality and completeness.</li>
+        <li><strong>Processing Controls:</strong> Ensure business logic and calculations execute correctly.</li>
+        <li><strong>Output Controls:</strong> Confirm generated outputs are complete and distributed appropriately.</li>
+        <li><strong>Interface Controls:</strong> Validate completeness and accuracy of system-to-system transfers.</li>
+        <li><strong>Application Access Controls:</strong> Restrict transactions and approvals based on role and authority.</li>
+      </ul>
+    </section>
+
+    <div class="warning">ITAC reliance requires effective underlying ITGCs. Run ITGC testing first.</div>
+    <div class="actions"><button class="btn btn-primary" id="runAll">Run All ITAC Tests</button></div>
+
+    <section class="table-wrap">
+      <table>
+        <thead><tr><th>Control ID</th><th>Type</th><th>Application</th><th>Test Procedure</th><th>Last Result</th><th>Risk Rating</th><th>Action</th></tr></thead>
+        <tbody id="itacRows"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <div class="suite-nav-widget">
+    <div class="sn-menu">
+      <div style="font-size:10px;color:#8895ad;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;padding-left:16px;font-weight:700;">App Switcher</div>
+      <a href="index.html" class="sn-item"><span class="sn-icon">🏠</span> Landing Page</a>
+      <a href="app.html" class="sn-item"><span class="sn-icon">📊</span> Master Audit Suite</a>
+      <a href="vault.html" class="sn-item"><span class="sn-icon">🔐</span> Evidence Vault</a>
+      <a href="governance.html" class="sn-item"><span class="sn-icon">🏛️</span> Governance</a>
+      <a href="reports.html" class="sn-item"><span class="sn-icon">📄</span> Reports</a>
+      <a href="itgc-controls.html" class="sn-item"><span class="sn-icon">🔒</span> ITGC Controls</a>
+      <a href="itac-testing.html" class="sn-item"><span class="sn-icon">⚙️</span> ITAC Testing</a>
+      <a href="settings.html" class="sn-item"><span class="sn-icon">⚙️</span> Settings</a>
+      <a href="help.html" class="sn-item"><span class="sn-icon">📖</span> Help & Docs</a>
+    </div>
+    <div class="sn-fab"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><circle cx="19" cy="12" r="3"></circle><circle cx="5" cy="12" r="3"></circle></svg></div>
+  </div>
+
+  <script>
+    const controls = [
+      ['ITAC-IN-001','Input','SAP AP','Verify duplicate invoice rule blocks duplicate vendor+invoice pairs.','Pass','High'],
+      ['ITAC-IN-002','Input','Workday HR','Verify mandatory employee fields block incomplete onboarding records.','Pass','Medium'],
+      ['ITAC-PR-001','Processing','SAP MM','Validate three-way match logic for PO, receipt, and invoice.','Fail','High'],
+      ['ITAC-PR-002','Processing','Payroll Engine','Recompute payroll for sampled employees and compare to system result.','Pass','High'],
+      ['ITAC-OUT-001','Output','SAP FI','Reconcile report distribution list to authorized recipients.','Not Tested','Medium'],
+      ['ITAC-OUT-002','Output','Close Console','Check output completeness against source transaction count.','Pass','Medium'],
+      ['ITAC-IF-001','Interface','ERP to GL','Validate transfer completeness and hash totals between ERP and GL.','Pass','High'],
+      ['ITAC-IF-002','Interface','Payroll to GL','Reconcile payroll summary feed to GL journal postings.','Fail','High'],
+      ['ITAC-AA-001','Application Access','Treasury Payments','Test approval limits by role with above-threshold transaction attempts.','Pass','High'],
+      ['ITAC-AA-002','Application Access','GL Journal','Test restricted journal types against non-authorized role.','Pass','Medium']
+    ];
+
+    const tbody = document.getElementById('itacRows');
+    function resultClass(result) {
+      if (result === 'Pass') return 'tag-pass';
+      if (result === 'Fail') return 'tag-fail';
+      return 'tag-not';
+    }
+    function riskClass(risk) {
+      if (risk === 'High') return 'risk-high';
+      if (risk === 'Medium') return 'risk-medium';
+      return 'risk-low';
+    }
+    tbody.innerHTML = controls.map(c => `
+      <tr>
+        <td><strong>${c[0]}</strong></td>
+        <td>${c[1]}</td>
+        <td>${c[2]}</td>
+        <td>${c[3]}</td>
+        <td class="${resultClass(c[4])}">${c[4]}</td>
+        <td class="${riskClass(c[5])}">${c[5]}</td>
+        <td><button class="run-btn">Run ITAC Test</button></td>
+      </tr>`).join('');
+
+    document.getElementById('runAll').addEventListener('click', () => alert('Running all ITAC tests...'));
+  </script>
+</body>
+</html>
