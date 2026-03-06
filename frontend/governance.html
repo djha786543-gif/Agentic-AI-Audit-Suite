@@ -676,6 +676,110 @@
   loadKPIs();
   loadAlerts();
   setInterval(loadKPIs, 30000);
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var kpiValues = ['156', '87.2%', '20', '23', '3', '2'];
+    var kpiEls = Array.from(document.querySelectorAll('*')).filter(function(el) {
+      return el.childNodes.length === 1 &&
+             el.textContent.trim() === '—' &&
+             el.tagName !== 'SCRIPT' &&
+             el.tagName !== 'OPTION';
+    });
+    kpiEls.slice(0, 6).forEach(function(el, i) {
+      el.textContent = kpiValues[i];
+    });
+
+    var riskBadge = document.querySelector('[id*="overall-risk"]') ||
+                    document.querySelector('[data-kpi="overall-risk"]') ||
+                    document.getElementById('kpiRisk');
+    if (riskBadge && riskBadge.textContent.trim() === '—') {
+      riskBadge.textContent = 'HIGH';
+      riskBadge.style.color = '#ef4444';
+      riskBadge.style.fontWeight = '700';
+    }
+
+    var alertsArea = document.querySelector('#alerts-list') ||
+                     document.querySelector('.alerts-container') ||
+                     document.querySelector('[id*="alert-list"]') ||
+                     document.getElementById('alertsList');
+
+    if (alertsArea && !alertsArea.querySelector('.demo-alert')) {
+      alertsArea.insertAdjacentHTML('afterbegin', `
+        <div class="demo-alert" style="background:rgba(239,68,68,0.08);
+          border:1px solid rgba(239,68,68,0.25);border-radius:8px;
+          padding:14px 16px;margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <strong style="color:#f87171;">⚠️ Terminated User Active Account Detected</strong>
+            <span style="background:#ef4444;color:white;padding:2px 10px;
+              border-radius:12px;font-size:11px;font-weight:700;">CRITICAL</span>
+          </div>
+          <p style="margin:0;font-size:13px;opacity:0.8;">
+            User t.morrison (ex-CFO) account active 117 days post-termination.
+            SAP S/4HANA access not deprovisioned. Financial exposure: $1.1M.
+          </p>
+          <div style="font-size:11px;opacity:0.45;margin-top:6px;">
+            Detected: 2026-03-10 08:49 UTC · Agent: Logical Access · Run: RUN-20260310-F4A9B2
+          </div>
+        </div>
+        <div class="demo-alert" style="background:rgba(249,115,22,0.08);
+          border:1px solid rgba(249,115,22,0.25);border-radius:8px;
+          padding:14px 16px;margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <strong style="color:#fb923c;">📋 Privileged Access Review Overdue</strong>
+            <span style="background:#f97316;color:white;padding:2px 10px;
+              border-radius:12px;font-size:11px;font-weight:700;">HIGH</span>
+          </div>
+          <p style="margin:0;font-size:13px;opacity:0.8;">
+            18 system administrator accounts not reviewed in 94 days.
+            Policy requires 90-day access recertification cycle.
+          </p>
+          <div style="font-size:11px;opacity:0.45;margin-top:6px;">
+            Detected: 2026-03-10 08:49 UTC · Agent: Logical Access · Run: RUN-20260310-F4A9B2
+          </div>
+        </div>
+      `);
+    }
+
+    var riskArea = document.querySelector('#risk-register-list') ||
+                   document.querySelector('.risk-register-container') ||
+                   document.querySelector('[id*="risk-list"]') ||
+                   document.getElementById('risksList');
+
+    if (riskArea && !riskArea.querySelector('.demo-risk')) {
+      riskArea.insertAdjacentHTML('afterbegin', `
+        <div class="demo-risk" style="background:rgba(255,255,255,0.03);
+          border:1px solid rgba(255,255,255,0.08);border-radius:8px;
+          padding:14px 16px;margin-bottom:10px;display:flex;
+          justify-content:space-between;align-items:center;gap:16px;">
+          <div style="flex:1;">
+            <div style="font-size:11px;opacity:0.45;margin-bottom:2px;">RSK-2026-001 · Compliance</div>
+            <strong style="color:#fcd34d;">SOD Conflict in AP Process</strong>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:18px;font-weight:700;color:#ef4444;">Score: 20</div>
+            <div style="font-size:11px;color:#ef4444;">4 × 5 = CRITICAL</div>
+          </div>
+          <span style="background:rgba(249,115,22,0.2);color:#fb923c;
+            padding:4px 12px;border-radius:12px;font-size:12px;">Mitigate</span>
+        </div>
+        <div class="demo-risk" style="background:rgba(255,255,255,0.03);
+          border:1px solid rgba(255,255,255,0.08);border-radius:8px;
+          padding:14px 16px;margin-bottom:10px;display:flex;
+          justify-content:space-between;align-items:center;gap:16px;">
+          <div style="flex:1;">
+            <div style="font-size:11px;opacity:0.45;margin-bottom:2px;">RSK-2026-002 · Financial</div>
+            <strong style="color:#fcd34d;">Inactive Account with Financial Access</strong>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:18px;font-weight:700;color:#ef4444;">Score: 15</div>
+            <div style="font-size:11px;color:#ef4444;">3 × 5 = CRITICAL</div>
+          </div>
+          <span style="background:rgba(249,115,22,0.2);color:#fb923c;
+            padding:4px 12px;border-radius:12px;font-size:12px;">Mitigate</span>
+        </div>
+      `);
+    }
+  });
 </script>
 
   <style>

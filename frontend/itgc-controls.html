@@ -63,12 +63,12 @@
       <div class="kpi"><div class="kpi-k">Total Controls</div><div class="kpi-v">12</div></div>
       <div class="kpi"><div class="kpi-k">High Risk</div><div class="kpi-v">4</div></div>
       <div class="kpi"><div class="kpi-k">Active</div><div class="kpi-v">12</div></div>
-      <div class="kpi"><div class="kpi-k">Last Tested</div><div class="kpi-v" id="lastTested">--</div></div>
+      <div class="kpi"><div class="kpi-k">Last Tested</div><div class="kpi-v" id="kpi-last-tested" data-kpi="last-tested">--</div></div>
     </section>
 
     <section class="filters">
-      <select id="domainFilter"><option value="all">All Domains</option><option>Logical Access</option><option>Change Management</option><option>Computer Operations</option><option>Program Development</option></select>
-      <select id="riskFilter"><option value="all">All Risk Ratings</option><option>High</option><option>Medium</option><option>Low</option></select>
+      <select id="filter-domain" data-filter="domain"><option value="All">All Domains</option><option>Logical Access</option><option>Change Management</option><option>Computer Operations</option><option>Program Development</option></select>
+      <select id="filter-risk" data-filter="risk"><option value="All">All Risk Ratings</option><option>CRITICAL</option><option>HIGH</option><option>MEDIUM</option><option>LOW</option></select>
       <select id="statusFilter"><option value="all">All Statuses</option><option>Active</option><option>Draft</option></select>
     </section>
 
@@ -79,7 +79,7 @@
             <th>Control ID</th><th>Name</th><th>Domain</th><th>COSO Component</th><th>SOX Assertion</th><th>Test Frequency</th><th>Risk Rating</th><th>Status</th><th>Action</th>
           </tr>
         </thead>
-        <tbody id="controlRows"></tbody>
+        <tbody id="itgc-tbody"></tbody>
       </table>
     </section>
   </main>
@@ -102,39 +102,76 @@
   </div>
 
   <script>
-    const controls = [
-      ['LA-001','Terminated User Deprovisioning','Logical Access','Control Activities','Occurrence','Daily','High','Active'],
-      ['LA-002','Privileged Access Review','Logical Access','Monitoring Activities','Rights & Obligations','Quarterly','High','Active'],
-      ['LA-003','MFA Enforcement','Logical Access','Control Environment','Occurrence','Daily','Medium','Active'],
-      ['CM-001','Change Authorization','Change Management','Control Activities','Accuracy','Per Change','High','Active'],
-      ['CM-002','Emergency Change Procedure','Change Management','Control Activities','Completeness','Per Change','Medium','Active'],
-      ['CM-003','Segregation of Initiator/Approver','Change Management','Control Environment','Occurrence','Per Change','High','Active'],
-      ['CO-001','Backup Completion Monitoring','Computer Operations','Monitoring Activities','Completeness','Daily','Medium','Active'],
-      ['CO-002','Job Failure Alerting','Computer Operations','Information & Communication','Occurrence','Daily','Low','Active'],
-      ['CO-003','Incident SLA Compliance','Computer Operations','Monitoring Activities','Occurrence','Weekly','Medium','Active'],
-      ['PD-001','UAT Completion','Program Development','Control Activities','Accuracy','Per Release','Low','Active'],
-      ['PD-002','Dev-to-Prod Access Segregation','Program Development','Control Environment','Occurrence','Quarterly','High','Active'],
-      ['PD-003','Go-Live Authorization','Program Development','Control Activities','Authorization','Per Release','Medium','Active']
+    var ITGC_CONTROLS = [
+      {id:'LA-001',name:'Terminated User Deprovisioning',domain:'Logical Access',coso:'CC6.2',sox:'Completeness',freq:'Daily',risk:'HIGH',status:'Active'},
+      {id:'LA-002',name:'Privileged Access Review',domain:'Logical Access',coso:'CC6.3',sox:'Accuracy',freq:'Quarterly',risk:'HIGH',status:'Active'},
+      {id:'LA-003',name:'MFA Enforcement',domain:'Logical Access',coso:'CC6.1',sox:'Existence',freq:'Continuous',risk:'CRITICAL',status:'Active'},
+      {id:'CM-001',name:'Change Authorization & CAB Approval',domain:'Change Management',coso:'CC8.1',sox:'Authorization',freq:'Per Change',risk:'HIGH',status:'Active'},
+      {id:'CM-002',name:'Emergency Change Procedure',domain:'Change Management',coso:'CC8.1',sox:'Completeness',freq:'Per Change',risk:'MEDIUM',status:'Active'},
+      {id:'CM-003',name:'Dev-to-Prod Segregation',domain:'Change Management',coso:'CC8.2',sox:'Authorization',freq:'Continuous',risk:'HIGH',status:'Active'},
+      {id:'CO-001',name:'Backup Completion Monitoring',domain:'Computer Operations',coso:'A1.1',sox:'Completeness',freq:'Daily',risk:'MEDIUM',status:'Active'},
+      {id:'CO-002',name:'Job Failure Alerting & Response',domain:'Computer Operations',coso:'A1.2',sox:'Completeness',freq:'Daily',risk:'MEDIUM',status:'Active'},
+      {id:'CO-003',name:'Incident Management SLA Compliance',domain:'Computer Operations',coso:'CC7.4',sox:'Timeliness',freq:'Monthly',risk:'LOW',status:'Active'},
+      {id:'PD-001',name:'UAT Completion Before Go-Live',domain:'Program Development',coso:'CC8.1',sox:'Accuracy',freq:'Per Release',risk:'MEDIUM',status:'Active'},
+      {id:'PD-002',name:'Developer Access to Production',domain:'Program Development',coso:'CC6.2',sox:'Authorization',freq:'Continuous',risk:'HIGH',status:'Active'},
+      {id:'PD-003',name:'Go-Live Authorization & Sign-Off',domain:'Program Development',coso:'CC8.1',sox:'Authorization',freq:'Per Release',risk:'MEDIUM',status:'Active'}
     ];
 
-    const domainFilter = document.getElementById('domainFilter');
-    const riskFilter = document.getElementById('riskFilter');
-    const statusFilter = document.getElementById('statusFilter');
-    const rows = document.getElementById('controlRows');
-    document.getElementById('lastTested').textContent = new Date().toISOString().slice(0,10);
+    function renderITGCTable(data) {
+      var tbody = document.getElementById('itgc-tbody') ||
+                  document.querySelector('#itgc-controls-table tbody') ||
+                  document.querySelector('table tbody');
+      if (!tbody) {
+        console.warn('[ITGC] Cannot find tbody');
+        return;
+      }
+      tbody.innerHTML = '';
+      data.forEach(function(c) {
+        var riskColor = c.risk === 'CRITICAL' ? '#ef4444'
+                      : c.risk === 'HIGH' ? '#f97316'
+                      : c.risk === 'MEDIUM' ? '#eab308'
+                      : '#22c55e';
+        var tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td style="font-family:monospace;font-size:12px;font-weight:600;">' + c.id + '</td>' +
+          '<td style="font-weight:500;">' + c.name + '</td>' +
+          '<td style="opacity:0.7;">' + c.domain + '</td>' +
+          '<td style="font-family:monospace;font-size:11px;">' + c.coso + '</td>' +
+          '<td style="font-size:12px;">' + c.sox + '</td>' +
+          '<td style="font-size:12px;">' + c.freq + '</td>' +
+          '<td style="color:' + riskColor + ';font-weight:700;font-size:12px;">' + c.risk + '</td>' +
+          '<td><span style="background:rgba(34,197,94,0.15);color:#86efac;padding:2px 8px;border-radius:10px;font-size:11px;">' + c.status + '</span></td>' +
+          '<td><a href="app.html" style="background:rgba(99,102,241,0.2);color:#a5b4fc;padding:4px 10px;border-radius:6px;font-size:11px;text-decoration:none;border:1px solid rgba(99,102,241,0.3);">Run Agent</a></td>';
+        tbody.appendChild(tr);
+      });
 
-    function render() {
-      const d = domainFilter.value;
-      const r = riskFilter.value;
-      const s = statusFilter.value;
-      const filtered = controls.filter(c => (d === 'all' || c[2] === d) && (r === 'all' || c[6] === r) && (s === 'all' || c[7] === s));
-      rows.innerHTML = filtered.map(c => {
-        const riskClass = c[6] === 'High' ? 'risk-high' : c[6] === 'Medium' ? 'risk-medium' : 'risk-low';
-        return `<tr><td><strong>${c[0]}</strong></td><td>${c[1]}</td><td>${c[2]}</td><td>${c[3]}</td><td>${c[4]}</td><td>${c[5]}</td><td class="risk ${riskClass}">${c[6]}</td><td class="status">${c[7]}</td><td><button class="run-btn">Run Agent</button></td></tr>`;
-      }).join('');
+      var lastTested = document.querySelector('[data-kpi="last-tested"]') ||
+                       document.getElementById('kpi-last-tested');
+      if (lastTested) lastTested.textContent = '2026-03-10';
     }
-    [domainFilter, riskFilter, statusFilter].forEach(el => el.addEventListener('change', render));
-    render();
+
+    document.addEventListener('DOMContentLoaded', function() {
+      renderITGCTable(ITGC_CONTROLS);
+
+      var domainFilter = document.getElementById('filter-domain') ||
+                         document.querySelector('select[data-filter="domain"]');
+      var riskFilter = document.getElementById('filter-risk') ||
+                       document.querySelector('select[data-filter="risk"]');
+
+      function applyFilters() {
+        var domain = domainFilter ? domainFilter.value : 'All';
+        var risk = riskFilter ? riskFilter.value : 'All';
+        var filtered = ITGC_CONTROLS.filter(function(c) {
+          var domainMatch = (domain === 'All' || domain === '' || c.domain === domain);
+          var riskMatch = (risk === 'All' || risk === '' || c.risk === risk);
+          return domainMatch && riskMatch;
+        });
+        renderITGCTable(filtered);
+      }
+
+      if (domainFilter) domainFilter.addEventListener('change', applyFilters);
+      if (riskFilter) riskFilter.addEventListener('change', applyFilters);
+    });
   </script>
 </body>
 </html>
