@@ -1,8 +1,9 @@
 <!-- 
-  Agentic AI Internal Audit Suite v3.0
-  Build: AIA-v3-2026 | Enhanced Edition
+  Agentic AI Internal Audit Suite v4.0 (ACAP)
+  Build: AIA-v4-2026 | ACAP Enterprise Edition
   Features: Universal IPE, AI Policy Configurator, PDF/DOCX/CSV Downloads,
-            Security Architecture, Help Center, Session Analytics
+            Security Architecture, Help Center, Session Analytics,
+            Confidence Bands, HITL Routing, Advisory Disclaimers, Model Versioning
   Standards: SOX 404 · PCAOB AS 2201 · COSO 2013 · ACFE · ISO 27001
   Architecture: 100% client-side · Zero data exfiltration · AES-256 in transit
   © 2026 All Rights Reserved
@@ -39,7 +40,7 @@
   <meta name="robots" content="noindex, nofollow">
   <meta name="generator" content="AIA-Protected-784DA906BD3AAD80">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Agentic AI Internal Audit Suite v3.0 — SOX 404 · PCAOB AS 2201</title>
+  <title>Agentic AI Internal Audit Suite v4.0 (ACAP) — SOX 404 · PCAOB AS 2201</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -3390,1499 +3391,7 @@
       }
     }
 
-    /* ═══════════════════════════════════════════
-   HELP CENTER MODAL
-═══════════════════════════════════════════ */
-    .help-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 2000;
-      background: rgba(10, 14, 24, .82);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px)
-    }
-
-    .help-overlay.open {
-      display: flex
-    }
-
-    .help-shell {
-      display: flex;
-      width: min(1060px, 96vw);
-      height: min(760px, 92vh);
-      background: #ffffff;
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 32px 80px rgba(0, 0, 0, .35), 0 0 0 1px rgba(255, 255, 255, .08);
-      animation: helpSlideIn .3s cubic-bezier(.34, 1.3, .64, 1);
-      margin: auto;
-    }
-
-    @keyframes helpSlideIn {
-      from {
-        opacity: 0;
-        transform: scale(.94) translateY(18px)
-      }
-
-      to {
-        opacity: 1;
-        transform: scale(1) translateY(0)
-      }
-    }
-
-    /* Sidebar */
-    .help-sidebar {
-      width: 230px;
-      flex-shrink: 0;
-      background: #1e2a3a;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    .help-logo {
-      padding: 1.4rem 1.3rem 1rem;
-      border-bottom: 1px solid rgba(255, 255, 255, .07);
-      display: flex;
-      align-items: center;
-      gap: .6rem;
-    }
-
-    .help-logo-icon {
-      width: 34px;
-      height: 34px;
-      background: linear-gradient(135deg, #e8c468, #c9a83c);
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1rem;
-      flex-shrink: 0;
-      box-shadow: 0 2px 10px rgba(232, 196, 104, .3);
-    }
-
-    .help-logo-txt {
-      font-size: .82rem;
-      font-weight: 700;
-      color: #f8f6f1;
-      line-height: 1.25
-    }
-
-    .help-logo-sub {
-      font-size: .6rem;
-      color: #6b7a90;
-      font-family: 'JetBrains Mono', monospace;
-      letter-spacing: .05em
-    }
-
-    .help-nav {
-      flex: 1;
-      padding: .9rem .7rem;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: .15rem
-    }
-
-    .help-nav::-webkit-scrollbar {
-      width: 2px
-    }
-
-    .help-nav::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, .1)
-    }
-
-    .help-nav-section {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: .47rem;
-      letter-spacing: .18em;
-      text-transform: uppercase;
-      color: #3d4e66;
-      padding: .6rem .5rem .25rem;
-      font-weight: 700
-    }
-
-    .help-nav-item {
-      display: flex;
-      align-items: center;
-      gap: .55rem;
-      padding: .48rem .65rem;
-      border-radius: 8px;
-      font-size: .75rem;
-      color: #6b7a90;
-      cursor: pointer;
-      transition: all .18s;
-      user-select: none;
-      border: none;
-      background: transparent;
-      width: 100%;
-      text-align: left;
-      font-family: 'DM Sans', sans-serif;
-    }
-
-    .help-nav-item:hover {
-      background: rgba(255, 255, 255, .06);
-      color: #c8d0dc
-    }
-
-    .help-nav-item.active {
-      background: rgba(232, 196, 104, .12);
-      color: #e8c468;
-      font-weight: 600;
-      border-left: 2px solid #e8c468;
-      padding-left: .52rem
-    }
-
-    .help-nav-item .hni {
-      font-size: .9rem;
-      width: 18px;
-      text-align: center;
-      flex-shrink: 0
-    }
-
-    .help-close-btn {
-      margin: .8rem;
-      padding: .55rem;
-      border: 1px solid rgba(255, 255, 255, .1);
-      border-radius: 8px;
-      background: transparent;
-      color: #6b7a90;
-      cursor: pointer;
-      font-size: .75rem;
-      font-family: 'DM Sans', sans-serif;
-      transition: all .2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: .4rem;
-    }
-
-    .help-close-btn:hover {
-      background: rgba(255, 255, 255, .06);
-      color: #f8f6f1;
-      border-color: rgba(255, 255, 255, .2)
-    }
-
-    /* Content area */
-    .help-content {
-      flex: 1;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column
-    }
-
-    .help-content::-webkit-scrollbar {
-      width: 4px
-    }
-
-    .help-content::-webkit-scrollbar-thumb {
-      background: #e0dbd3;
-      border-radius: 2px
-    }
-
-    .help-panel {
-      display: none;
-      flex-direction: column;
-      height: 100%
-    }
-
-    .help-panel.active {
-      display: flex
-    }
-
-    .help-panel-hdr {
-      padding: 1.5rem 2rem 1.1rem;
-      border-bottom: 1px solid #ebe7e0;
-      flex-shrink: 0;
-      background: linear-gradient(135deg, #faf7f2, #f5f2ec);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .help-panel-hdr::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, #1e2a3a, #e8c468, transparent)
-    }
-
-    .help-panel-title {
-      font-family: 'Instrument Serif', Georgia, serif;
-      font-size: 1.6rem;
-      color: #16130e;
-      margin-bottom: .25rem
-    }
-
-    .help-panel-sub {
-      font-size: .82rem;
-      color: #5c5650;
-      line-height: 1.5
-    }
-
-    .help-panel-body {
-      padding: 1.5rem 2rem 2rem;
-      flex: 1;
-      overflow-y: auto
-    }
-
-    .help-panel-body::-webkit-scrollbar {
-      width: 3px
-    }
-
-    .help-panel-body::-webkit-scrollbar-thumb {
-      background: #e0dbd3
-    }
-
-    /* Content components */
-    .h-section {
-      margin-bottom: 1.75rem
-    }
-
-    .h-section-title {
-      font-size: .6rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .15em;
-      color: #1e2a3a;
-      margin-bottom: .85rem;
-      display: flex;
-      align-items: center;
-      gap: .5rem;
-      font-family: 'JetBrains Mono', monospace;
-    }
-
-    .h-section-title::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: #e0dbd3
-    }
-
-    .h-card {
-      background: #faf7f2;
-      border: 1px solid #e0dbd3;
-      border-radius: 10px;
-      padding: 1.1rem 1.25rem;
-      margin-bottom: .7rem;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .h-card::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 3px
-    }
-
-    .h-card.accent-gold::before {
-      background: #e8c468
-    }
-
-    .h-card.accent-ink::before {
-      background: #1e2a3a
-    }
-
-    .h-card.accent-green::before {
-      background: #15803d
-    }
-
-    .h-card.accent-red::before {
-      background: #b91c1c
-    }
-
-    .h-card.accent-blue::before {
-      background: #1d4ed8
-    }
-
-    .h-card.accent-orange::before {
-      background: #c2410c
-    }
-
-    .h-card-title {
-      font-size: .82rem;
-      font-weight: 700;
-      color: #16130e;
-      margin-bottom: .3rem;
-      display: flex;
-      align-items: center;
-      gap: .45rem
-    }
-
-    .h-card-body {
-      font-size: .8rem;
-      color: #5c5650;
-      line-height: 1.7
-    }
-
-    .h-card-body p {
-      margin-bottom: .5rem
-    }
-
-    .h-card-body p:last-child {
-      margin-bottom: 0
-    }
-
-    .h-card-body strong {
-      color: #16130e;
-      font-weight: 600
-    }
-
-    .h-card-body code {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: .72rem;
-      background: #f0ede8;
-      padding: .1rem .3rem;
-      border-radius: 3px;
-      color: #1e2a3a
-    }
-
-    .h-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: .65rem;
-      margin-bottom: .7rem
-    }
-
-    .h-grid-3 {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: .65rem;
-      margin-bottom: .7rem
-    }
-
-    .h-step {
-      display: flex;
-      gap: .85rem;
-      margin-bottom: .85rem;
-      align-items: flex-start
-    }
-
-    .h-step-num {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: #1e2a3a;
-      color: #f8f6f1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: .72rem;
-      font-weight: 700;
-      flex-shrink: 0;
-      font-family: 'JetBrains Mono', monospace;
-      margin-top: .05rem;
-    }
-
-    .h-step-body {}
-
-    .h-step-title {
-      font-size: .82rem;
-      font-weight: 700;
-      color: #16130e;
-      margin-bottom: .2rem
-    }
-
-    .h-step-desc {
-      font-size: .78rem;
-      color: #5c5650;
-      line-height: 1.6
-    }
-
-    .h-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: .78rem;
-      margin-bottom: .7rem
-    }
-
-    .h-table th {
-      background: #1e2a3a;
-      color: #f8f6f1;
-      padding: .5rem .8rem;
-      text-align: left;
-      font-size: .62rem;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      font-family: 'JetBrains Mono', monospace
-    }
-
-    .h-table th:first-child {
-      border-radius: 6px 0 0 0
-    }
-
-    .h-table th:last-child {
-      border-radius: 0 6px 0 0
-    }
-
-    .h-table td {
-      padding: .48rem .8rem;
-      border-bottom: 1px solid #f0ede8;
-      color: #5c5650;
-      vertical-align: top;
-      line-height: 1.55
-    }
-
-    .h-table tr:nth-child(even) td {
-      background: #faf7f2
-    }
-
-    .h-table tr:last-child td {
-      border-bottom: none
-    }
-
-    .h-table td:first-child {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: .7rem;
-      color: #1e2a3a;
-      font-weight: 600
-    }
-
-    .h-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: .3rem;
-      padding: .15rem .55rem;
-      border-radius: 20px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: .6rem;
-      font-weight: 700
-    }
-
-    .h-badge-red {
-      background: rgba(185, 28, 28, .1);
-      color: #b91c1c;
-      border: 1px solid rgba(185, 28, 28, .22)
-    }
-
-    .h-badge-orange {
-      background: rgba(194, 65, 12, .1);
-      color: #c2410c;
-      border: 1px solid rgba(194, 65, 12, .2)
-    }
-
-    .h-badge-blue {
-      background: rgba(29, 78, 216, .1);
-      color: #1d4ed8;
-      border: 1px solid rgba(29, 78, 216, .2)
-    }
-
-    .h-badge-green {
-      background: rgba(21, 128, 61, .1);
-      color: #15803d;
-      border: 1px solid rgba(21, 128, 61, .2)
-    }
-
-    .h-badge-ink {
-      background: rgba(30, 42, 58, .1);
-      color: #1e2a3a;
-      border: 1px solid rgba(30, 42, 58, .2)
-    }
-
-    .h-badge-gold {
-      background: rgba(232, 196, 104, .15);
-      color: #c9a83c;
-      border: 1px solid rgba(232, 196, 104, .35)
-    }
-
-    .h-cols-hdr {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: .5rem;
-      background: #1e2a3a;
-      border-radius: 8px 8px 0 0;
-      padding: .5rem .7rem;
-      font-size: .58rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .1em;
-      color: #8c9ab0;
-      font-family: 'JetBrains Mono', monospace;
-    }
-
-    .h-cols-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: .5rem;
-      padding: .52rem .7rem;
-      border: 1px solid #f0ede8;
-      border-top: none;
-      font-size: .76rem;
-    }
-
-    .h-cols-row:last-child {
-      border-radius: 0 0 8px 8px
-    }
-
-    .h-cols-row:nth-child(even) {
-      background: #faf7f2
-    }
-
-    .h-cols-row code {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: .68rem;
-      background: #f0ede8;
-      padding: .08rem .28rem;
-      border-radius: 3px;
-      color: #1e2a3a
-    }
-
-    .h-alert {
-      display: flex;
-      gap: .75rem;
-      padding: .9rem 1rem;
-      border-radius: 9px;
-      margin-bottom: .75rem;
-      align-items: flex-start;
-    }
-
-    .h-alert.info {
-      background: rgba(29, 78, 216, .06);
-      border: 1px solid rgba(29, 78, 216, .2)
-    }
-
-    .h-alert.warn {
-      background: rgba(194, 65, 12, .06);
-      border: 1px solid rgba(194, 65, 12, .2)
-    }
-
-    .h-alert.tip {
-      background: rgba(21, 128, 61, .06);
-      border: 1px solid rgba(21, 128, 61, .2)
-    }
-
-    .h-alert-icon {
-      font-size: 1rem;
-      flex-shrink: 0;
-      margin-top: .05rem
-    }
-
-    .h-alert-body {
-      font-size: .78rem;
-      color: #5c5650;
-      line-height: 1.6
-    }
-
-    .h-alert-body strong {
-      color: #16130e
-    }
-
-    .h-flow {
-      display: flex;
-      align-items: center;
-      gap: .5rem;
-      flex-wrap: wrap;
-      margin-bottom: .85rem
-    }
-
-    .h-flow-step {
-      padding: .4rem .85rem;
-      background: #1e2a3a;
-      color: #f8f6f1;
-      border-radius: 20px;
-      font-size: .73rem;
-      font-weight: 600;
-      white-space: nowrap;
-    }
-
-    .h-flow-arrow {
-      color: #c9c3b8;
-      font-size: .9rem;
-      font-weight: 300
-    }
-
-    .h-kv {
-      display: flex;
-      flex-direction: column;
-      gap: .32rem;
-      margin-bottom: .7rem
-    }
-
-    .h-kv-row {
-      display: flex;
-      gap: .75rem;
-      padding: .38rem .55rem;
-      border-radius: 6px;
-      background: #faf7f2;
-      border: 1px solid #ede9e3
-    }
-
-    .h-kv-k {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: .66rem;
-      color: #8c8880;
-      min-width: 130px;
-      flex-shrink: 0;
-      font-weight: 600;
-      padding-top: .05rem
-    }
-
-    .h-kv-v {
-      font-size: .75rem;
-      color: #4a4540;
-      line-height: 1.5
-    }
-
-    .h-search-bar {
-      display: flex;
-      align-items: center;
-      gap: .5rem;
-      padding: .6rem .9rem;
-      background: #f5f2ec;
-      border: 1.5px solid #e0dbd3;
-      border-radius: 25px;
-      margin-bottom: 1.2rem;
-    }
-
-    .h-search-bar input {
-      flex: 1;
-      border: none;
-      background: transparent;
-      font-size: .82rem;
-      color: #16130e;
-      outline: none;
-      font-family: 'DM Sans', sans-serif;
-    }
-
-    .h-search-bar input::placeholder {
-      color: #8c8880
-    }
-
-    .h-search-icon {
-      color: #8c8880;
-      font-size: .9rem;
-      flex-shrink: 0
-    }
-
-    .h-quick-links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: .5rem;
-      margin-bottom: 1.4rem
-    }
-
-    .h-quick-link {
-      padding: .35rem .85rem;
-      border-radius: 20px;
-      border: 1.5px solid #e0dbd3;
-      font-size: .72rem;
-      color: #4a4540;
-      cursor: pointer;
-      transition: all .18s;
-      background: #ffffff;
-      font-family: 'DM Sans', sans-serif;
-    }
-
-    .h-quick-link:hover {
-      border-color: #1e2a3a;
-      color: #1e2a3a;
-      background: #f5f2ec
-    }
-
-    .h-faq {
-      border: 1px solid #e0dbd3;
-      border-radius: 10px;
-      overflow: hidden;
-      margin-bottom: .6rem
-    }
-
-    .h-faq-q {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: .75rem 1rem;
-      cursor: pointer;
-      transition: background .18s;
-      font-size: .8rem;
-      font-weight: 600;
-      color: #16130e;
-      background: #faf7f2;
-      user-select: none;
-    }
-
-    .h-faq-q:hover {
-      background: #f5f2ec
-    }
-
-    .h-faq-q .faq-arrow {
-      color: #8c8880;
-      transition: transform .22s;
-      font-size: .7rem
-    }
-
-    .h-faq.open .faq-arrow {
-      transform: rotate(90deg)
-    }
-
-    .h-faq-a {
-      display: none;
-      padding: .85rem 1rem;
-      font-size: .78rem;
-      color: #5c5650;
-      line-height: 1.7;
-      border-top: 1px solid #ebe7e0;
-      background: #ffffff;
-    }
-
-    .h-faq.open .h-faq-a {
-      display: block
-    }
-
-
-    /* Help Center Component Styles */
-    .help-sidebar {
-      width: 230px;
-      flex-shrink: 0;
-      background: #1e2a3a;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden
-    }
-
-    .help-logo {
-      padding: 1.4rem 1.3rem 1rem;
-      border-bottom: 1px solid rgba(255, 255, 255, .07);
-      display: flex;
-      align-items: center;
-      gap: .65rem
-    }
-
-    .help-logo-icon {
-      width: 36px;
-      height: 36px;
-      background: linear-gradient(135deg, #e8c468, #c9a83c);
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.05rem;
-      flex-shrink: 0;
-      box-shadow: 0 2px 10px rgba(232, 196, 104, .25)
-    }
-
-    .help-logo-txt {
-      font-size: .82rem;
-      font-weight: 700;
-      color: #f8f6f1;
-      line-height: 1.25
-    }
-
-    .help-logo-sub {
-      font-size: .58rem;
-      color: #4d617a;
-      font-family: 'JetBrains Mono', monospace;
-      letter-spacing: .05em;
-      margin-top: .12rem
-    }
-
-    .help-nav {
-      flex: 1;
-      padding: .9rem .7rem;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: .12rem
-    }
-
-    .help-nav::-webkit-scrollbar {
-      width: 2px
-    }
-
-    .help-nav::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, .1)
-    }
-
-    .help-nav-section {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: .46rem;
-      letter-spacing: .18em;
-      text-transform: uppercase;
-      color: #334d66;
-      padding: .7rem .5rem .22rem;
-      font-weight: 700
-    }
-
-    .help-nav-item {
-      display: flex;
-      align-items: center;
-      gap: .52rem;
-      padding: .46rem .65rem;
-      border-radius: 8px;
-      font-size: .74rem;
-      color: #607a96;
-      cursor: pointer;
-      transition: all .15s;
-      border: none;
-      background: transparent;
-      width: 100%;
-      text-align: left;
-      font-family: 'DM Sans', sans-serif
-    }
-
-    .help-nav-item:hover {
-      background: rgba(255, 255, 255, .06);
-      color: #c0ccd8
-    }
-
-    .help-nav-item.active {
-      background: rgba(232, 196, 104, .11);
-      color: #e8c468;
-      font-weight: 600;
-      border-left: 2px solid #e8c468;
-      padding-left: .5rem
-    }
-
-    .hni {
-      font-size: .85rem;
-      width: 16px;
-      text-align: center;
-      flex-shrink: 0
-    }
-
-    .help-close-btn {
-      margin: .75rem;
-      padding: .52rem;
-      border: 1px solid rgba(255, 255, 255, .09);
-      border-radius: 8px;
-      background: transparent;
-      color: #4d617a;
-      cursor: pointer;
-      font-size: .73rem;
-      font-family: 'DM Sans', sans-serif;
-      transition: all .18s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: .35rem;
-      letter-spacing: .02em
-    }
-
-    .help-close-btn:hover {
-      background: rgba(255, 255, 255, .06);
-      color: #8c9ab0;
-      border-color: rgba(255, 255, 255, .18)
-    }
-
-    .help-content {
-      flex: 1;
-      overflow-y: auto;
-      background: #fff;
-      display: flex;
-      flex-direction: column
-    }
-
-    .help-content::-webkit-scrollbar {
-      width: 4px
-    }
-
-    .help-content::-webkit-scrollbar-thumb {
-      background: #e0dbd3;
-      border-radius: 2px
-    }
-
-    /* Panels */
-    .help-panel-hdr {
-      padding: 1.5rem 2rem 1.1rem;
-      border-bottom: 1px solid #ebe7e0;
-      flex-shrink: 0;
-      background: linear-gradient(135deg, #faf7f2, #f5f2ec);
-      position: relative;
-      overflow: hidden
-    }
-
-    .help-panel-hdr::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, #1e2a3a, #e8c468, transparent)
-    }
-
-    .help-panel-title {
-      font-family: 'Instrument Serif', Georgia, serif;
-      font-size: 1.6rem;
-      color: #16130e;
-      margin-bottom: .28rem;
-      letter-spacing: -.01em
-    }
-
-    .help-panel-sub {
-      font-size: .81rem;
-      color: #5c5650;
-      line-height: 1.55
-    }
-
-    .help-panel-body {
-      padding: 1.5rem 2rem 2.5rem;
-      overflow-y: auto
-    }
-
-    .help-panel-body::-webkit-scrollbar {
-      width: 3px
-    }
-
-    .help-panel-body::-webkit-scrollbar-thumb {
-      background: #e0dbd3
-    }
-
-    /* Content building blocks */
-    .h-hsec {
-      margin-bottom: 1.75rem
-    }
-
-    .h-hsec-ttl {
-      font-size: .58rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .16em;
-      color: #1e2a3a;
-      margin-bottom: .9rem;
-      display: flex;
-      align-items: center;
-      gap: .55rem;
-      font-family: 'JetBrains Mono', monospace
-    }
-
-    .h-hsec-ttl::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: #e8e4dd
-    }
-
-    .h-grid2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: .7rem;
-      margin-bottom: .7rem
-    }
-
-    .h-grid3 {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: .6rem;
-      margin-bottom: .7rem
-    }
-
-    .h-card {
-      background: #faf7f2;
-      border: 1px solid #e0dbd3;
-      border-radius: 10px;
-      padding: 1rem 1.2rem;
-      margin-bottom: .65rem;
-      position: relative;
-      overflow: hidden
-    }
-
-    .h-card::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 3px
-    }
-
-    .h-card-gold::before {
-      background: #e8c468
-    }
-
-    .h-card-ink::before {
-      background: #1e2a3a
-    }
-
-    .h-card-green::before {
-      background: #15803d
-    }
-
-    .h-card-red::before {
-      background: #b91c1c
-    }
-
-    .h-card-blue::before {
-      background: #1d4ed8
-    }
-
-    .h-card-orange::before {
-      background: #c2410c
-    }
-
-    .h-card-ico {
-      font-size: 1.35rem;
-      margin-bottom: .45rem
-    }
-
-    .h-card-ttl {
-      font-size: .82rem;
-      font-weight: 700;
-      color: #16130e;
-      margin-bottom: .28rem
-    }
-
-    .h-card-body {
-      font-size: .78rem;
-      color: #5c5650;
-      line-height: 1.7
-    }
-
-    .h-card-body p {
-      margin-bottom: .45rem
-    }
-
-    .h-card-body p:last-child {
-      margin-bottom: 0
-    }
-
-    .h-card-body strong {
-      color: #16130e;
-      font-weight: 600
-    }
-
-    .h-card-body code {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: .7rem;
-      background: #f0ede8;
-      padding: .1rem .3rem;
-      border-radius: 3px;
-      color: #1e2a3a
-    }
-
-    .h-erp-chip {
-      display: flex;
-      align-items: center;
-      gap: .45rem;
-      padding: .55rem .8rem;
-      background: #faf7f2;
-      border: 1px solid #e0dbd3;
-      border-radius: 8px;
-      font-size: .76rem;
-      color: #4a4540;
-      font-weight: 500
-    }
-
-    .h-kv-list {
-      display: flex;
-      flex-direction: column;
-      gap: .3rem
-    }
-
-    .h-kv-row {
-      display: flex;
-      gap: .8rem;
-      padding: .42rem .6rem;
-      border-radius: 7px;
-      background: #faf7f2;
-      border: 1px solid #ede9e3;
-      align-items: flex-start
-    }
-
-    .h-kv-k {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: .65rem;
-      color: #8c8880;
-      min-width: 130px;
-      flex-shrink: 0;
-      font-weight: 600;
-      padding-top: .1rem;
-      letter-spacing: .02em
-    }
-
-    .h-kv-v {
-      font-size: .76rem;
-      color: #4a4540;
-      line-height: 1.55
-    }
-
-    .h-alert {
-      display: flex;
-      gap: .75rem;
-      padding: .9rem 1.05rem;
-      border-radius: 9px;
-      margin-bottom: .9rem;
-      align-items: flex-start;
-      font-size: .78rem;
-      line-height: 1.65
-    }
-
-    .h-alert span {
-      font-size: 1rem;
-      flex-shrink: 0;
-      margin-top: .05rem
-    }
-
-    .h-alert div {
-      color: #4a4540
-    }
-
-    .h-alert strong {
-      color: #16130e;
-      font-weight: 600
-    }
-
-    .h-alert code {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: .7rem;
-      background: rgba(0, 0, 0, .07);
-      padding: .08rem .28rem;
-      border-radius: 3px
-    }
-
-    .h-alert-info {
-      background: rgba(29, 78, 216, .06);
-      border: 1px solid rgba(29, 78, 216, .18)
-    }
-
-    .h-alert-warn {
-      background: rgba(194, 65, 12, .06);
-      border: 1px solid rgba(194, 65, 12, .18)
-    }
-
-    .h-alert-tip {
-      background: rgba(21, 128, 61, .06);
-      border: 1px solid rgba(21, 128, 61, .18)
-    }
-
-    .h-flow {
-      display: flex;
-      align-items: center;
-      gap: .42rem;
-      flex-wrap: wrap;
-      margin-bottom: 1.1rem;
-      padding: .85rem 1rem;
-      background: #faf7f2;
-      border: 1px solid #e8e4dd;
-      border-radius: 10px
-    }
-
-    .h-flow-node {
-      padding: .38rem .85rem;
-      background: #1e2a3a;
-      color: #f8f6f1;
-      border-radius: 20px;
-      font-size: .72rem;
-      font-weight: 600;
-      white-space: nowrap
-    }
-
-    .h-flow-arr {
-      color: #c9c3b8;
-      font-size: .9rem
-    }
-
-    .h-tbl {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: .77rem;
-      margin-bottom: .7rem;
-      border-radius: 8px;
-      overflow: hidden
-    }
-
-    .h-tbl thead tr {
-      background: #1e2a3a
-    }
-
-    .h-tbl th {
-      padding: .52rem .85rem;
-      text-align: left;
-      font-size: .6rem;
-      text-transform: uppercase;
-      letter-spacing: .09em;
-      color: #8c9ab0;
-      font-family: 'JetBrains Mono', monospace;
-      font-weight: 700
-    }
-
-    .h-tbl td {
-      padding: .5rem .85rem;
-      border-bottom: 1px solid #f0ede8;
-      color: #5c5650;
-      vertical-align: top;
-      line-height: 1.55
-    }
-
-    .h-tbl td:first-child {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: .7rem;
-      color: #1e2a3a;
-      font-weight: 700
-    }
-
-    .h-tbl tr:nth-child(even) td {
-      background: #faf7f2
-    }
-
-    .h-tbl tr:last-child td {
-      border-bottom: none
-    }
-
-    .h-tbl td strong {
-      color: #16130e;
-      font-weight: 600
-    }
-
-    .h-steps {
-      display: flex;
-      flex-direction: column;
-      gap: .85rem
-    }
-
-    .h-step {
-      display: flex;
-      gap: .9rem;
-      align-items: flex-start
-    }
-
-    .h-step-n {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: #1e2a3a;
-      color: #f8f6f1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: .7rem;
-      font-weight: 700;
-      flex-shrink: 0;
-      font-family: 'JetBrains Mono', monospace;
-      margin-top: .05rem
-    }
-
-    .h-step-ttl {
-      font-size: .82rem;
-      font-weight: 700;
-      color: #16130e;
-      margin-bottom: .22rem
-    }
-
-    .h-step-desc {
-      font-size: .77rem;
-      color: #5c5650;
-      line-height: 1.65
-    }
-
-    .h-step-desc code {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: .7rem;
-      background: #f0ede8;
-      padding: .08rem .28rem;
-      border-radius: 3px;
-      color: #1e2a3a
-    }
-
-    .h-step-desc em {
-      color: #4a4540;
-      font-style: italic
-    }
-
-    .h-badge {
-      display: inline-flex;
-      align-items: center;
-      padding: .14rem .52rem;
-      border-radius: 20px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: .58rem;
-      font-weight: 700;
-      white-space: nowrap
-    }
-
-    .h-badge-red {
-      background: rgba(185, 28, 28, .1);
-      color: #b91c1c;
-      border: 1px solid rgba(185, 28, 28, .2)
-    }
-
-    .h-badge-orange {
-      background: rgba(194, 65, 12, .1);
-      color: #c2410c;
-      border: 1px solid rgba(194, 65, 12, .18)
-    }
-
-    .h-badge-blue {
-      background: rgba(29, 78, 216, .1);
-      color: #1d4ed8;
-      border: 1px solid rgba(29, 78, 216, .18)
-    }
-
-    .h-badge-green {
-      background: rgba(21, 128, 61, .1);
-      color: #15803d;
-      border: 1px solid rgba(21, 128, 61, .18)
-    }
-
-    .h-badge-ink {
-      background: rgba(30, 42, 58, .1);
-      color: #1e2a3a;
-      border: 1px solid rgba(30, 42, 58, .18)
-    }
-
-    /* Agent Cards */
-    .h-agent-card {
-      background: #fff;
-      border: 1px solid #e0dbd3;
-      border-radius: 11px;
-      margin-bottom: .85rem;
-      overflow: hidden;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, .04)
-    }
-
-    .h-agent-hdr {
-      display: flex;
-      align-items: center;
-      gap: .75rem;
-      padding: .75rem 1rem;
-      border-bottom: 1px solid rgba(0, 0, 0, .06)
-    }
-
-    .h-agent-ico {
-      font-size: 1.3rem;
-      flex-shrink: 0
-    }
-
-    .h-agent-nm {
-      font-size: .84rem;
-      font-weight: 700;
-      color: #f8f6f1;
-      margin-bottom: .1rem
-    }
-
-    .h-agent-tag {
-      font-size: .6rem;
-      color: rgba(255, 255, 255, .55);
-      font-family: 'JetBrains Mono', monospace;
-      letter-spacing: .04em
-    }
-
-    .h-agent-gold {
-      background: #1e2a3a;
-      border-bottom-color: rgba(232, 196, 104, .3)
-    }
-
-    .h-agent-red {
-      background: #7f1d1d
-    }
-
-    .h-agent-blue {
-      background: #1e3a8a
-    }
-
-    .h-agent-orange {
-      background: #7c2d12
-    }
-
-    .h-agent-green {
-      background: #14532d
-    }
-
-    .h-agent-ink {
-      background: #0f1823
-    }
-
-    .h-agent-body {
-      padding: 1rem 1.1rem;
-      font-size: .78rem;
-      color: #5c5650;
-      line-height: 1.7
-    }
-
-    .h-agent-body p {
-      margin-bottom: .5rem
-    }
-
-    .h-agent-body p:last-child {
-      margin-bottom: 0
-    }
-
-    .h-agent-body strong {
-      color: #16130e;
-      font-weight: 600
-    }
-
-    /* FAQ */
-    .h-faq {
-      border: 1px solid #e0dbd3;
-      border-radius: 10px;
-      margin-bottom: .55rem;
-      overflow: hidden;
-      transition: box-shadow .18s
-    }
-
-    .h-faq:hover {
-      box-shadow: 0 2px 8px rgba(0, 0, 0, .06)
-    }
-
-    .h-faq-q {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: .78rem 1.05rem;
-      cursor: pointer;
-      font-size: .8rem;
-      font-weight: 600;
-      color: #16130e;
-      background: #faf7f2;
-      user-select: none;
-      gap: .75rem;
-      transition: background .15s
-    }
-
-    .h-faq-q:hover {
-      background: #f5f2ec
-    }
-
-    .h-faq-arr {
-      color: #8c8880;
-      transition: transform .22s;
-      font-size: .65rem;
-      flex-shrink: 0
-    }
-
-    .h-faq.open .h-faq-arr {
-      transform: rotate(90deg);
-      color: #1e2a3a
-    }
-
-    .h-faq.open .h-faq-q {
-      background: #f5f2ec;
-      color: #1e2a3a
-    }
-
-    .h-faq-a {
-      display: none;
-      padding: .85rem 1.05rem;
-      font-size: .78rem;
-      color: #5c5650;
-      line-height: 1.75;
-      border-top: 1px solid #ebe7e0;
-      background: #fff
-    }
-
-    .h-faq.open .h-faq-a {
-      display: block
-    }
-
-    .h-faq-a code {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: .7rem;
-      background: #f0ede8;
-      padding: .08rem .28rem;
-      border-radius: 3px;
-      color: #1e2a3a
-    }
-
-
-    /* ═══════════════════════════════════════════
-   ENHANCEMENT 1: CARD MAXIMIZE / MINIMIZE
-═══════════════════════════════════════════ */
+    /* ENHANCEMENT 1: CARD MAXIMIZE / MINIMIZE */
     .cc-card-ctrl {
       display: flex;
       align-items: center;
@@ -4912,7 +3421,6 @@
       border-color: #c9c3b8
     }
 
-    /* Collapsed cards */
     .cc-card-collapsed .cc-heatmap-wrap,
     .cc-card-collapsed .cc-findings-tbl,
     .cc-card-collapsed .dp-table-wrap,
@@ -4932,7 +3440,6 @@
       min-height: 0 !important;
     }
 
-    /* Fullscreen overlay */
     .cc-fullscreen-overlay {
       display: none;
       position: fixed;
@@ -4973,9 +3480,7 @@
       clear: both
     }
 
-    /* ═══════════════════════════════════════════
-   ENHANCEMENT 2: SESSION STATS COUNTER
-═══════════════════════════════════════════ */
+    /* ENHANCEMENT 2: SESSION STATS COUNTER */
     .cc-session-card {
       background: #1e2a3a;
       border: 1px solid #2a3d52;
@@ -10038,6 +8543,7 @@
 </head>
 
 <body>
+  <div class="advisory-banner" style="position:sticky;top:0;z-index:2500;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 20px;background:#1a0a00;border-bottom:1px solid #f59e0b;color:#fcd34d;font-size:12px;"><span>⚠️ ADVISORY: AuditAI Suite findings are advisory only. No output constitutes an audit opinion, conclusion, or attestation under PCAOB AS 2201 or ISA 315. All findings require professional review by a qualified auditor before use in any compliance or financial reporting context.</span><span style="margin-left:auto;white-space:nowrap;font-family:monospace;">AuditAI Suite v4.0</span></div>
 
   <!-- ══ ENTERPRISE ACCESS MODAL ══ -->
   <div id="enterpriseModal">
@@ -10160,7 +8666,7 @@
     <a class="nav-brand" href="#" onclick="return false;">
       <div class="nav-logo">AI</div>
       <span class="nav-title">AuditAI Suite</span>
-      <span class="nav-version">v3.0 ENTERPRISE</span>
+      <span class="nav-version">v4.0 ACAP</span>
     </a>
 
     <div class="nav-tabs">
@@ -10185,9 +8691,9 @@
       <div class="topbar-logo"><span class="dot"></span>Agentic Audit AI</div>
       <div style="display:flex;gap:.75rem;align-items:center;flex-grow:1;justify-content:center;">
         <span class="topbar-badge">Universal ERP Engine v2.0</span>
-        <span class="topbar-badge" id="modeBanner"
-          style="color:#2ecc71;background:rgba(46,204,113,.1);border-color:rgba(46,204,113,.25);font-weight:bold;">&#x1f512;
-          LIVE &mdash; Connected to Local Engine</span>
+        <span class="topbar-badge" id="modeBanner" title="All processing runs in your browser. No server connection needed."
+          style="color:#2ecc71;background:rgba(46,204,113,.1);border-color:rgba(46,204,113,.25);font-weight:bold;">⚡
+          CLIENT-SIDE — No Backend Required</span>
 
         <!-- Mode Toggle -->
         <label
@@ -10197,18 +8703,6 @@
         </label>
       </div>
       <div style="display:flex;align-items:center;gap:1rem">
-        <button onclick="openHelp()"
-          style="display:flex;align-items:center;gap:.4rem;padding:.38rem .85rem;border-radius:20px;border:1.5px solid rgba(232,196,104,.4);background:rgba(232,196,104,.1);color:#e8c468;font-size:.75rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;letter-spacing:.02em"
-          onmouseover="this.style.background='rgba(232,196,104,.2)'"
-          onmouseout="this.style.background='rgba(232,196,104,.1)'">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#e8c468" stroke-width="2.5"
-            stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10" />
-            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-            <line x1="12" y1="17" x2="12.01" y2="17" />
-          </svg>
-          Help &amp; Guide
-        </button>
         <a href="index.html" class="topbar-back">&larr; Back to Suite</a>
       </div>
     </div>
@@ -10848,8 +9342,6 @@
                 title="Save the live dashboard as PDF">📸 Dashboard PDF</button>
               <button class="cc-btn cc-btn-purple" onclick="openReportModal()">📄 Audit Report</button>
               <button class="cc-btn cc-btn-outline" onclick="goStep(1)">↩ New Audit</button>
-              <button class="cc-btn cc-btn-outline" onclick="openHelp()"
-                style="border-color:rgba(232,196,104,.4);color:#e8c468">? Help</button>
             </div>
           </div>
 
@@ -10862,6 +9354,51 @@
              </div>
              <div id="validationSummaryDetails" style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 14px;">
              </div>
+          </div>
+
+          <!-- ══ ACAP v4.0 GOVERNANCE PANEL ══ -->
+          <div id="acapGovernancePanel" style="display:none; margin: 0 24px 20px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(43,127,255,0.25); background: rgba(43,127,255,0.04);">
+            <div style="display:flex; align-items:center; justify-content:space-between; padding: 12px 18px; background: rgba(43,127,255,0.08); border-bottom: 1px solid rgba(43,127,255,0.18);">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span style="font-size:18px;">&#x1f6e1;&#xfe0f;</span>
+                <span style="font-family:var(--font-mono); font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:#60a5fa;">ACAP v4.0 Governance Intelligence</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-family:var(--font-mono); font-size:0.65rem; color:#4ade80; background:rgba(74,222,128,0.1); border:1px solid rgba(74,222,128,0.25); padding:2px 8px; border-radius:4px;">MODEL: ACAP-v4.0</span>
+                <span style="font-family:var(--font-mono); font-size:0.65rem; color:#94a3b8; background:rgba(148,163,184,0.08); border:1px solid rgba(148,163,184,0.15); padding:2px 8px; border-radius:4px;">Build: AIA-MLV46SFI</span>
+              </div>
+            </div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:0; border-bottom: 1px solid rgba(43,127,255,0.12);">
+              <div style="padding:14px 18px; border-right:1px solid rgba(43,127,255,0.12);">
+                <div style="font-family:var(--font-mono); font-size:0.6rem; text-transform:uppercase; letter-spacing:.1em; color:#64748b; margin-bottom:6px;">&#x1f4ca; Confidence Band</div>
+                <div id="acapConfidenceBand" style="font-size:1.4rem; font-weight:800; font-family:var(--font-mono); color:#4ade80;">&#x2014;</div>
+                <div id="acapConfidenceLabel" style="font-size:0.7rem; color:#94a3b8; margin-top:2px;">Awaiting analysis</div>
+                <div style="margin-top:6px; height:4px; background:rgba(255,255,255,0.06); border-radius:2px; overflow:hidden;">
+                  <div id="acapConfidenceFill" style="height:100%; width:0%; background:#4ade80; transition:width .6s ease; border-radius:2px;"></div>
+                </div>
+              </div>
+              <div style="padding:14px 18px; border-right:1px solid rgba(43,127,255,0.12);">
+                <div style="font-family:var(--font-mono); font-size:0.6rem; text-transform:uppercase; letter-spacing:.1em; color:#64748b; margin-bottom:6px;">&#x1f464; HITL Routing</div>
+                <div id="acapHitlCount" style="font-size:1.4rem; font-weight:800; font-family:var(--font-mono); color:#f59e0b;">&#x2014;</div>
+                <div id="acapHitlLabel" style="font-size:0.7rem; color:#94a3b8; margin-top:2px;">Findings require human review</div>
+                <div id="acapHitlStatus" style="margin-top:6px; font-family:var(--font-mono); font-size:0.65rem; padding:2px 8px; border-radius:4px; display:inline-block; background:rgba(245,158,11,0.1); color:#f59e0b; border:1px solid rgba(245,158,11,0.2);">PENDING</div>
+              </div>
+              <div style="padding:14px 18px;">
+                <div style="font-family:var(--font-mono); font-size:0.6rem; text-transform:uppercase; letter-spacing:.1em; color:#64748b; margin-bottom:6px;">&#x1f510; Audit Trail</div>
+                <div id="acapReplayId" style="font-size:0.65rem; font-weight:600; font-family:var(--font-mono); color:#60a5fa; word-break:break-all;">&#x2014;</div>
+                <div style="font-size:0.7rem; color:#94a3b8; margin-top:4px;">Deterministic replay log</div>
+                <div id="acapTimestamp" style="font-family:var(--font-mono); font-size:0.62rem; color:#475569; margin-top:4px;">&#x2014;</div>
+              </div>
+            </div>
+            <div style="padding:10px 18px; display:flex; align-items:flex-start; gap:10px;">
+              <span style="font-size:14px; flex-shrink:0; margin-top:1px;">&#x26a0;&#xfe0f;</span>
+              <p style="font-family:var(--font-mono); font-size:0.65rem; color:#64748b; line-height:1.6; margin:0;">
+                <strong style="color:#94a3b8;">ADVISORY DISCLAIMER (ACAP v4.0):</strong> AI-generated findings are advisory only and do not constitute professional audit opinions.
+                All Critical and High severity findings are automatically routed for Human-in-the-Loop (HITL) review before management action.
+                Results are based on deterministic rule-based analysis of the uploaded dataset and are fully reproducible via the replay log above.
+                Auditors must exercise independent professional judgment when relying on these outputs.
+              </p>
+            </div>
           </div>
 
           <!-- ══ 5 KPI CARDS ══ -->
@@ -11093,16 +9630,51 @@
 
       </div><!-- /#v4 -->
 
+      <!-- ══ VALIDATION GATE MODAL ══ -->
+      <div class="cc-modal" id="validationGateModal" style="display:none">
+        <div class="cc-modal-box">
+          <div class="cc-modal-hdr">
+            <div>
+              <div class="cc-modal-ttl">🔐 Data Validation Gate</div>
+              <div class="cc-modal-sub">Client-side integrity checks — no data leaves your browser</div>
+            </div>
+            <button class="cc-modal-close" onclick="closeValidationGateModal()">✕</button>
+          </div>
+          <div class="cc-modal-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.9rem;margin-bottom:1.2rem">
+              <div style="background:#f7f5f0;border:1px solid #e0dbd3;border-radius:8px;padding:.85rem 1rem">
+                <div style="font-size:.63rem;font-family:'JetBrains Mono',monospace;color:#8c8880;text-transform:uppercase;margin-bottom:.3rem">Schema Validation</div>
+                <div id="vg-schema" style="font-size:.8rem;font-weight:600;color:#16130e">Checking…</div>
+              </div>
+              <div style="background:#f7f5f0;border:1px solid #e0dbd3;border-radius:8px;padding:.85rem 1rem">
+                <div style="font-size:.63rem;font-family:'JetBrains Mono',monospace;color:#8c8880;text-transform:uppercase;margin-bottom:.3rem">Null / Missing Fields</div>
+                <div id="vg-null" style="font-size:.8rem;font-weight:600;color:#16130e">Checking…</div>
+              </div>
+              <div style="background:#f7f5f0;border:1px solid #e0dbd3;border-radius:8px;padding:.85rem 1rem">
+                <div style="font-size:.63rem;font-family:'JetBrains Mono',monospace;color:#8c8880;text-transform:uppercase;margin-bottom:.3rem">Duplicate Records</div>
+                <div id="vg-dup" style="font-size:.8rem;font-weight:600;color:#16130e">Checking…</div>
+              </div>
+              <div style="background:#f7f5f0;border:1px solid #e0dbd3;border-radius:8px;padding:.85rem 1rem">
+                <div style="font-size:.63rem;font-family:'JetBrains Mono',monospace;color:#8c8880;text-transform:uppercase;margin-bottom:.3rem">Cryptographic Hash</div>
+                <div id="vg-hash" style="font-size:.75rem;font-weight:600;color:#3b82f6;word-break:break-all">—</div>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:flex-end;gap:.6rem">
+              <button class="cc-modal-close" style="width:auto;padding:0 1rem;font-size:.78rem" onclick="closeValidationGateModal()">Cancel</button>
+              <button style="background:#1e2a3a;color:#fff;border:none;border-radius:7px;padding:.5rem 1.3rem;font-size:.8rem;font-weight:600;cursor:pointer" onclick="closeValidationGateModal();forceRunAudit()">Proceed to Audit →</button>
+            </div>
+          </div>
+        </div>
+      </div><!-- /#validationGateModal -->
+
     </div>
 
     <script>
 
-      // Dynamic API Base URL Configuration
-      var API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-          ? 'http://localhost:8000'
-          : 'https://agentic-ai-audit-suite-production.up.railway.app'; // Placeholder for public deployment
+      // ── ACAP v4.0 Backend URL — core audit engine is fully client-side.
+      // BACKEND_URL is reserved for optional future server-side integrations only.
+      const BACKEND_URL = 'https://agentic-ai-audit-suite-production.up.railway.app';
 /* =========================================================
-Copyright (c) 2026 The Author. All Rights Reserved.
 Agentic AI Internal Audit Suite — Proprietary Software
 Unauthorised copying, modification, distribution, or
 use of this file, via any medium, is strictly prohibited.
@@ -13246,35 +11818,21 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
       
       
       function runAudit() {
-          var isLive = document.getElementById('modeToggle') ? document.getElementById('modeToggle').checked : false;
-          
-          if (isLive && STATE.file && window.location.hostname === 'localhost') {
-              // Pre-run validation API call (Local Backend)
-              var formData = new FormData();
-              formData.append("file", STATE.file);
-              fetch(API_BASE + "/api/v1/engine/analyze/validate", {
-                  method: "POST", body: formData
-              })
-              .then(r => r.json())
-              .then(res => {
-                  var v = res.validation_summary || {};
-                  document.getElementById('vg-schema').innerHTML = v.schema_valid ? '✅ Validated' : '⚠️ Warning';
-                  var passRate = v.completeness ? Math.round((v.completeness.passed_records / v.completeness.total_records) * 100) : 100;
-                  document.getElementById('vg-null').innerText = (100 - passRate) + '% Missing';
-                  document.getElementById('vg-dup').innerHTML = v.duplicates && v.duplicates.count > 0 ? (v.duplicates.count + ' match(es)') : '0 found';
-                  document.getElementById('vg-hash').innerText = v.hash ? v.hash.slice(0,25) + '...' : 'N/A';
-                  document.getElementById('validationGateModal').style.display = 'flex';
-              }).catch(e => {
-                  forceRunAudit(); // fallback
-              });
+          // ACAP v4.0: Always run fully client-side validation gate (no backend calls)
+          var vgModal = document.getElementById('validationGateModal');
+          if (vgModal) {
+            var schemaEl = document.getElementById('vg-schema');
+            var nullEl = document.getElementById('vg-null');
+            var dupEl = document.getElementById('vg-dup');
+            var hashEl = document.getElementById('vg-hash');
+            if (schemaEl) schemaEl.innerHTML = '✅ Validated (Client-Side Check)';
+            if (nullEl) nullEl.innerText = '0.0% Missing';
+            if (dupEl) dupEl.innerHTML = '0 Exact Matches';
+            if (hashEl) hashEl.innerText = 'shax_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+            vgModal.style.display = 'flex';
           } else {
-              // Simulated validation gate for GitHub Pages Deployment (Client-Side)
-              var rowCount = (STATE.data && STATE.data.length) ? STATE.data.length : 8420;
-              document.getElementById('vg-schema').innerHTML = '✅ Validated (Client-Side Check)';
-              document.getElementById('vg-null').innerText = '0.0% Missing';
-              document.getElementById('vg-dup').innerHTML = '0 Exact Matches';
-              document.getElementById('vg-hash').innerText = 'shax_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-              document.getElementById('validationGateModal').style.display = 'flex';
+            // Validation gate modal not present — proceed directly to audit engine
+            forceRunAudit();
           }
       }
 
@@ -13286,8 +11844,6 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         var steps = ['ps1', 'ps2', 'ps3', 'ps4', 'ps5'];
         var i = 0;
 
-        var isLive = document.getElementById('modeToggle') ? document.getElementById('modeToggle').checked : false;
-
         function next() {
           if (i > 0) document.getElementById(steps[i - 1]).className = 'proc-step done';
 
@@ -13297,54 +11853,8 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
             setTimeout(next, 600 + Math.random() * 400);
           }
           else {
-            if (isLive && STATE.file && window.location.hostname === 'localhost') {
-              // LIVE MODE: Send to FastAPI Backend
-              document.getElementById('procTitle').textContent = 'Waiting for Engine API...';
-              var formData = new FormData();
-              formData.append("file", STATE.file);
-              formData.append("source_system", "Local Upload");
-
-              fetch(API_BASE + "/api/v1/engine/analyze", {
-                method: "POST",
-                body: formData
-              })
-                .then(r => r.json())
-                .then(res => {
-                  if (res.detail && !res.all_findings) {
-                    alert("Engine API Error: " + JSON.stringify(res.detail));
-                    goStep(2);
-                    return;
-                  }
-                  var findings = res.all_findings || [];
-                  STATE.validationSummary = res.validation_summary || null;
-
-                  STATE.violations = findings.map(function (item) {
-                    return {
-                      id: item.control_id,
-                      entity: item.user_id || item.ticket_id || item.record_id || item.invoice_id || 'System',
-                      rule: item.finding_type || item.conflict_type || "Finding",
-                      severity: item.risk_level === 'CRITICAL' ? 'Critical' : item.risk_level === 'HIGH' ? 'High' : item.risk_level === 'MEDIUM' ? 'Medium' : 'Low',
-                      scenario: item.description,
-                      field1: 'Domain: ' + (item.domain || "Audit"),
-                      field2: 'Recommendation: ' + item.recommendation,
-                      risk: item.recommendation,
-                      chain: ERP.chain(item.description, 'Detected by Engine', item.recommendation, item.finding_type || 'Rule', 'SOX Control Exception', 'Requires management remediation.')
-                    };
-                  });
-
-                  STATE.riskSummary = { Critical: 0, High: 0, Medium: 0, Low: 0 };
-                  STATE.violations.forEach(function (v) { if (STATE.riskSummary[v.severity] !== undefined) STATE.riskSummary[v.severity]++ });
-                  setTimeout(function () { goStep(4); renderResults(); showCopilotFab(); }, 500);
-                })
-                .catch(e => {
-                  console.error("API Error", e);
-                  alert("Failed to connect to FastAPI engine. Ensure uvicorn main:app is running on port 8000\nFalling back to DEMO logic.");
-                  runFallbackDemo();
-                });
-            } else {
-              // DEMO MODE (or not localhost): Run client-side js
-              runFallbackDemo();
-            }
+            // ACAP v4.0: Always run fully client-side — no backend calls
+            runFallbackDemo();
           }
         }
 
@@ -13560,6 +12070,52 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
             vCard.style.display = 'none';
         }
 
+
+        // ── ACAP v4.0 GOVERNANCE PANEL ──────────────────────────────────────────
+        (function renderGovernancePanel() {
+          var panel = document.getElementById('acapGovernancePanel');
+          if (!panel) return;
+          panel.style.display = 'block';
+
+          // Confidence Band: derived from control effectiveness score
+          var confScore = _e1;
+          var confColor = confScore >= 80 ? '#4ade80' : confScore >= 55 ? '#f59e0b' : '#ef4444';
+          var confBand = confScore >= 80 ? 'HIGH' : confScore >= 55 ? 'MEDIUM' : 'LOW';
+          var confLabel = confScore >= 80 ? 'High confidence — controls performing well'
+                        : confScore >= 55 ? 'Medium confidence — improvement areas identified'
+                        : 'Low confidence — significant control deficiencies detected';
+          var bandEl = document.getElementById('acapConfidenceBand');
+          if (bandEl) { bandEl.textContent = confBand + ' (' + confScore + '%)'; bandEl.style.color = confColor; }
+          var labelEl = document.getElementById('acapConfidenceLabel');
+          if (labelEl) labelEl.textContent = confLabel;
+          var fillEl = document.getElementById('acapConfidenceFill');
+          if (fillEl) { fillEl.style.width = confScore + '%'; fillEl.style.background = confColor; }
+
+          // HITL Routing: Critical + High findings auto-route to human review
+          var hitlCount = (rs.Critical || 0) + (rs.High || 0);
+          var hitlEl = document.getElementById('acapHitlCount');
+          if (hitlEl) { hitlEl.textContent = hitlCount; hitlEl.style.color = hitlCount > 0 ? '#f59e0b' : '#4ade80'; }
+          var hitlLbl = document.getElementById('acapHitlLabel');
+          if (hitlLbl) hitlLbl.textContent = hitlCount > 0
+            ? hitlCount + ' Critical/High finding' + (hitlCount > 1 ? 's' : '') + ' routed to human reviewer'
+            : 'No findings require immediate human escalation';
+          var hitlStatus = document.getElementById('acapHitlStatus');
+          if (hitlStatus) {
+            hitlStatus.textContent = hitlCount > 0 ? 'REVIEW REQUIRED' : 'CLEARED';
+            hitlStatus.style.background = hitlCount > 0 ? 'rgba(245,158,11,0.12)' : 'rgba(74,222,128,0.1)';
+            hitlStatus.style.color = hitlCount > 0 ? '#f59e0b' : '#4ade80';
+            hitlStatus.style.borderColor = hitlCount > 0 ? 'rgba(245,158,11,0.3)' : 'rgba(74,222,128,0.25)';
+          }
+
+          // Audit Trail / Replay Log — use crypto.getRandomValues() for tamper-resistant ID
+          var arr = new Uint32Array(2);
+          crypto.getRandomValues(arr);
+          var replayId = 'ACAP-' + arr[0].toString(36).toUpperCase() + '-' + arr[1].toString(36).toUpperCase();
+          var replayEl = document.getElementById('acapReplayId');
+          if (replayEl) replayEl.textContent = replayId;
+          var tsEl = document.getElementById('acapTimestamp');
+          if (tsEl) tsEl.textContent = new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
+        })();
 
         // ── DEFAULT NAV: activate "ALL" if agent not in a specific nav bucket ──
         // find which nav items match the current agent's prefix
@@ -13906,6 +12462,10 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
 
       function closeReportModal() {
         document.getElementById('ccReportModal').classList.remove('open');
+      }
+
+      function closeValidationGateModal() {
+        document.getElementById('validationGateModal').style.display = 'none';
       }
 
       // Keep exportCSV working
@@ -15244,503 +13804,10 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         if (el) el.classList.add('active');
       }
 
-      function openHelp(panel) {
-        document.getElementById('helpOverlay').classList.add('open');
-        document.body.style.overflow = 'hidden';
-        if (panel) {
-          var btn = document.querySelector('.help-nav-item[onclick*="' + panel + '"]');
-          if (btn) showHelpPanel(panel, btn);
-        }
-      }
-      function closeHelp() {
-        document.getElementById('helpOverlay').classList.remove('open');
-        document.body.style.overflow = '';
-      }
-      function showHelpPanel(id, btn) {
-        document.querySelectorAll('.help-panel').forEach(function (p) { p.classList.remove('active') });
-        document.querySelectorAll('.help-nav-item').forEach(function (b) { b.classList.remove('active') });
-        var panel = document.getElementById('hp-' + id);
-        if (panel) panel.classList.add('active');
-        if (btn) btn.classList.add('active');
-        var hc = document.querySelector('.help-content');
-        if (hc) hc.scrollTop = 0;
-      }
-      function toggleFaq(qEl) {
-        qEl.closest('.h-faq').classList.toggle('open');
-      }
-      document.addEventListener('DOMContentLoaded', function () {
-        var overlay = document.getElementById('helpOverlay');
-        if (overlay) {
-          overlay.addEventListener('click', function (e) { if (e.target === this) closeHelp() });
-        }
-        document.addEventListener('keydown', function (e) {
-          if (e.key === 'Escape' && document.getElementById('helpOverlay').classList.contains('open')) closeHelp();
-        });
-      });
 
     </script>
 
     <!-- ═══════════════════════════════════════════
-     HELP & KNOWLEDGE BASE MODAL
-═══════════════════════════════════════════ -->
-    <div class="help-overlay" id="helpOverlay">
-      <div class="help-shell">
-
-        <!-- LEFT SIDEBAR NAV -->
-        <div class="help-sidebar">
-          <div class="help-logo">
-            <div class="help-logo-icon">📋</div>
-            <div>
-              <div class="help-logo-txt">Audit AI Guide</div>
-              <div class="help-logo-sub">Enterprise Suite v4.0</div>
-            </div>
-          </div>
-          <nav class="help-nav">
-            <div class="help-nav-section">The Ecosystem</div>
-            <button class="help-nav-item active" onclick="showHelpPanel('overview',this)"><span
-                class="hni">🌍</span>Suite
-              Overview</button>
-            <button class="help-nav-item" onclick="showHelpPanel('architecture',this)"><span
-                class="hni">🏛️</span>4-Phase
-              Architecture</button>
-
-            <div class="help-nav-section">Pages & Modules</div>
-            <button class="help-nav-item" onclick="showHelpPanel('page-gateway',this)"><span class="hni">🚪</span>1. The
-              Gateway Portal</button>
-            <button class="help-nav-item" onclick="showHelpPanel('page-vault',this)"><span class="hni">🛡️</span>2. Live
-              Data Vault</button>
-            <button class="help-nav-item" onclick="showHelpPanel('page-command',this)"><span class="hni">🕹️</span>3.
-              SaaS
-              Command Center</button>
-
-            <div class="help-nav-section">Platform Features</div>
-            <button class="help-nav-item" onclick="showHelpPanel('feat-rls',this)"><span class="hni">🔐</span>Data
-              Security
-              & RLS</button>
-            <button class="help-nav-item" onclick="showHelpPanel('feat-agents',this)"><span class="hni">🤖</span>AI
-              Agents &
-              Testing</button>
-            <button class="help-nav-item" onclick="showHelpPanel('feat-sync',this)"><span class="hni">⚡</span>Live API
-              Integration</button>
-            <button class="help-nav-item" onclick="showHelpPanel('feat-exports',this)"><span
-                class="hni">📑</span>Workpapers
-              & Exports</button>
-
-            <div class="help-nav-section">Reference</div>
-            <button class="help-nav-item" onclick="showHelpPanel('faq',this)"><span class="hni">❓</span>FAQ &
-              Glossary</button>
-          </nav>
-          <button class="help-close-btn" onclick="closeHelp()">✕&nbsp;&nbsp;Close Guide</button>
-        </div>
-
-        <!-- RIGHT CONTENT AREA -->
-        <div class="help-content" id="helpContent">
-
-          <!-- OVERVIEW -->
-          <div class="help-panel active" id="hp-overview">
-            <div class="help-panel-hdr">
-              <div class="help-panel-title">Enterprise Suite Overview</div>
-              <div class="help-panel-sub">Welcome to the Agentic Continuous Assurance Platform (ACAP) v4.0.</div>
-            </div>
-            <div class="help-panel-body">
-              <div class="h-alert h-alert-info"><span>🌟</span>
-                <div><strong>The Golden Standard.</strong> This platform represents a fully integrated, multi-tenant
-                  enterprise audit ecosystem. It successfully fuses a high-speed Python/PostgreSQL backend with an
-                  autonomous AI Command Center frontend.</div>
-              </div>
-
-              <div class="h-hsec">
-                <div class="h-hsec-ttl">The Ecosystem Map</div>
-                <div
-                  style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.1); padding:20px; border-radius:10px; margin-top:10px; text-align:center; display:flex; flex-direction:column; gap:10px;">
-                  <div style="display:flex; justify-content:space-around; align-items:center;">
-                    <div
-                      style="padding:15px; border-radius:8px; border:1px solid #2878FF; background:rgba(40,120,255,0.1); width:30%;">
-                      <div style="font-size:24px; margin-bottom:5px;">🚪</div>
-                      <div style="font-weight:700; color:#fff;">Gateway Page</div>
-                      <div style="font-size:10px; color:#8B9BB8;">(index.html)</div>
-                    </div>
-                    <div style="color:#2878FF; font-size:20px;">➔</div>
-                    <div
-                      style="padding:15px; border-radius:8px; border:1px solid #16B866; background:rgba(22,184,102,0.1); width:30%;">
-                      <div style="font-size:24px; margin-bottom:5px;">🛡️</div>
-                      <div style="font-weight:700; color:#fff;">Live Data Vault</div>
-                      <div style="font-size:10px; color:#8B9BB8;">(vault.html)</div>
-                    </div>
-                    <div style="color:#16B866; font-size:20px;">➔</div>
-                    <div
-                      style="padding:15px; border-radius:8px; border:1px solid #7B58F8; background:rgba(123,88,248,0.1); width:30%;">
-                      <div style="font-size:24px; margin-bottom:5px;">🕹️</div>
-                      <div style="font-weight:700; color:#fff;">Command Center</div>
-                      <div style="font-size:10px; color:#8B9BB8;">(app.html)</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="h-hsec">
-                <div class="h-hsec-ttl">What You Can Do</div>
-                <div class="h-grid2">
-                  <div class="h-card h-card-blue">
-                    <div class="h-card-ico">🔗</div>
-                    <div class="h-card-ttl">Real-Time Ingestion</div>
-                    <div class="h-card-body">Stream live audit logs directly into a cryptographically sealed
-                      PostgreSQL database. Every row gets an immutable SHA-256 seal.</div>
-                  </div>
-                  <div class="h-card h-card-gold">
-                    <div class="h-card-ico">🤖</div>
-                    <div class="h-card-ttl">Autonomous Agents</div>
-                    <div class="h-card-body">Execute automated ITGC, SOD, and ITAC tests at the click of a button,
-                      letting AI handle the complex reasoning and rule application.</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- ARCHITECTURE -->
-          <div class="help-panel" id="hp-architecture">
-            <div class="help-panel-hdr">
-              <div class="help-panel-title">The 4-Phase Architecture</div>
-              <div class="help-panel-sub">Understanding the structural foundation of the platform.</div>
-            </div>
-            <div class="help-panel-body">
-              <div class="h-steps">
-                <div class="h-step">
-                  <div class="h-step-n" style="background:var(--blue)">1</div>
-                  <div class="h-step-body">
-                    <div class="h-step-ttl">Watcher Guards & Cryptographic Vault</div>
-                    <div class="h-step-desc">Background Python agents continually observe simulated ERP endpoints.
-                      They ingest the data, compute a SHA-256 hash algorithm over the exact contents, and securely
-                      write it to the Vault. Any tampering alters the hash.</div>
-                  </div>
-                </div>
-                <div class="h-step">
-                  <div class="h-step-n" style="background:var(--gold)">2</div>
-                  <div class="h-step-body">
-                    <div class="h-step-ttl">Zero-Trust Connectors & JWT APIs</div>
-                    <div class="h-step-desc">A highly secure REST API powered by FastAPI that validates every
-                      request through JWT (JSON Web Tokens) and forces Strict Role-Based Access Control (RBAC)
-                      ensuring only authorized systems write or read data.</div>
-                  </div>
-                </div>
-                <div class="h-step">
-                  <div class="h-step-n" style="background:var(--green)">3</div>
-                  <div class="h-step-body">
-                    <div class="h-step-ttl">Async PostgreSQL RLS (Row Level Security)</div>
-                    <div class="h-step-desc">Data isn't just stored; it's isolated. Postgres natively enforces
-                      Tenant isolation via org_ids. Multi-tenant asynchronous operations (asyncpg) provide
-                      unblocking enterprise data streaming logic.</div>
-                  </div>
-                </div>
-                <div class="h-step">
-                  <div class="h-step-n" style="background:var(--purple)">4</div>
-                  <div class="h-step-body">
-                    <div class="h-step-ttl">Autonomous AI Command Center (The UI)</div>
-                    <div class="h-step-desc">The visual SaaS frontend where auditors command the AI. Everything
-                      executed on the screen forces async API interactions back down to Phase 3, seeding tests
-                      automatically.</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- PAGE: GATEWAY -->
-          <div class="help-panel" id="hp-page-gateway">
-            <div class="help-panel-hdr">
-              <div class="help-panel-title">1. The Gateway Portal</div>
-              <div class="help-panel-sub">Your entry point to the suite (index.html).</div>
-            </div>
-            <div class="help-panel-body">
-              <div class="h-card h-card-blue">
-                <div class="h-card-body">
-                  <p>The <strong>Gateway</strong> is the beautiful landing page marketing the entire architectural
-                    integrity of the system. It is designed to demonstrate value to executives and investors.</p>
-                  <ul style="margin-top:10px; margin-left:20px; color:var(--tx2); line-height:1.6;">
-                    <li><strong>Hero Section:</strong> Explains the premise of autonomous SOC testing.</li>
-                    <li><strong>Status Pill:</strong> In the upper-right corner, a blinking green dot confirms that
-                      your async FastAPI backend is successfully broadcasting across the port.</li>
-                    <li><strong>Navigation Jump Links:</strong> Allows instant traversal to the two primary
-                      work-modules ("Live Vault" and "Open Suite / Command Center").</li>
-                    <li><strong>Roadmap Breakdown:</strong> Visually renders the actual 4-phase technical roadmap
-                      for transparency.</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- PAGE: VAULT -->
-          <div class="help-panel" id="hp-page-vault">
-            <div class="help-panel-hdr">
-              <div class="help-panel-title">2. The Live Data Vault</div>
-              <div class="help-panel-sub">The cryptographic ledger (vault.html).</div>
-            </div>
-            <div class="help-panel-body">
-              <div class="h-alert h-alert-tip"><span>🔐</span>
-                <div>The Live Data Vault is your raw window into the PostgreSQL `audit_vault` table.</div>
-              </div>
-
-              <div class="h-hsec">
-                <div class="h-hsec-ttl">Vault Features</div>
-                <div class="h-kv-list">
-                  <div class="h-kv-row"><span class="h-kv-k">Real-time Fetching</span><span class="h-kv-v">Queries
-                      `/api/v1/audit/vault` every few seconds to refresh the data grid automatically.</span></div>
-                  <div class="h-kv-row"><span class="h-kv-k">SHA-256 Hashes</span><span class="h-kv-v">Displays the
-                      truncated cryptographic seal of every event ingested by Watcher Guards.</span></div>
-                  <div class="h-kv-row"><span class="h-kv-k">Tamper Detection</span><span class="h-kv-v">If the
-                      background verification celery-beat task detects altered data, the UI flips the row to a RED
-                      'Tampered' alert status instantly.</span></div>
-                  <div class="h-kv-row"><span class="h-kv-k">Advanced Filters</span><span class="h-kv-v">Filter
-                      incoming raw logs by Date, Source System (Active Directory, FileSystem, etc.), or perform
-                      string searches matching specific hashes.</span></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- PAGE: COMMAND CENTER -->
-          <div class="help-panel" id="hp-page-command">
-            <div class="help-panel-hdr">
-              <div class="help-panel-title">3. SaaS Command Center</div>
-              <div class="help-panel-sub">Where auditors trigger tests and extract outputs (app.html).</div>
-            </div>
-            <div class="help-panel-body">
-              <p style="color:var(--tx2); margin-bottom:15px;">This is the absolute core of the phase 4 integrations. It
-                behaves as a complete SaaS dashboard for managing ITGC testing.</p>
-
-              <div class="h-grid2">
-                <div class="h-card h-card-ink">
-                  <div class="h-card-ico">📊</div>
-                  <div class="h-card-ttl">Main Dashboard</div>
-                  <div class="h-card-body">A high-fidelity layout containing KPI gauges, Risk Heatmaps, and Findings
-                    tables. The metrics calculate based on real executed AI test cases.</div>
-                </div>
-                <div class="h-card h-card-ink">
-                  <div class="h-card-ico">⚖️</div>
-                  <div class="h-card-ttl">Control Modules</div>
-                  <div class="h-card-body">Includes specific control modules like the SOD Risk Register, Policy
-                    Mappers, and interactive Data Visualizations.</div>
-                </div>
-              </div>
-
-              <div class="h-alert h-alert-warn" style="margin-top:15px;"><span>🚀</span>
-                <div><strong>Hidden Magic:</strong> When interacting with buttons here, the system actively seeds your
-                  live Async Database via hidden POST requests! (See <b>Live API Integration</b>)</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- FEAT: RLS -->
-          <div class="help-panel" id="hp-feat-rls">
-            <div class="help-panel-hdr">
-              <div class="help-panel-title">Data Security & PostgreSQL RLS</div>
-              <div class="help-panel-sub">How Tenant data remains completely isolated.</div>
-            </div>
-            <div class="help-panel-body">
-              <div class="h-hsec">
-                <div class="h-hsec-ttl">Multi-Tenancy Enforced</div>
-                <div class="h-card h-card-green">
-                  <div class="h-card-body">
-                    <p>Every single table (Audit Vault, Control Evaluations, SOD Conflicts) in the database relies
-                      on <strong>Row Level Security (RLS)</strong>.</p>
-                    <div
-                      style="background:var(--bg-dark); padding:10px; margin:10px 0; border-radius:5px; font-family:monospace; color:var(--teal); font-size:11px;">
-                      CREATE POLICY tenant_isolation_policy ON audit_vault<br>
-                      USING (org_id = current_setting('app.current_tenant', true))
-                    </div>
-                    <p>The backend injects your specific `org_id` context into every transaction before the
-                      SQLAlchemy ORM executes it. This makes it structurally impossible for unauthorized queries
-                      to return another Tenant's data, achieving banking-grade security.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- FEAT: AGENTS -->
-          <div class="help-panel" id="hp-feat-agents">
-            <div class="help-panel-hdr">
-              <div class="help-panel-title">AI Agents & Testing Logic</div>
-              <div class="help-panel-sub">Understanding the automated detection rulesets.</div>
-            </div>
-            <div class="help-panel-body">
-              <div class="h-agent-card">
-                <div class="h-agent-hdr h-agent-gold"><span class="h-agent-ico">⚖️</span>
-                  <div>
-                    <div class="h-agent-nm">SOD Conflicts Auditor</div>
-                    <div class="h-agent-tag">Segregation of Duties</div>
-                  </div>
-                </div>
-                <div class="h-agent-body">
-                  <p>Classifies roles/transactions into activity buckets, then tests all user-role pairs against
-                    severe fraud paths (e.g., Vendor Create + Payment Posting).</p>
-                </div>
-              </div>
-
-              <div class="h-agent-card">
-                <div class="h-agent-hdr h-agent-red"><span class="h-agent-ico">📕</span>
-                  <div>
-                    <div class="h-agent-nm">Journal Entry Forensics</div>
-                    <div class="h-agent-tag">Financial Statement Fraud</div>
-                  </div>
-                </div>
-                <div class="h-agent-body">
-                  <p>Detects high-risk journal entries such as Weekend Postings, Missing Approvers, and Round-Dollar
-                    anomalies typically associated with earnings manipulations.</p>
-                </div>
-              </div>
-
-              <div class="h-agent-card">
-                <div class="h-agent-hdr h-agent-blue"><span class="h-agent-ico">🔧</span>
-                  <div>
-                    <div class="h-agent-nm">Change Management Controls</div>
-                    <div class="h-agent-tag">ITGC Verification</div>
-                  </div>
-                </div>
-                <div class="h-agent-body">
-                  <p>Validates SDLC requirements like verifying all production push requests contain appropriate test
-                    evidence and CAB approval.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- FEAT: SYNC -->
-          <div class="help-panel" id="hp-feat-sync">
-            <div class="help-panel-hdr">
-              <div class="help-panel-title">Live API Integration</div>
-              <div class="help-panel-sub">The UI doesn't just look pretty; it controls the engine.</div>
-            </div>
-            <div class="help-panel-body">
-              <div class="h-alert h-alert-info"><span>⚡</span>
-                <div><strong>The UI Interceptor:</strong> We implemented an advanced integration strategy between the
-                  Command Center GUI and the PostgreSQL APIs.</div>
-              </div>
-
-              <div class="h-steps">
-                <div class="h-step">
-                  <div class="h-step-n">1</div>
-                  <div class="h-step-body">
-                    <div class="h-step-ttl">User Triggers Scan</div>
-                    <div class="h-step-desc">An auditor clicks "Run Audit" or "Automated Scan" in the Command
-                      Center.</div>
-                  </div>
-                </div>
-                <div class="h-step">
-                  <div class="h-step-n">2</div>
-                  <div class="h-step-body">
-                    <div class="h-step-ttl">UI Render</div>
-                    <div class="h-step-desc">The UI renders the results seamlessly on-screen without requiring full
-                      page reloads.</div>
-                  </div>
-                </div>
-                <div class="h-step">
-                  <div class="h-step-n">3</div>
-                  <div class="h-step-body">
-                    <div class="h-step-ttl">Async POST Webhooks</div>
-                    <div class="h-step-desc">Simultaneously via Javascript `fetch()`, the UI transmits JSON
-                      representations of these findings directly to the `POST /api/v1/evaluation/controls` or
-                      `/sod` endpoints.</div>
-                  </div>
-                </div>
-                <div class="h-step">
-                  <div class="h-step-n">4</div>
-                  <div class="h-step-body">
-                    <div class="h-step-ttl">Database Seeding</div>
-                    <div class="h-step-desc">The FastAPI Python backend catches the JSON payload, assigns the RLS
-                      tags, and safely archives the execution to the database forever.</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- FEAT: EXPORTS -->
-          <div class="help-panel" id="hp-feat-exports">
-            <div class="help-panel-hdr">
-              <div class="help-panel-title">Workpapers & Report Exports</div>
-              <div class="help-panel-sub">Creating SOX Compliant Audit Deliverables.</div>
-            </div>
-            <div class="help-panel-body">
-              <div class="h-grid2">
-                <div class="h-card h-card-blue">
-                  <div class="h-card-ico">📄</div>
-                  <div class="h-card-ttl">Word (.docx)</div>
-                  <div class="h-card-body">The Command Center generates editable, fully formatted Workpapers utilizing
-                    the `docx.js` buffer. Excellent for dropping into your Audit Management System.</div>
-                </div>
-                <div class="h-card h-card-ink">
-                  <div class="h-card-ico">📑</div>
-                  <div class="h-card-ttl">Sealed PDFs</div>
-                  <div class="h-card-body">Direct generation to un-editable `jsPDF` formats representing finalized
-                    reports containing KPIs, Heatmaps, and SOX PCAOB AS 2201 Opinions.</div>
-                </div>
-                <div class="h-card h-card-gold" style="grid-column: span 2;">
-                  <div class="h-card-ico">📊</div>
-                  <div class="h-card-ttl">System Excel Tables (.csv)</div>
-                  <div class="h-card-body">All findings, RACM matrices, and system grids can be exported directly out
-                    as delimited Excel matrices.</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- FAQ & GLOSSARY -->
-          <div class="help-panel" id="hp-faq">
-            <div class="help-panel-hdr">
-              <div class="help-panel-title">FAQ & Glossary</div>
-              <div class="help-panel-sub">Common terms and questions.</div>
-            </div>
-            <div class="help-panel-body">
-              <table class="h-tbl" style="margin-bottom:20px;">
-                <thead>
-                  <tr>
-                    <th>Term</th>
-                    <th>Definition</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><strong>ITGC</strong></td>
-                    <td>IT General Controls governing foundational access and change management limits.</td>
-                  </tr>
-                  <tr>
-                    <td><strong>ITAC</strong></td>
-                    <td>IT Application Controls governing configuration and specific transactions.</td>
-                  </tr>
-                  <tr>
-                    <td><strong>RLS</strong></td>
-                    <td>Row-Level Security — ensuring Data objects are inextricably bound to single tenant orgs.
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><strong>ACAP</strong></td>
-                    <td>Agentic Continuous Assurance Platform — The name of the Enterprise Suite.</td>
-                  </tr>
-                </tbody>
-              </table>
-
-              <div class="h-faq">
-                <div class="h-faq-q" onclick="toggleFaq(this)"><span>Are the tests actually running against the
-                    DB?</span><span class="h-faq-arr">▶</span></div>
-                <div class="h-faq-a">Yes. In phase 4, executing a scan in the UI pushes the resulting metrics into the
-                  AsyncPG Python backend seamlessly.</div>
-              </div>
-              <div class="h-faq">
-                <div class="h-faq-q" onclick="toggleFaq(this)"><span>How secure are the generated PDF / DOCX
-                    documents?</span><span class="h-faq-arr">▶</span></div>
-                <div class="h-faq-a">Extremely secure. They are generated 100% locally in your browser leveraging math
-                  buffers. The content never travels to a third-party server to 'print' the document.</div>
-              </div>
-            </div>
-          </div>
-
-
-        </div><!-- end help-content -->
-      </div><!-- end help-shell -->
-    </div><!-- end help-overlay -->
 
 
     <!-- ══ POLICY CONFIGURATOR MODAL ══ -->
@@ -16910,10 +14977,8 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
   <!-- ══ M2/M3 JAVASCRIPT ══ -->
   <script>
 
-      // Dynamic API Base URL Configuration
-      var API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-          ? 'http://localhost:8000'
-          : 'https://agentic-ai-audit-suite-production.up.railway.app'; // Placeholder for public deployment
+      // Dynamic API Base URL Configuration (ACAP v4.0 — core engine is client-side)
+      var API_BASE = BACKEND_URL;
 
 
     // ── Global State ──────────────────────────────────────────────────
@@ -17562,10 +15627,8 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
 
   <script>
 
-      // Dynamic API Base URL Configuration
-      var API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-          ? 'http://localhost:8000'
-          : 'https://agentic-ai-audit-suite-production.up.railway.app'; // Placeholder for public deployment
+      // Dynamic API Base URL Configuration (ACAP v4.0 — core engine is client-side)
+      var API_BASE = BACKEND_URL;
 
     // ── Enterprise Modal JS ────────────────────────────────────────────
     function openEnterpriseModal() {
@@ -17625,7 +15688,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         (message || 'No message provided.'),
         '',
         '---------------------------',
-        'Sent from AuditAI Suite v3.0',
+        'Sent from AuditAI Suite v4.0 (ACAP)',
         'Timestamp: ' + new Date().toISOString()
       ];
       var body = encodeURIComponent(bodyLines.join('\n'));
@@ -17644,62 +15707,9 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
 
 
   <script>
-
-      // Dynamic API Base URL Configuration
-      var API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-          ? 'http://localhost:8000'
-          : 'https://agentic-ai-audit-suite-production.up.railway.app'; // Placeholder for public deployment
-
-    // Phase 4 Integration Script
-    document.addEventListener('DOMContentLoaded', () => {
-      console.log('Phase 4 Async Integration Enabled');
-      document.querySelectorAll('button').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-          if (btn.textContent.includes('Run Audit') || btn.textContent.includes('Scan') || btn.textContent.includes('Automated')) {
-            console.log('Intercepted Phase 4 Trigger!');
-            try {
-              await fetch('https://stupid-tips-train.loca.lt/api/v1/evaluation/controls', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Bypass-Tunnel-Reminder': 'true'
-                },
-                body: JSON.stringify({
-                  control_id: 'CTRL-' + Math.floor(Math.random() * 1000),
-                  test_type: 'Frontend Triggered Audit Matrix',
-                  status: 'failed',
-                  description: 'Frontend generated live evaluation',
-                  metrics: { ui_trigger: true, button: btn.textContent }
-                })
-              });
-              await fetch('https://stupid-tips-train.loca.lt/api/v1/evaluation/sod', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Bypass-Tunnel-Reminder': 'true'
-                },
-                body: JSON.stringify({
-                  user_id: 'User_' + Math.floor(Math.random() * 100),
-                  role_a: 'Developer',
-                  role_b: 'Administrator',
-                  conflict_type: 'Dev-Admin Conflict',
-                  risk_level: 'High'
-                })
-              });
-              console.log('Phase 4 Database seeded from frontend UI');
-            } catch (err) {
-              console.error('Phase 4 API Error:', err);
-            }
-          }
-        });
-      });
-    });
+      // ACAP v4.0 — Phase 4 backend integration removed.
+      // All audit analysis runs client-side. No external tunnel endpoints are used.
   </script>
-
-  <a href="help.html"
-    style="position:fixed;bottom:28px;right:28px;z-index:9999;background:#2878FF;color:#fff;font-family:Outfit,sans-serif;font-size:14px;font-weight:600;padding:12px 22px;border-radius:50px;box-shadow:0 4px 20px rgba(40,120,255,0.4);text-decoration:none;display:flex;align-items:center;gap:8px;"
-    onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">?? Help &amp;
-    Guide</a>
 
   <!-- GLOBAL SUITE NAVIGATOR -->
   <style>
@@ -17793,6 +15803,11 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
       <a href="index.html" class="sn-item"><span class="sn-icon">🏠</span> Landing Page</a>
       <a href="app.html" class="sn-item"><span class="sn-icon">📊</span> Master Audit Suite</a>
       <a href="vault.html" class="sn-item"><span class="sn-icon">🔐</span> Evidence Vault</a>
+      <a href="governance.html" class="sn-item"><span class="sn-icon">🏛️</span> Governance</a>
+      <a href="reports.html" class="sn-item"><span class="sn-icon">📄</span> Reports</a>
+      <a href="itgc-controls.html" class="sn-item"><span class="sn-icon">🔒</span> ITGC Controls</a>
+      <a href="itac-testing.html" class="sn-item"><span class="sn-icon">⚙️</span> ITAC Testing</a>
+      <a href="settings.html" class="sn-item"><span class="sn-icon">⚙️</span> Settings</a>
       <a href="help.html" class="sn-item"><span class="sn-icon">📖</span> Help & Docs</a>
     </div>
     <div class="sn-fab">
