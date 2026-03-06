@@ -11139,6 +11139,43 @@
 
       </div><!-- /#v4 -->
 
+      <!-- ══ VALIDATION GATE MODAL ══ -->
+      <div class="cc-modal" id="validationGateModal" style="display:none">
+        <div class="cc-modal-box">
+          <div class="cc-modal-hdr">
+            <div>
+              <div class="cc-modal-ttl">🔐 Data Validation Gate</div>
+              <div class="cc-modal-sub">Client-side integrity checks — no data leaves your browser</div>
+            </div>
+            <button class="cc-modal-close" onclick="closeValidationGateModal()">✕</button>
+          </div>
+          <div class="cc-modal-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.9rem;margin-bottom:1.2rem">
+              <div style="background:#f7f5f0;border:1px solid #e0dbd3;border-radius:8px;padding:.85rem 1rem">
+                <div style="font-size:.63rem;font-family:'JetBrains Mono',monospace;color:#8c8880;text-transform:uppercase;margin-bottom:.3rem">Schema Validation</div>
+                <div id="vg-schema" style="font-size:.8rem;font-weight:600;color:#16130e">Checking…</div>
+              </div>
+              <div style="background:#f7f5f0;border:1px solid #e0dbd3;border-radius:8px;padding:.85rem 1rem">
+                <div style="font-size:.63rem;font-family:'JetBrains Mono',monospace;color:#8c8880;text-transform:uppercase;margin-bottom:.3rem">Null / Missing Fields</div>
+                <div id="vg-null" style="font-size:.8rem;font-weight:600;color:#16130e">Checking…</div>
+              </div>
+              <div style="background:#f7f5f0;border:1px solid #e0dbd3;border-radius:8px;padding:.85rem 1rem">
+                <div style="font-size:.63rem;font-family:'JetBrains Mono',monospace;color:#8c8880;text-transform:uppercase;margin-bottom:.3rem">Duplicate Records</div>
+                <div id="vg-dup" style="font-size:.8rem;font-weight:600;color:#16130e">Checking…</div>
+              </div>
+              <div style="background:#f7f5f0;border:1px solid #e0dbd3;border-radius:8px;padding:.85rem 1rem">
+                <div style="font-size:.63rem;font-family:'JetBrains Mono',monospace;color:#8c8880;text-transform:uppercase;margin-bottom:.3rem">Cryptographic Hash</div>
+                <div id="vg-hash" style="font-size:.75rem;font-weight:600;color:#3b82f6;word-break:break-all">—</div>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:flex-end;gap:.6rem">
+              <button class="cc-modal-close" style="width:auto;padding:0 1rem;font-size:.78rem" onclick="closeValidationGateModal()">Cancel</button>
+              <button style="background:#1e2a3a;color:#fff;border:none;border-radius:7px;padding:.5rem 1.3rem;font-size:.8rem;font-weight:600;cursor:pointer" onclick="closeValidationGateModal();forceRunAudit()">Proceed to Audit →</button>
+            </div>
+          </div>
+        </div>
+      </div><!-- /#validationGateModal -->
+
     </div>
 
     <script>
@@ -13934,6 +13971,10 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
 
       function closeReportModal() {
         document.getElementById('ccReportModal').classList.remove('open');
+      }
+
+      function closeValidationGateModal() {
+        document.getElementById('validationGateModal').style.display = 'none';
       }
 
       // Keep exportCSV working
