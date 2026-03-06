@@ -26,7 +26,10 @@ def execute_control_test(self, control_id: str, system_path: str, mock_data: dic
     async def _do_work():
         from sqlalchemy import text
         async with AsyncSessionLocal() as db:
-            await db.execute(text("SET LOCAL app.current_tenant = :tenant"), {"tenant": "default-org"})
+            await db.execute(
+                text("SELECT set_config('app.current_tenant', :tenant, true)"),
+                {"tenant": "default-org"},
+            )
             payload: dict[str, Any] = mock_data or {
                 "user": "admin",
                 "access_level": "root",
@@ -72,7 +75,10 @@ def run_watcher_cycle(self, control_id: str = None, source_system: str = None, a
         from sqlalchemy import text
         import random
         async with AsyncSessionLocal() as db:
-            await db.execute(text("SET LOCAL app.current_tenant = :tenant"), {"tenant": "default-org"})
+            await db.execute(
+                text("SELECT set_config('app.current_tenant', :tenant, true)"),
+                {"tenant": "default-org"},
+            )
             ctrl = control_id or f"ACAP-{random.randint(100, 999)}"
             src  = source_system or "FileSystem-Watcher"
             conf = ai_confidence_score if ai_confidence_score is not None else random.randint(60, 100)

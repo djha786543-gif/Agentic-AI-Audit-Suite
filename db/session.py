@@ -19,7 +19,10 @@ def get_db(org_id: Optional[str] = None) -> Generator[Session, None, None]:
     db = SessionLocal()
     tenant = org_id or "default-org"
     try:
-        db.execute(text("SET LOCAL app.current_tenant = :tenant"), {"tenant": tenant})
+        db.execute(
+            text("SELECT set_config('app.current_tenant', :tenant, true)"),
+            {"tenant": tenant},
+        )
         yield db
     finally:
         db.close()

@@ -44,7 +44,11 @@ async def get_async_db(org_id: Optional[str] = None) -> AsyncGenerator[AsyncSess
     from sqlalchemy import text
     tenant = org_id or "default-org"
     async with AsyncSessionLocal() as session:
-        await session.execute(text("SET LOCAL app.current_tenant = :tenant"), {"tenant": tenant})
+        # asyncpg cannot bind parameters inside SET LOCAL; set_config supports bound args safely.
+        await session.execute(
+            text("SELECT set_config('app.current_tenant', :tenant, true)"),
+            {"tenant": tenant},
+        )
         yield session
 
 

@@ -95,7 +95,7 @@ async def _run_monitoring_sweep() -> dict[str, Any]:
 
     async with AsyncSessionLocal() as db:
         await db.execute(
-            text("SET LOCAL app.current_tenant = :tenant"),
+            text("SELECT set_config('app.current_tenant', :tenant, true)"),
             {"tenant": "default-org"},
         )
 
