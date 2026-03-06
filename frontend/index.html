@@ -2042,6 +2042,174 @@
       color: var(--tx2);
     }
 
+    /*
+   INDUSTRY JOURNEY
+ */
+    .journey-section {
+      padding: 100px 0 64px;
+      border-top: 1px solid var(--b1);
+      border-bottom: 1px solid var(--b1);
+      background:
+        radial-gradient(circle at 12% 8%, rgba(40, 120, 255, 0.11) 0%, transparent 38%),
+        radial-gradient(circle at 86% 86%, rgba(200, 155, 40, 0.09) 0%, transparent 34%),
+        linear-gradient(180deg, rgba(14, 20, 34, 0.75) 0%, rgba(7, 10, 16, 0.92) 100%);
+    }
+
+    .journey-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+      margin-top: 36px;
+    }
+
+    .journey-flow {
+      background: linear-gradient(180deg, rgba(22, 31, 50, 0.95), rgba(12, 18, 31, 0.95));
+      border: 1px solid var(--b2);
+      border-radius: 14px;
+      padding: 24px;
+    }
+
+    .journey-flow-title {
+      font-family: var(--fd);
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--tx1);
+    }
+
+    .journey-flow-sub {
+      color: var(--tx2);
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    .journey-steps {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .journey-step {
+      border: 1px solid var(--b2);
+      background: rgba(7, 10, 16, 0.75);
+      border-radius: 10px;
+      padding: 14px;
+      min-height: 120px;
+      position: relative;
+    }
+
+    .journey-step-no {
+      font-family: var(--fm);
+      font-size: 11px;
+      color: var(--goldlt);
+      margin-bottom: 8px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .journey-step-h {
+      font-family: var(--fd);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--tx1);
+      margin-bottom: 6px;
+      line-height: 1.35;
+    }
+
+    .journey-step-p {
+      font-size: 12px;
+      color: var(--tx2);
+      line-height: 1.5;
+    }
+
+    .journey-step::after {
+      content: ">";
+      position: absolute;
+      top: 50%;
+      right: -9px;
+      transform: translateY(-50%);
+      color: var(--tx3);
+      font-family: var(--fm);
+      font-size: 14px;
+      background: var(--ink2);
+      border: 1px solid var(--b1);
+      width: 18px;
+      height: 18px;
+      border-radius: 20px;
+      display: grid;
+      place-items: center;
+      z-index: 2;
+    }
+
+    .journey-step:last-child::after {
+      display: none;
+    }
+
+    .journey-map {
+      background: linear-gradient(180deg, rgba(22, 31, 50, 0.95), rgba(12, 18, 31, 0.95));
+      border: 1px solid var(--b2);
+      border-radius: 14px;
+      padding: 24px;
+      overflow-x: auto;
+    }
+
+    .journey-map table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+    }
+
+    .journey-map th,
+    .journey-map td {
+      text-align: left;
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--b1);
+      vertical-align: top;
+    }
+
+    .journey-map th {
+      font-family: var(--fm);
+      font-size: 10px;
+      color: var(--tx2);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .journey-map td {
+      font-size: 13px;
+      color: var(--tx1);
+    }
+
+    .journey-pill {
+      display: inline-block;
+      font-family: var(--fm);
+      font-size: 10px;
+      color: var(--blue);
+      background: var(--bdim);
+      border: 1px solid var(--bbord);
+      border-radius: 999px;
+      padding: 3px 8px;
+      margin-right: 6px;
+      margin-bottom: 4px;
+      letter-spacing: 0.03em;
+    }
+
+    .journey-value {
+      margin-top: 22px;
+      border: 1px solid var(--b2);
+      border-radius: 12px;
+      padding: 18px;
+      background: rgba(7, 10, 16, 0.68);
+      color: var(--tx2);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .journey-value strong {
+      color: var(--tx1);
+      font-weight: 600;
+    }
+
     /* 
    ANIMATIONS
  */
@@ -2137,6 +2305,14 @@
         grid-template-columns: 1fr;
       }
 
+      .journey-steps {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .journey-step::after {
+        display: none;
+      }
+
       .sec-grid {
         grid-template-columns: repeat(2, 1fr);
       }
@@ -2174,6 +2350,10 @@
       }
 
       .sec-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .journey-steps {
         grid-template-columns: 1fr;
       }
 
@@ -2234,6 +2414,7 @@
         <li><a href="#problem">The Problem</a></li>
         <li><a href="#breakthrough">Breakthrough</a></li>
         <li><a href="#platform">Platform</a></li>
+        <li><a href="#journey">Industry Journey</a></li>
         <li><a href="#security">Security</a></li>
       </ul>
       <div class="nav-btns">
@@ -2917,6 +3098,127 @@
                 Party</span></div>
             <div class="pg-agent"><span class="pga-n"> AI Governance</span><span class="pga-t pgt-purple">Agent
                 Oversight</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!--
+     6. INDUSTRY JOURNEY
+ -->
+  <section class="journey-section" id="journey">
+    <div class="wrap">
+      <div class="eyebrow fu">Industry Use Case</div>
+      <h2 class="sec-h fu d1">AI credit decision governance for a regulated bank</h2>
+      <p class="sec-sub fu d2">A single end-to-end scenario: onboarding an agentic lending model, validating controls,
+        preserving evidence, and producing executive attestation under SOX, COSO, and model risk governance mandates.</p>
+
+      <div class="journey-grid">
+        <div class="journey-flow fu d2">
+          <div class="journey-flow-title">Architecture Workflow Diagram</div>
+          <div class="journey-flow-sub">Lifecycle path from model onboarding to board-ready reporting and continuous
+            assurance.</div>
+
+          <div class="journey-steps">
+            <div class="journey-step">
+              <div class="journey-step-no">Step 1</div>
+              <div class="journey-step-h">System Onboarding</div>
+              <div class="journey-step-p">Register AI lending process, risk context, owners, and baseline controls.</div>
+            </div>
+            <div class="journey-step">
+              <div class="journey-step-no">Step 2</div>
+              <div class="journey-step-h">Risk + Compliance Evaluation</div>
+              <div class="journey-step-p">Run autonomous control and exception testing across policy and framework rules.</div>
+            </div>
+            <div class="journey-step">
+              <div class="journey-step-no">Step 3</div>
+              <div class="journey-step-h">Evidence + Traceability</div>
+              <div class="journey-step-p">Capture immutable artifacts, lineage, hashes, and model decision records.</div>
+            </div>
+            <div class="journey-step">
+              <div class="journey-step-no">Step 4</div>
+              <div class="journey-step-h">Audit Reporting</div>
+              <div class="journey-step-p">Produce board and regulator-ready findings, KPI dashboards, and remediation status.</div>
+            </div>
+            <div class="journey-step">
+              <div class="journey-step-no">Step 5</div>
+              <div class="journey-step-h">Governance Oversight</div>
+              <div class="journey-step-p">Continuously monitor drift, rerun UAT hardening cycles, and sustain control health.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="journey-map fu d3">
+          <table>
+            <thead>
+              <tr>
+                <th>Workflow Stage</th>
+                <th>Portal Pages</th>
+                <th>Operational Role In The Use Case</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Program Entry + Context</td>
+                <td>
+                  <span class="journey-pill">index.html</span>
+                  <span class="journey-pill">help.html</span>
+                </td>
+                <td>Defines audit objective, stakeholder journey, and operating model before evidence collection.</td>
+              </tr>
+              <tr>
+                <td>Model + Control Onboarding</td>
+                <td>
+                  <span class="journey-pill">app.html</span>
+                  <span class="journey-pill">settings.html</span>
+                </td>
+                <td>Registers AI process inputs, configures runtime and audit parameters, and launches domain agents.</td>
+              </tr>
+              <tr>
+                <td>Domain-Specific Testing</td>
+                <td>
+                  <span class="journey-pill">itgc-controls.html</span>
+                  <span class="journey-pill">itac-testing.html</span>
+                </td>
+                <td>Executes ITGC and ITAC validation aligned to enterprise control ownership and segregation rules.</td>
+              </tr>
+              <tr>
+                <td>Evidence Preservation</td>
+                <td>
+                  <span class="journey-pill">vault.html</span>
+                </td>
+                <td>Stores audit artifacts and integrity metadata for reproducibility and external auditor challenge.</td>
+              </tr>
+              <tr>
+                <td>Policy + Risk Governance</td>
+                <td>
+                  <span class="journey-pill">governance.html</span>
+                </td>
+                <td>Maintains policy inventory, framework mapping, alerting, and risk register decisions.</td>
+              </tr>
+              <tr>
+                <td>Attestation + Reporting</td>
+                <td>
+                  <span class="journey-pill">reports.html</span>
+                </td>
+                <td>Generates executive summary, findings, compliance status, and board-ready report packages.</td>
+              </tr>
+              <tr>
+                <td>Quality Assurance + Hardening</td>
+                <td>
+                  <span class="journey-pill">uat.html</span>
+                </td>
+                <td>Runs readiness gates and controlled patch workflows to keep autonomous audit behavior reliable.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="journey-value">
+            <strong>Industry value proposition:</strong> organizations implement this platform to replace fragmented,
+            manual AI assurance with one traceable governance operating system. It lowers governance risk through
+            continuous control testing, improves auditability with evidence lineage and immutable trails, and supports
+            responsible scaling of agentic AI through policy-to-execution monitoring.
           </div>
         </div>
       </div>
