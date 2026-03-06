@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UAT Insights - ACAP</title>
+  <style>
+    :root {
+      --bg: #0b1320;
+      --panel: #121d2f;
+      --panel-2: #16253c;
+      --ink: #e8f0ff;
+      --muted: #9ab0d1;
+      --line: #28405f;
+      --accent: #2d9bff;
+      --ok: #1fbf75;
+      --warn: #f1b74a;
+      --bad: #f15b6c;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Trebuchet MS", sans-serif;
+      background: radial-gradient(1200px 700px at 20% -5%, #1a2c48 0%, var(--bg) 50%, #09101a 100%);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    .wrap {
+      width: min(1240px, 96vw);
+      margin: 24px auto 40px;
+    }
+
+    .hero {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.4rem, 2.6vw, 2.1rem);
+      letter-spacing: 0.02em;
+    }
+
+    .sub {
+      color: var(--muted);
+      margin-top: 6px;
+      font-size: 0.95rem;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .runbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+
+    .runbar select,
+    .runbar input {
+      border: 1px solid var(--line);
+      background: #0e1a2a;
+      color: var(--ink);
+      border-radius: 8px;
+      padding: 8px 10px;
+    }
+
+    button {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, #1c304f, #14253d);
+      color: var(--ink);
+      border-radius: 10px;
+      padding: 9px 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button:hover { border-color: #3f70a9; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, var(--panel-2), var(--panel));
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .k { color: var(--muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.07em; }
+    .v { margin-top: 6px; font-size: 1.3rem; font-weight: 700; }
+
+    .ok { color: var(--ok); }
+    .warn { color: var(--warn); }
+    .bad { color: var(--bad); }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 12px;
+    }
+
+    .panel {
+      background: linear-gradient(180deg, var(--panel-2), var(--panel));
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .panel h2 {
+      margin: 0;
+      padding: 11px 12px;
+      font-size: 0.96rem;
+      border-bottom: 1px solid var(--line);
+      background: #102036;
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+    th, td {
+      text-align: left;
+      padding: 9px 10px;
+      border-bottom: 1px solid rgba(120, 160, 210, 0.16);
+      font-size: 0.85rem;
+      vertical-align: top;
+    }
+
+    th { color: #b8cbeb; font-weight: 700; font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    tr:hover { background: rgba(45, 155, 255, 0.08); }
+
+    .mono { font-family: Consolas, Menlo, monospace; font-size: 0.78rem; }
+
+    #reportJson {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #0e1a2a;
+      color: #bdd0ed;
+      max-height: 360px;
+      overflow: auto;
+      white-space: pre-wrap;
+      font-family: Consolas, Menlo, monospace;
+      font-size: 0.77rem;
+    }
+
+    @media (max-width: 980px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+      .layout { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <div>
+        <h1>UAT Insights</h1>
+        <div class="sub">View run history, top failing endpoints, and compare latest runs without terminal commands.</div>
+      </div>
+      <div class="sub" id="dirHint">Loading reports...</div>
+    </div>
+
+    <div class="toolbar">
+      <button id="refreshBtn">Refresh Reports</button>
+      <button id="compareBtn">Compare Latest 2 Runs</button>
+      <button id="planBtn">Phase 2 Plan</button>
+      <button id="patchBtn">Generate Patch</button>
+      <button id="applyBtn">Apply Patch</button>
+      <a href="index.html"><button>Back To Portal</button></a>
+    </div>
+
+    <div class="runbar">
+      <label>Scale</label>
+      <select id="runScale">
+        <option value="small">small</option>
+        <option value="medium">medium</option>
+        <option value="deep" selected>deep</option>
+      </select>
+      <label>Seed</label>
+      <input id="runSeed" type="number" value="42" min="0" step="1" />
+      <button id="startRunBtn">Start UAT Run</button>
+      <button id="stopRunBtn">Stop Run</button>
+      <button id="refreshRunBtn">Refresh Run Status</button>
+    </div>
+
+    <div class="grid" id="kpiGrid">
+      <div class="card"><div class="k">Reports</div><div class="v" id="kReports">-</div></div>
+      <div class="card"><div class="k">Latest Failed Steps</div><div class="v bad" id="kFailed">-</div></div>
+      <div class="card"><div class="k">Latest Success Rate</div><div class="v warn" id="kRate">-</div></div>
+      <div class="card"><div class="k">Latest P95 Latency</div><div class="v" id="kP95">-</div></div>
+    </div>
+
+    <div class="layout">
+      <div class="panel">
+        <h2>Recent UAT Reports</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>File</th>
+              <th>Failed / Total</th>
+              <th>Success %</th>
+              <th>P95 ms</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="reportsBody"></tbody>
+        </table>
+      </div>
+
+      <div class="panel">
+        <h2>Top Failures (Selected Report)</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Endpoint</th>
+              <th>Count</th>
+            </tr>
+          </thead>
+          <tbody id="failuresBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:12px;">
+      <h2>Latest Comparison / Selected Report Snippet</h2>
+      <div id="reportJson">Select a report or click Compare Latest 2 Runs.</div>
+    </div>
+
+    <div class="panel" style="margin-top:12px;">
+      <h2>UAT Runner Status</h2>
+      <div id="runStatus" style="padding:12px; color:#bdd0ed; font-family:Consolas, Menlo, monospace; font-size:0.8rem;">
+        Waiting for status...
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:12px;">
+      <h2>Phase 2 Auto Improvement</h2>
+      <div id="phase2Status" style="padding:12px; color:#bdd0ed; font-family:Consolas, Menlo, monospace; font-size:0.8rem;">
+        Run "Phase 2 Plan" to inspect latest failures and get recommended patch recipes.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let latestGeneratedPatch = null;
+
+    async function jget(path) {
+      const res = await fetch(path);
+      if (!res.ok) throw new Error(`${path} -> ${res.status}`);
+      return res.json();
+    }
+
+    async function jpost(path, payload) {
+      const res = await fetch(path, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload || {}),
+      });
+      if (!res.ok) {
+        let details = `${path} -> ${res.status}`;
+        try {
+          const body = await res.json();
+          details += ` ${JSON.stringify(body)}`;
+        } catch (err) {
+          details += ' (non-json error body)';
+        }
+        throw new Error(details);
+      }
+      return res.json();
+    }
+
+    function fmtPct(v) {
+      if (v === null || v === undefined) return '-';
+      return `${Number(v).toFixed(2)}%`;
+    }
+
+    function fmtNum(v) {
+      if (v === null || v === undefined) return '-';
+      return `${v}`;
+    }
+
+    function renderKPIs(reports) {
+      const latest = reports[0];
+      document.getElementById('kReports').textContent = reports.length;
+      document.getElementById('kFailed').textContent = latest ? `${fmtNum(latest.summary.failed_steps)} / ${fmtNum(latest.summary.total_steps)}` : '-';
+      document.getElementById('kRate').textContent = latest ? fmtPct(latest.summary.success_rate_pct) : '-';
+      document.getElementById('kP95').textContent = latest ? fmtNum(latest.summary.p95_latency_ms) : '-';
+    }
+
+    function renderTopFailures(topFailures) {
+      const body = document.getElementById('failuresBody');
+      body.innerHTML = '';
+      if (!topFailures || topFailures.length === 0) {
+        body.innerHTML = '<tr><td colspan="2">No failure data</td></tr>';
+        return;
+      }
+      for (const f of topFailures) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td class="mono">${f.endpoint}</td><td>${f.count}</td>`;
+        body.appendChild(tr);
+      }
+    }
+
+    async function loadReportDetails(file) {
+      const data = await jget(`/api/v1/uat/reports/${encodeURIComponent(file)}`);
+      const report = data.report || {};
+      document.getElementById('reportJson').textContent = JSON.stringify({
+        file: data.file,
+        run_id: report.run_id,
+        started_at: report.started_at,
+        finished_at: report.finished_at,
+        summary: report.summary,
+        improvement_candidates: report.improvement_candidates,
+      }, null, 2);
+    }
+
+    async function loadReports() {
+      const data = await jget('/api/v1/uat/reports?limit=40');
+      const reports = data.reports || [];
+
+      document.getElementById('dirHint').textContent = `Reports dir: ${data.reports_dir}`;
+      renderKPIs(reports);
+
+      const body = document.getElementById('reportsBody');
+      body.innerHTML = '';
+
+      if (reports.length === 0) {
+        body.innerHTML = '<tr><td colspan="5">No UAT reports found. Run UAT first.</td></tr>';
+        renderTopFailures([]);
+        document.getElementById('reportJson').textContent = 'No reports yet.';
+        return;
+      }
+
+      reports.forEach((r, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="mono">${r.file}</td>
+          <td>${fmtNum(r.summary.failed_steps)} / ${fmtNum(r.summary.total_steps)}</td>
+          <td>${fmtPct(r.summary.success_rate_pct)}</td>
+          <td>${fmtNum(r.summary.p95_latency_ms)}</td>
+          <td><button data-file="${r.file}">Open</button></td>
+        `;
+        body.appendChild(tr);
+
+        if (idx === 0) {
+          renderTopFailures(r.top_failures || []);
+          document.getElementById('reportJson').textContent = JSON.stringify(r, null, 2);
+        }
+      });
+
+      body.querySelectorAll('button[data-file]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const file = btn.getAttribute('data-file');
+          const selected = reports.find((x) => x.file === file);
+          renderTopFailures((selected && selected.top_failures) || []);
+          await loadReportDetails(file);
+        });
+      });
+    }
+
+    async function compareLatest() {
+      try {
+        const data = await jget('/api/v1/uat/compare/latest');
+        document.getElementById('reportJson').textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        document.getElementById('reportJson').textContent = `Compare failed: ${err}`;
+      }
+    }
+
+    async function refreshRunStatus() {
+      try {
+        const data = await jget('/api/v1/uat/run/status');
+        document.getElementById('runStatus').textContent = JSON.stringify(data, null, 2);
+        if (!data.running && data.latest_report) {
+          loadReports();
+        }
+      } catch (err) {
+        document.getElementById('runStatus').textContent = `Run status failed: ${err}`;
+      }
+    }
+
+    async function startRun() {
+      try {
+        const scale = document.getElementById('runScale').value;
+        const seed = Number(document.getElementById('runSeed').value || 42);
+        const data = await jpost('/api/v1/uat/run/start', {
+          scale,
+          seed,
+          base_url: window.location.origin,
+        });
+        document.getElementById('runStatus').textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        document.getElementById('runStatus').textContent = `Run start failed: ${err}`;
+      }
+    }
+
+    async function stopRun() {
+      try {
+        const data = await jpost('/api/v1/uat/run/stop', {});
+        document.getElementById('runStatus').textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        document.getElementById('runStatus').textContent = `Run stop failed: ${err}`;
+      }
+    }
+
+    async function runPhase2Plan() {
+      try {
+        const data = await jpost('/api/v1/uat/phase2/plan', {});
+        document.getElementById('phase2Status').textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        document.getElementById('phase2Status').textContent = `Plan failed: ${err}`;
+      }
+    }
+
+    async function generatePhase2Patch() {
+      try {
+        const data = await jpost('/api/v1/uat/phase2/patch', { recipe_id: 'retry_hardening_uat_agent_v1' });
+        latestGeneratedPatch = data.patch_file;
+        document.getElementById('phase2Status').textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        document.getElementById('phase2Status').textContent = `Patch generation failed: ${err}`;
+      }
+    }
+
+    async function applyPhase2Patch() {
+      try {
+        if (!latestGeneratedPatch) {
+          document.getElementById('phase2Status').textContent = 'No patch generated in this session. Click Generate Patch first.';
+          return;
+        }
+
+        const check = await jpost('/api/v1/uat/phase2/apply', {
+          patch_file: latestGeneratedPatch,
+          confirm: false,
+        });
+
+        if (!check.check_passed) {
+          document.getElementById('phase2Status').textContent = JSON.stringify(check, null, 2);
+          return;
+        }
+
+        const ok = window.confirm('Patch check passed. Apply patch to workspace now?');
+        if (!ok) {
+          document.getElementById('phase2Status').textContent = JSON.stringify(check, null, 2);
+          return;
+        }
+
+        const applied = await jpost('/api/v1/uat/phase2/apply', {
+          patch_file: latestGeneratedPatch,
+          confirm: true,
+        });
+        document.getElementById('phase2Status').textContent = JSON.stringify(applied, null, 2);
+      } catch (err) {
+        document.getElementById('phase2Status').textContent = `Apply failed: ${err}`;
+      }
+    }
+
+    document.getElementById('refreshBtn').addEventListener('click', () => loadReports());
+    document.getElementById('compareBtn').addEventListener('click', () => compareLatest());
+    document.getElementById('startRunBtn').addEventListener('click', () => startRun());
+    document.getElementById('stopRunBtn').addEventListener('click', () => stopRun());
+    document.getElementById('refreshRunBtn').addEventListener('click', () => refreshRunStatus());
+    document.getElementById('planBtn').addEventListener('click', () => runPhase2Plan());
+    document.getElementById('patchBtn').addEventListener('click', () => generatePhase2Patch());
+    document.getElementById('applyBtn').addEventListener('click', () => applyPhase2Patch());
+
+    setInterval(() => refreshRunStatus(), 4000);
+    refreshRunStatus();
+
+    loadReports().catch((err) => {
+      document.getElementById('reportJson').textContent = `Load error: ${err}`;
+    });
+  </script>
+</body>
+</html>

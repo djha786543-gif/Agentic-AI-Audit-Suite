@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from api.v1.endpoints import audit, auth, health, engagement, grc, engine, connectors
 from api.v1.endpoints import evaluation
 from api.v1.endpoints import governance, alerts, reports
+from api.v1.endpoints import uat
 
 api_router = APIRouter()
 api_router.include_router(auth.router,        prefix="/auth",        tags=["Auth"])
@@ -17,5 +18,6 @@ api_router.include_router(governance.router,  prefix="/governance",  tags=["Gove
 api_router.include_router(alerts.router,      prefix="/alerts",      tags=["Compliance Alerts"])
 # Phase 6 — Enterprise Reporting
 api_router.include_router(reports.router,     prefix="/reports",     tags=["Enterprise Reports"])
+api_router.include_router(uat.router,         prefix="/uat",         tags=["UAT Reports"])
 api_router.include_router(health.router,      prefix="",             tags=["Health"])
 
