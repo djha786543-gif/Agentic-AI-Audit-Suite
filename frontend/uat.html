@@ -207,9 +207,21 @@
       </select>
       <label>Seed</label>
       <input id="runSeed" type="number" value="42" min="0" step="1" />
+      <label>Autopilot Mode</label>
+      <select id="autopilotMode">
+        <option value="advisory" selected>advisory (generate only)</option>
+        <option value="apply">apply (generate + apply)</option>
+        <option value="manual_approval">manual_approval (token per cycle)</option>
+      </select>
+      <label>Approval Token</label>
+      <input id="autopilotToken" type="text" placeholder="auto-generated if blank" style="min-width:180px;" />
       <button id="startRunBtn">Start UAT Run</button>
       <button id="stopRunBtn">Stop Run</button>
       <button id="refreshRunBtn">Refresh Run Status</button>
+      <button id="startAutopilotBtn">Start Autopilot</button>
+      <button id="stopAutopilotBtn">Stop Autopilot</button>
+      <button id="refreshAutopilotBtn">Refresh Autopilot</button>
+      <button id="approveAutopilotBtn">Approve Cycle</button>
     </div>
 
     <div class="grid" id="kpiGrid">
@@ -286,6 +298,13 @@
     </div>
 
     <div class="panel" style="margin-top:12px;">
+      <h2>Phase 2 Autopilot Status</h2>
+      <div id="autopilotStatus" style="padding:12px; color:#bdd0ed; font-family:Consolas, Menlo, monospace; font-size:0.8rem;">
+        Autopilot is idle.
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:12px;">
       <h2>UAT Closure Guide</h2>
       <div style="padding:12px; color:#bdd0ed; font-size:0.84rem; line-height:1.45;">
         1. Click <strong>Start UAT Run</strong> with <code>small</code> scale first to validate service stability.
@@ -301,6 +320,25 @@
 
   <script>
     let latestGeneratedPatch = null;
+
+    function setButtonBusy(buttonId, busy, busyLabel, idleLabel) {
+      const btn = document.getElementById(buttonId);
+      if (!btn) return;
+      btn.disabled = busy;
+      btn.dataset.idleLabel = btn.dataset.idleLabel || idleLabel || btn.textContent;
+      btn.textContent = busy ? busyLabel : (btn.dataset.idleLabel || idleLabel || btn.textContent);
+      btn.style.opacity = busy ? '0.7' : '1';
+    }
+
+    function setPhase2Status(message, payload) {
+      const el = document.getElementById('phase2Status');
+      if (!el) return;
+      let text = String(message || '');
+      if (payload !== undefined) {
+        text += `\n\n${JSON.stringify(payload, null, 2)}`;
+      }
+      el.textContent = text;
+    }
 
     function setApplyButtonEnabled(enabled) {
       const applyBtn = document.getElementById('applyBtn');
@@ -561,32 +599,130 @@
       }
     }
 
+    async function refreshAutopilotStatus() {
+      try {
+        const data = await jget('/api/v1/uat/phase2/autopilot/status');
+        document.getElementById('autopilotStatus').textContent = JSON.stringify(data, null, 2);
+        const tokenInput = document.getElementById('autopilotToken');
+        if (tokenInput && !tokenInput.value && data && data.approval_token) {
+          tokenInput.value = data.approval_token;
+        }
+      } catch (err) {
+        document.getElementById('autopilotStatus').textContent = `Autopilot status failed: ${err}`;
+      }
+    }
+
+    async function startAutopilot() {
+      setButtonBusy('startAutopilotBtn', true, 'Starting...', 'Start Autopilot');
+      try {
+        const scale = document.getElementById('runScale').value;
+        const seed = Number(document.getElementById('runSeed').value || 42);
+        const mode = document.getElementById('autopilotMode').value || 'advisory';
+        const token = (document.getElementById('autopilotToken').value || '').trim();
+        const data = await jpost('/api/v1/uat/phase2/autopilot/start', {
+          scale,
+          seed,
+          mode,
+          approval_timeout_seconds: 600,
+          approval_token: token || undefined,
+          max_cycles: 5,
+          poll_seconds: 1.0,
+          base_url: window.location.origin,
+        });
+        document.getElementById('autopilotStatus').textContent = JSON.stringify(data, null, 2);
+        if (data && data.approval_token) {
+          document.getElementById('autopilotToken').value = data.approval_token;
+        }
+        setPhase2Status(`Autopilot started in ${mode} mode. Monitoring status until stop condition.`, data);
+        if (mode === 'manual_approval' && data && data.approval_token) {
+          alert(`Manual approval mode enabled. Token: ${data.approval_token}`);
+        }
+      } catch (err) {
+        document.getElementById('autopilotStatus').textContent = `Autopilot start failed: ${err}`;
+        alert(`Autopilot start failed: ${err}`);
+      } finally {
+        setButtonBusy('startAutopilotBtn', false, 'Starting...', 'Start Autopilot');
+      }
+    }
+
+    async function approveAutopilotCycle() {
+      setButtonBusy('approveAutopilotBtn', true, 'Approving...', 'Approve Cycle');
+      try {
+        const token = (document.getElementById('autopilotToken').value || '').trim();
+        if (!token) {
+          throw new Error('Approval token is required. Start manual_approval autopilot first.');
+        }
+
+        const status = await jget('/api/v1/uat/phase2/autopilot/status');
+        const cycle = Number(status.pending_cycle || status.current_cycle || 0);
+        if (!cycle) {
+          throw new Error('No pending cycle found to approve.');
+        }
+
+        const data = await jpost('/api/v1/uat/phase2/autopilot/approve', {
+          token,
+          cycle,
+        });
+        document.getElementById('autopilotStatus').textContent = JSON.stringify(data, null, 2);
+        setPhase2Status(`Cycle ${cycle} approval sent successfully.`, data);
+      } catch (err) {
+        document.getElementById('autopilotStatus').textContent = `Autopilot approval failed: ${err}`;
+        alert(`Autopilot approval failed: ${err}`);
+      } finally {
+        setButtonBusy('approveAutopilotBtn', false, 'Approving...', 'Approve Cycle');
+      }
+    }
+
+    async function stopAutopilot() {
+      setButtonBusy('stopAutopilotBtn', true, 'Stopping...', 'Stop Autopilot');
+      try {
+        const data = await jpost('/api/v1/uat/phase2/autopilot/stop', {});
+        document.getElementById('autopilotStatus').textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        document.getElementById('autopilotStatus').textContent = `Autopilot stop failed: ${err}`;
+        alert(`Autopilot stop failed: ${err}`);
+      } finally {
+        setButtonBusy('stopAutopilotBtn', false, 'Stopping...', 'Stop Autopilot');
+      }
+    }
+
     async function generatePhase2Patch() {
+      setButtonBusy('patchBtn', true, 'Generating...', 'Generate Patch');
       try {
         const data = await jpost('/api/v1/uat/phase2/patch', { recipe_id: 'retry_hardening_uat_agent_v1' });
         if (data.already_applied) {
           latestGeneratedPatch = null;
           setApplyButtonEnabled(false);
-          document.getElementById('phase2Status').textContent =
-            'Patch status: already applied. No apply step is required. Run UAT again and compare latest runs.\n\n' +
-            JSON.stringify(data, null, 2);
+          setPhase2Status(
+            'Patch status: already applied. No apply step is required. Run UAT again and compare latest runs.',
+            data
+          );
+          alert('Generate Patch completed: retry hardening is already applied in this workspace.');
           return;
         }
 
         latestGeneratedPatch = data.patch_file || null;
         setApplyButtonEnabled(Boolean(latestGeneratedPatch));
-        document.getElementById('phase2Status').textContent = JSON.stringify(data, null, 2);
+        setPhase2Status('Patch file generated successfully.', data);
+        if (latestGeneratedPatch) {
+          alert(`Generate Patch completed: ${latestGeneratedPatch}`);
+        }
       } catch (err) {
         setApplyButtonEnabled(false);
-        document.getElementById('phase2Status').textContent = `Patch generation failed: ${err}`;
+        setPhase2Status(`Patch generation failed: ${err}`);
+        alert(`Generate Patch failed: ${err}`);
+      } finally {
+        setButtonBusy('patchBtn', false, 'Generating...', 'Generate Patch');
       }
     }
 
     async function applyPhase2Patch() {
+      setButtonBusy('applyBtn', true, 'Applying...', 'Apply Patch');
       try {
         if (!latestGeneratedPatch) {
-          document.getElementById('phase2Status').textContent =
-            'No patch pending apply. Click Generate Patch first. If response says already applied, skip apply and run UAT again.';
+          setPhase2Status(
+            'No patch pending apply. Click Generate Patch first. If response says already applied, skip apply and run UAT again.'
+          );
           return;
         }
 
@@ -596,13 +732,14 @@
         });
 
         if (!check.check_passed) {
-          document.getElementById('phase2Status').textContent = JSON.stringify(check, null, 2);
+          setPhase2Status('Patch check failed. Review details below.', check);
+          alert('Apply Patch check failed. See details in the Phase 2 panel.');
           return;
         }
 
         const ok = window.confirm('Patch check passed. Apply patch to workspace now?');
         if (!ok) {
-          document.getElementById('phase2Status').textContent = JSON.stringify(check, null, 2);
+          setPhase2Status('Patch apply cancelled after validation.', check);
           return;
         }
 
@@ -612,9 +749,13 @@
         });
         setApplyButtonEnabled(false);
         latestGeneratedPatch = null;
-        document.getElementById('phase2Status').textContent = JSON.stringify(applied, null, 2);
+        setPhase2Status('Patch applied successfully.', applied);
+        alert('Apply Patch completed successfully.');
       } catch (err) {
-        document.getElementById('phase2Status').textContent = `Apply failed: ${err}`;
+        setPhase2Status(`Apply failed: ${err}`);
+        alert(`Apply Patch failed: ${err}`);
+      } finally {
+        setButtonBusy('applyBtn', false, 'Applying...', 'Apply Patch');
       }
     }
 
@@ -623,12 +764,18 @@
     document.getElementById('startRunBtn').addEventListener('click', () => startRun());
     document.getElementById('stopRunBtn').addEventListener('click', () => stopRun());
     document.getElementById('refreshRunBtn').addEventListener('click', () => refreshRunStatus());
+    document.getElementById('startAutopilotBtn').addEventListener('click', () => startAutopilot());
+    document.getElementById('stopAutopilotBtn').addEventListener('click', () => stopAutopilot());
+    document.getElementById('refreshAutopilotBtn').addEventListener('click', () => refreshAutopilotStatus());
+    document.getElementById('approveAutopilotBtn').addEventListener('click', () => approveAutopilotCycle());
     document.getElementById('planBtn').addEventListener('click', () => runPhase2Plan());
     document.getElementById('patchBtn').addEventListener('click', () => generatePhase2Patch());
     document.getElementById('applyBtn').addEventListener('click', () => applyPhase2Patch());
 
     setInterval(() => refreshRunStatus(), 4000);
+    setInterval(() => refreshAutopilotStatus(), 4000);
     refreshRunStatus();
+    refreshAutopilotStatus();
     setApplyButtonEnabled(false);
 
     loadReports().catch((err) => {

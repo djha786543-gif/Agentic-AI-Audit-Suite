@@ -13,8 +13,11 @@ import hashlib
 import os
 from pathlib import Path
 import json
+import secrets
 import subprocess
 import sys
+import threading
+import time
 from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, Body, HTTPException
@@ -37,6 +40,30 @@ _RUNNER_STATE: Dict[str, Any] = {
 }
 
 
+_AUTOPILOT_STATE: Dict[str, Any] = {
+    "thread": None,
+    "stop_event": None,
+    "running": False,
+    "started_at": None,
+    "finished_at": None,
+    "current_cycle": 0,
+    "max_cycles": 0,
+    "scale": "deep",
+    "seed": 42,
+    "mode": "advisory",
+    "approval_token": None,
+    "approval_timeout_seconds": 600,
+    "approved_cycle": None,
+    "pending_cycle": None,
+    "pending_patch_file": None,
+    "status": "idle",
+    "last_error": None,
+    "reason": None,
+    "history": [],
+    "log_file": None,
+}
+
+
 def _reports_dir() -> Path:
     # /repo/api/v1/endpoints/uat.py -> /repo
     repo_root = Path(__file__).resolve().parents[3]
@@ -51,6 +78,11 @@ def _load_json(path: Path) -> Dict[str, Any]:
 def _save_text(path: Path, content: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(content, encoding="utf-8")
+
+
+def _save_json(path: Path, payload: Dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
 
 def _latest_report_path() -> Path:
@@ -135,6 +167,377 @@ def _report_failure_profile(report: Dict[str, Any]) -> Dict[str, Any]:
         "server_error_count": server_errors,
         "disconnect_count": disconnected,
     }
+
+
+def _status_count(report: Dict[str, Any], code: int) -> int:
+    count = 0
+    for step in report.get("steps", []):
+        if int(step.get("status_code", 0) or 0) == code:
+            count += 1
+    return count
+
+
+def _evaluate_readiness(report: Dict[str, Any]) -> Dict[str, Any]:
+    profile = _report_failure_profile(report)
+    summary = report.get("summary", {})
+    total = int(profile["total_steps"] or 0)
+    failure_pct = float(profile["failure_pct"])
+    disconnect_count = int(profile["disconnect_count"])
+    server_error_count = int(profile["server_error_count"])
+    server_error_pct = round((server_error_count / total) * 100.0, 2) if total else 100.0
+    disconnect_pct = round((disconnect_count / total) * 100.0, 2) if total else 100.0
+    p95_latency_ms = float(summary.get("p95_latency_ms") or 0)
+
+    industry_ready = (
+        failure_pct <= 2.0
+        and disconnect_count == 0
+        and server_error_pct <= 1.0
+        and p95_latency_ms <= 1000.0
+    )
+    pilot_ready = (
+        failure_pct <= 8.0
+        and disconnect_pct <= 1.0
+        and server_error_pct <= 3.0
+        and p95_latency_ms <= 1500.0
+    )
+
+    level = "not_ready"
+    if industry_ready:
+        level = "industry_ready"
+    elif pilot_ready:
+        level = "pilot_ready"
+
+    return {
+        "level": level,
+        "metrics": {
+            "total_steps": total,
+            "failed_steps": int(profile["failed_steps"]),
+            "failure_pct": failure_pct,
+            "disconnect_count": disconnect_count,
+            "disconnect_pct": disconnect_pct,
+            "server_error_count": server_error_count,
+            "server_error_pct": server_error_pct,
+            "p95_latency_ms": p95_latency_ms,
+            "status_500": _status_count(report, 500),
+            "status_502": _status_count(report, 502),
+            "status_503": _status_count(report, 503),
+            "status_504": _status_count(report, 504),
+            "status_0": _status_count(report, 0),
+        },
+        "thresholds": {
+            "industry_ready": {
+                "failure_pct_lte": 2.0,
+                "disconnect_count_eq": 0,
+                "server_error_pct_lte": 1.0,
+                "p95_latency_ms_lte": 1000.0,
+            },
+            "pilot_ready": {
+                "failure_pct_lte": 8.0,
+                "disconnect_pct_lte": 1.0,
+                "server_error_pct_lte": 3.0,
+                "p95_latency_ms_lte": 1500.0,
+            },
+        },
+    }
+
+
+def _current_autopilot_status() -> Dict[str, Any]:
+    return {
+        "running": bool(_AUTOPILOT_STATE.get("running")),
+        "started_at": _AUTOPILOT_STATE.get("started_at"),
+        "finished_at": _AUTOPILOT_STATE.get("finished_at"),
+        "current_cycle": _AUTOPILOT_STATE.get("current_cycle"),
+        "max_cycles": _AUTOPILOT_STATE.get("max_cycles"),
+        "scale": _AUTOPILOT_STATE.get("scale"),
+        "seed": _AUTOPILOT_STATE.get("seed"),
+        "mode": _AUTOPILOT_STATE.get("mode"),
+        "approval_token": _AUTOPILOT_STATE.get("approval_token"),
+        "approval_timeout_seconds": _AUTOPILOT_STATE.get("approval_timeout_seconds"),
+        "approved_cycle": _AUTOPILOT_STATE.get("approved_cycle"),
+        "pending_cycle": _AUTOPILOT_STATE.get("pending_cycle"),
+        "pending_patch_file": _AUTOPILOT_STATE.get("pending_patch_file"),
+        "status": _AUTOPILOT_STATE.get("status"),
+        "reason": _AUTOPILOT_STATE.get("reason"),
+        "last_error": _AUTOPILOT_STATE.get("last_error"),
+        "history": _AUTOPILOT_STATE.get("history", []),
+        "log_file": _AUTOPILOT_STATE.get("log_file"),
+    }
+
+
+def _start_uat_process(scale: str, seed: int, base_url: str) -> Dict[str, Any]:
+    current = _runner_status()
+    if current["running"]:
+        raise HTTPException(status_code=409, detail={"message": "UAT run already in progress", "status": current})
+
+    repo_root = Path(__file__).resolve().parents[3]
+    py_exec = _pick_python_executable(repo_root)
+    cmd = [
+        py_exec,
+        str(repo_root / "agents" / "uat_enterprise_agent.py"),
+        "--base-url",
+        base_url,
+        "--scale",
+        scale,
+        "--seed",
+        str(seed),
+    ]
+
+    log_path = _reports_dir() / RUN_LOG_FILE
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    log_fp = open(log_path, "a", encoding="utf-8")
+    log_fp.write(f"\n[{datetime.utcnow().isoformat()}] START {' '.join(cmd)}\n")
+    log_fp.flush()
+
+    try:
+        proc = subprocess.Popen(
+            cmd,
+            cwd=repo_root,
+            stdout=log_fp,
+            stderr=log_fp,
+        )
+    except Exception as exc:
+        _RUNNER_STATE["last_error"] = f"Failed to launch UAT process: {exc}"
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "message": "Failed to launch UAT process",
+                "error": str(exc),
+                "command": cmd,
+                "repo_root": str(repo_root),
+            },
+        )
+
+    _RUNNER_STATE["process"] = proc
+    _RUNNER_STATE["started_at"] = datetime.utcnow().isoformat()
+    _RUNNER_STATE["finished_at"] = None
+    _RUNNER_STATE["exit_code"] = None
+    _RUNNER_STATE["command"] = cmd
+    _RUNNER_STATE["log_path"] = str(log_path)
+    _RUNNER_STATE["last_error"] = None
+
+    return {
+        "started": True,
+        "pid": proc.pid,
+        "status": _runner_status(),
+    }
+
+
+def _apply_generated_patch(patch_file: str) -> Dict[str, Any]:
+    patch_path = (_phase2_patch_dir() / str(patch_file)).resolve()
+    patch_dir = _phase2_patch_dir().resolve()
+    if patch_dir not in patch_path.parents and patch_path != patch_dir:
+        raise HTTPException(status_code=400, detail="Invalid patch path")
+    if not patch_path.exists():
+        raise HTTPException(status_code=404, detail=f"Patch file not found: {patch_file}")
+
+    repo_root = Path(__file__).resolve().parents[3]
+    env = os.environ.copy()
+    apply_check_cmd = ["git", "apply", "--check", str(patch_path)]
+    apply_cmd = ["git", "apply", str(patch_path)]
+
+    check_proc = subprocess.run(
+        apply_check_cmd,
+        cwd=repo_root,
+        text=True,
+        capture_output=True,
+        env=env,
+    )
+    if check_proc.returncode != 0:
+        return {
+            "phase": "phase2_apply",
+            "applied": False,
+            "confirm_required": True,
+            "check_passed": False,
+            "stderr": check_proc.stderr,
+            "stdout": check_proc.stdout,
+        }
+
+    apply_proc = subprocess.run(
+        apply_cmd,
+        cwd=repo_root,
+        text=True,
+        capture_output=True,
+        env=env,
+    )
+    if apply_proc.returncode != 0:
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "message": "Patch apply failed",
+                "stdout": apply_proc.stdout,
+                "stderr": apply_proc.stderr,
+            },
+        )
+
+    validate_cmd = [sys.executable, "-m", "py_compile", "agents/uat_enterprise_agent.py"]
+    validate_proc = subprocess.run(
+        validate_cmd,
+        cwd=repo_root,
+        text=True,
+        capture_output=True,
+        env=env,
+    )
+
+    return {
+        "phase": "phase2_apply",
+        "applied": True,
+        "patch_file": patch_file,
+        "check_passed": True,
+        "validation": {
+            "command": " ".join(validate_cmd),
+            "returncode": validate_proc.returncode,
+            "stdout": validate_proc.stdout,
+            "stderr": validate_proc.stderr,
+        },
+    }
+
+
+def _autopilot_loop(max_cycles: int, scale: str, seed: int, base_url: str, poll_seconds: float, mode: str) -> None:
+    stop_event = _AUTOPILOT_STATE.get("stop_event")
+    history: List[Dict[str, Any]] = []
+    reason = "max_cycles_reached"
+
+    try:
+        for cycle in range(1, max_cycles + 1):
+            if stop_event is not None and stop_event.is_set():
+                reason = "stopped_by_user"
+                break
+
+            _AUTOPILOT_STATE["current_cycle"] = cycle
+            _AUTOPILOT_STATE["status"] = "starting_uat_run"
+
+            run_started = _start_uat_process(scale=scale, seed=seed + cycle - 1, base_url=base_url)
+
+            _AUTOPILOT_STATE["status"] = "waiting_for_uat_completion"
+            while True:
+                if stop_event is not None and stop_event.is_set():
+                    reason = "stopped_by_user"
+                    break
+                status = _runner_status()
+                if not status.get("running"):
+                    break
+                time.sleep(max(0.3, poll_seconds))
+
+            if reason == "stopped_by_user":
+                break
+
+            status = _runner_status()
+            if int(status.get("exit_code") or 0) != 0:
+                _AUTOPILOT_STATE["status"] = "uat_run_failed"
+                reason = "uat_run_failed"
+                history.append(
+                    {
+                        "cycle": cycle,
+                        "status": "uat_run_failed",
+                        "run": run_started,
+                        "runner_status": status,
+                        "recorded_at": datetime.utcnow().isoformat(),
+                    }
+                )
+                break
+
+            report_path = _latest_report_path()
+            report = _load_json(report_path)
+            readiness = _evaluate_readiness(report)
+            cycle_record: Dict[str, Any] = {
+                "cycle": cycle,
+                "report_file": report_path.name,
+                "mode": mode,
+                "readiness": readiness,
+                "recorded_at": datetime.utcnow().isoformat(),
+            }
+
+            if readiness["level"] == "industry_ready":
+                _AUTOPILOT_STATE["status"] = "industry_ready"
+                reason = "industry_ready"
+                history.append(cycle_record)
+                break
+
+            _AUTOPILOT_STATE["status"] = "planning_patch"
+            profile = _report_failure_profile(report)
+            cycle_record["failure_profile"] = profile
+
+            if profile["disconnect_count"] <= 0 and profile["server_error_count"] <= 0:
+                reason = "no_supported_recipe_for_current_failures"
+                cycle_record["status"] = reason
+                history.append(cycle_record)
+                break
+
+            _AUTOPILOT_STATE["status"] = "generating_patch"
+            patch_obj = _build_retry_hardening_patch()
+            cycle_record["recipe_id"] = patch_obj.get("recipe_id")
+
+            if patch_obj.get("already_applied"):
+                reason = "recipe_already_applied_but_not_industry_ready"
+                cycle_record["status"] = reason
+                history.append(cycle_record)
+                break
+
+            stamp = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+            patch_file = f"{patch_obj['recipe_id']}_{stamp}.patch"
+            patch_path = _phase2_patch_dir() / patch_file
+            _save_text(patch_path, patch_obj["patch"])
+            cycle_record["patch_file"] = patch_file
+            _AUTOPILOT_STATE["pending_cycle"] = cycle
+            _AUTOPILOT_STATE["pending_patch_file"] = patch_file
+
+            if mode == "advisory":
+                _AUTOPILOT_STATE["status"] = "advisory_patch_generated"
+                cycle_record["status"] = "advisory_patch_generated"
+                reason = "advisory_patch_generated"
+                history.append(cycle_record)
+                break
+
+            if mode == "manual_approval":
+                _AUTOPILOT_STATE["status"] = "waiting_for_approval"
+                deadline = time.time() + float(_AUTOPILOT_STATE.get("approval_timeout_seconds") or 600)
+                approved = False
+
+                while time.time() < deadline:
+                    if stop_event is not None and stop_event.is_set():
+                        reason = "stopped_by_user"
+                        break
+                    if int(_AUTOPILOT_STATE.get("approved_cycle") or 0) == cycle:
+                        approved = True
+                        break
+                    time.sleep(max(0.3, poll_seconds))
+
+                if reason == "stopped_by_user":
+                    break
+                if not approved:
+                    _AUTOPILOT_STATE["status"] = "approval_timeout"
+                    cycle_record["status"] = "approval_timeout"
+                    reason = "approval_timeout"
+                    history.append(cycle_record)
+                    break
+
+                _AUTOPILOT_STATE["status"] = "approval_received"
+
+            _AUTOPILOT_STATE["status"] = "applying_patch"
+            applied = _apply_generated_patch(patch_file)
+            cycle_record["apply_result"] = applied
+            cycle_record["status"] = "patch_applied"
+            history.append(cycle_record)
+            _AUTOPILOT_STATE["approved_cycle"] = None
+            _AUTOPILOT_STATE["pending_cycle"] = None
+            _AUTOPILOT_STATE["pending_patch_file"] = None
+
+        _AUTOPILOT_STATE["history"] = history
+    except Exception as exc:
+        _AUTOPILOT_STATE["last_error"] = str(exc)
+        _AUTOPILOT_STATE["status"] = "failed"
+        reason = "autopilot_exception"
+    finally:
+        _AUTOPILOT_STATE["running"] = False
+        _AUTOPILOT_STATE["finished_at"] = datetime.utcnow().isoformat()
+        _AUTOPILOT_STATE["pending_cycle"] = None
+        _AUTOPILOT_STATE["pending_patch_file"] = None
+        _AUTOPILOT_STATE["reason"] = reason
+        status_payload = _current_autopilot_status()
+        stamp = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+        log_path = _phase2_patch_dir() / f"autopilot_session_{stamp}.json"
+        _save_json(log_path, status_payload)
+        _AUTOPILOT_STATE["log_file"] = str(log_path)
 
 
 def _build_retry_hardening_patch() -> Dict[str, Any]:
@@ -489,68 +892,13 @@ def compare_latest() -> Dict[str, Any]:
 
 @router.post("/run/start")
 def start_uat_run(payload: Dict[str, Any] = Body(default={})) -> Dict[str, Any]:
-    current = _runner_status()
-    if current["running"]:
-        raise HTTPException(status_code=409, detail={"message": "UAT run already in progress", "status": current})
-
     scale = str(payload.get("scale") or "deep").lower()
     if scale not in {"small", "medium", "deep"}:
         raise HTTPException(status_code=400, detail="scale must be one of: small, medium, deep")
 
     seed = int(payload.get("seed", 42))
     base_url = str(payload.get("base_url") or "http://127.0.0.1:8000")
-
-    repo_root = Path(__file__).resolve().parents[3]
-    py_exec = _pick_python_executable(repo_root)
-    cmd = [
-        py_exec,
-        str(repo_root / "agents" / "uat_enterprise_agent.py"),
-        "--base-url",
-        base_url,
-        "--scale",
-        scale,
-        "--seed",
-        str(seed),
-    ]
-
-    log_path = _reports_dir() / RUN_LOG_FILE
-    log_path.parent.mkdir(parents=True, exist_ok=True)
-    log_fp = open(log_path, "a", encoding="utf-8")
-    log_fp.write(f"\n[{datetime.utcnow().isoformat()}] START {' '.join(cmd)}\n")
-    log_fp.flush()
-
-    try:
-        proc = subprocess.Popen(
-            cmd,
-            cwd=repo_root,
-            stdout=log_fp,
-            stderr=log_fp,
-        )
-    except Exception as exc:
-        _RUNNER_STATE["last_error"] = f"Failed to launch UAT process: {exc}"
-        raise HTTPException(
-            status_code=500,
-            detail={
-                "message": "Failed to launch UAT process",
-                "error": str(exc),
-                "command": cmd,
-                "repo_root": str(repo_root),
-            },
-        )
-
-    _RUNNER_STATE["process"] = proc
-    _RUNNER_STATE["started_at"] = datetime.utcnow().isoformat()
-    _RUNNER_STATE["finished_at"] = None
-    _RUNNER_STATE["exit_code"] = None
-    _RUNNER_STATE["command"] = cmd
-    _RUNNER_STATE["log_path"] = str(log_path)
-    _RUNNER_STATE["last_error"] = None
-
-    return {
-        "started": True,
-        "pid": proc.pid,
-        "status": _runner_status(),
-    }
+    return _start_uat_process(scale=scale, seed=seed, base_url=base_url)
 
 
 @router.get("/run/status")
@@ -654,36 +1002,33 @@ def phase2_apply(payload: Dict[str, Any] = Body(default={})) -> Dict[str, Any]:
     if not patch_file:
         raise HTTPException(status_code=400, detail="patch_file is required")
 
-    patch_path = (_phase2_patch_dir() / str(patch_file)).resolve()
-    patch_dir = _phase2_patch_dir().resolve()
-    if patch_dir not in patch_path.parents and patch_path != patch_dir:
-        raise HTTPException(status_code=400, detail="Invalid patch path")
-    if not patch_path.exists():
-        raise HTTPException(status_code=404, detail=f"Patch file not found: {patch_file}")
-
-    repo_root = Path(__file__).resolve().parents[3]
-    env = os.environ.copy()
-    apply_check_cmd = ["git", "apply", "--check", str(patch_path)]
-    apply_cmd = ["git", "apply", str(patch_path)]
-
-    check_proc = subprocess.run(
-        apply_check_cmd,
-        cwd=repo_root,
-        text=True,
-        capture_output=True,
-        env=env,
-    )
-    if check_proc.returncode != 0:
-        return {
-            "phase": "phase2_apply",
-            "applied": False,
-            "confirm_required": True,
-            "check_passed": False,
-            "stderr": check_proc.stderr,
-            "stdout": check_proc.stdout,
-        }
-
     if not confirm:
+        patch_path = (_phase2_patch_dir() / str(patch_file)).resolve()
+        patch_dir = _phase2_patch_dir().resolve()
+        if patch_dir not in patch_path.parents and patch_path != patch_dir:
+            raise HTTPException(status_code=400, detail="Invalid patch path")
+        if not patch_path.exists():
+            raise HTTPException(status_code=404, detail=f"Patch file not found: {patch_file}")
+
+        repo_root = Path(__file__).resolve().parents[3]
+        env = os.environ.copy()
+        check_proc = subprocess.run(
+            ["git", "apply", "--check", str(patch_path)],
+            cwd=repo_root,
+            text=True,
+            capture_output=True,
+            env=env,
+        )
+        if check_proc.returncode != 0:
+            return {
+                "phase": "phase2_apply",
+                "applied": False,
+                "confirm_required": True,
+                "check_passed": False,
+                "stderr": check_proc.stderr,
+                "stdout": check_proc.stdout,
+            }
+
         return {
             "phase": "phase2_apply",
             "applied": False,
@@ -692,42 +1037,143 @@ def phase2_apply(payload: Dict[str, Any] = Body(default={})) -> Dict[str, Any]:
             "message": "Patch validated. Re-submit with confirm=true to apply.",
         }
 
-    apply_proc = subprocess.run(
-        apply_cmd,
-        cwd=repo_root,
-        text=True,
-        capture_output=True,
-        env=env,
-    )
-    if apply_proc.returncode != 0:
-        raise HTTPException(
-            status_code=500,
-            detail={
-                "message": "Patch apply failed",
-                "stdout": apply_proc.stdout,
-                "stderr": apply_proc.stderr,
-            },
-        )
+    return _apply_generated_patch(str(patch_file))
 
-    # Quick syntax validation of the patched file.
-    validate_cmd = [sys.executable, "-m", "py_compile", "agents/uat_enterprise_agent.py"]
-    validate_proc = subprocess.run(
-        validate_cmd,
-        cwd=repo_root,
-        text=True,
-        capture_output=True,
-        env=env,
+
+@router.get("/readiness/latest")
+def readiness_latest(report_file: Optional[str] = None) -> Dict[str, Any]:
+    if report_file:
+        report_path = (_reports_dir() / str(report_file)).resolve()
+        if not report_path.exists():
+            raise HTTPException(status_code=404, detail=f"Report not found: {report_file}")
+    else:
+        report_path = _latest_report_path()
+
+    report = _load_json(report_path)
+    readiness = _evaluate_readiness(report)
+    return {
+        "report_file": report_path.name,
+        "readiness": readiness,
+    }
+
+
+@router.post("/phase2/autopilot/start")
+def autopilot_start(payload: Dict[str, Any] = Body(default={})) -> Dict[str, Any]:
+    if bool(_AUTOPILOT_STATE.get("running")):
+        raise HTTPException(status_code=409, detail={"message": "Autopilot is already running", "status": _current_autopilot_status()})
+
+    scale = str(payload.get("scale") or "deep").lower()
+    if scale not in {"small", "medium", "deep"}:
+        raise HTTPException(status_code=400, detail="scale must be one of: small, medium, deep")
+
+    max_cycles = int(payload.get("max_cycles", 5))
+    if max_cycles < 1 or max_cycles > 25:
+        raise HTTPException(status_code=400, detail="max_cycles must be between 1 and 25")
+
+    seed = int(payload.get("seed", 42))
+    poll_seconds = float(payload.get("poll_seconds", 1.0))
+    mode = str(payload.get("mode") or "advisory").lower()
+    if mode not in {"advisory", "apply", "manual_approval"}:
+        raise HTTPException(status_code=400, detail="mode must be one of: advisory, apply, manual_approval")
+    approval_timeout_seconds = int(payload.get("approval_timeout_seconds", 600))
+    if approval_timeout_seconds < 30 or approval_timeout_seconds > 7200:
+        raise HTTPException(status_code=400, detail="approval_timeout_seconds must be between 30 and 7200")
+    provided_token = str(payload.get("approval_token") or "").strip()
+    approval_token = provided_token if provided_token else secrets.token_hex(8)
+    base_url = str(payload.get("base_url") or "http://127.0.0.1:8000")
+
+    stop_event = threading.Event()
+    _AUTOPILOT_STATE["thread"] = None
+    _AUTOPILOT_STATE["stop_event"] = stop_event
+    _AUTOPILOT_STATE["running"] = True
+    _AUTOPILOT_STATE["started_at"] = datetime.utcnow().isoformat()
+    _AUTOPILOT_STATE["finished_at"] = None
+    _AUTOPILOT_STATE["current_cycle"] = 0
+    _AUTOPILOT_STATE["max_cycles"] = max_cycles
+    _AUTOPILOT_STATE["scale"] = scale
+    _AUTOPILOT_STATE["seed"] = seed
+    _AUTOPILOT_STATE["mode"] = mode
+    _AUTOPILOT_STATE["approval_token"] = approval_token if mode == "manual_approval" else None
+    _AUTOPILOT_STATE["approval_timeout_seconds"] = approval_timeout_seconds
+    _AUTOPILOT_STATE["approved_cycle"] = None
+    _AUTOPILOT_STATE["pending_cycle"] = None
+    _AUTOPILOT_STATE["pending_patch_file"] = None
+    _AUTOPILOT_STATE["status"] = "starting"
+    _AUTOPILOT_STATE["last_error"] = None
+    _AUTOPILOT_STATE["reason"] = None
+    _AUTOPILOT_STATE["history"] = []
+    _AUTOPILOT_STATE["log_file"] = None
+
+    t = threading.Thread(
+        target=_autopilot_loop,
+        kwargs={
+            "max_cycles": max_cycles,
+            "scale": scale,
+            "seed": seed,
+            "mode": mode,
+            "base_url": base_url,
+            "poll_seconds": poll_seconds,
+        },
+        daemon=True,
+        name="uat-autopilot",
     )
+    _AUTOPILOT_STATE["thread"] = t
+    t.start()
 
     return {
-        "phase": "phase2_apply",
-        "applied": True,
-        "patch_file": patch_file,
-        "check_passed": True,
-        "validation": {
-            "command": " ".join(validate_cmd),
-            "returncode": validate_proc.returncode,
-            "stdout": validate_proc.stdout,
-            "stderr": validate_proc.stderr,
-        },
+        "started": True,
+        "message": f"Phase 2 autopilot started in {mode} mode",
+        "approval_required": mode == "manual_approval",
+        "approval_token": _AUTOPILOT_STATE.get("approval_token"),
+        "status": _current_autopilot_status(),
+    }
+
+
+@router.get("/phase2/autopilot/status")
+def autopilot_status() -> Dict[str, Any]:
+    return _current_autopilot_status()
+
+
+@router.post("/phase2/autopilot/stop")
+def autopilot_stop() -> Dict[str, Any]:
+    if not bool(_AUTOPILOT_STATE.get("running")):
+        return {"stopped": False, "message": "Autopilot is not running", "status": _current_autopilot_status()}
+
+    stop_event = _AUTOPILOT_STATE.get("stop_event")
+    if stop_event is not None:
+        stop_event.set()
+    _AUTOPILOT_STATE["status"] = "stop_requested"
+    _AUTOPILOT_STATE["reason"] = "stop_requested"
+
+    return {"stopped": True, "message": "Stop requested", "status": _current_autopilot_status()}
+
+
+@router.post("/phase2/autopilot/approve")
+def autopilot_approve(payload: Dict[str, Any] = Body(default={})) -> Dict[str, Any]:
+    if not bool(_AUTOPILOT_STATE.get("running")):
+        raise HTTPException(status_code=409, detail="Autopilot is not running")
+
+    if _AUTOPILOT_STATE.get("mode") != "manual_approval":
+        raise HTTPException(status_code=409, detail="Autopilot approval is only valid in manual_approval mode")
+
+    token = str(payload.get("token") or "").strip()
+    expected_token = str(_AUTOPILOT_STATE.get("approval_token") or "")
+    if not token or token != expected_token:
+        raise HTTPException(status_code=403, detail="Invalid approval token")
+
+    cycle = int(payload.get("cycle") or int(_AUTOPILOT_STATE.get("current_cycle") or 0))
+    pending_cycle = int(_AUTOPILOT_STATE.get("pending_cycle") or 0)
+    if pending_cycle <= 0:
+        raise HTTPException(status_code=409, detail="No pending cycle awaiting approval")
+    if cycle != pending_cycle:
+        raise HTTPException(status_code=409, detail=f"Approval cycle mismatch. Expected cycle {pending_cycle}")
+
+    _AUTOPILOT_STATE["approved_cycle"] = cycle
+    _AUTOPILOT_STATE["status"] = "approval_received"
+
+    return {
+        "approved": True,
+        "cycle": cycle,
+        "message": "Approval accepted. Autopilot will continue patch apply for this cycle.",
+        "status": _current_autopilot_status(),
     }
