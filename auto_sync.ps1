@@ -23,7 +23,7 @@ function Write-Log {
 }
 
 function Invoke-Git {
-    param([Parameter(ValueFromRemainingArguments = $true)][string[]]$Args)
+    param([Parameter(ValueFromRemainingArguments = $true)][string[]]$Args = @())
     & git @Args
 }
 
