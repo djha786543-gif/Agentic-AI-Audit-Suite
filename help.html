@@ -597,6 +597,27 @@
     border-radius: 3px;
     padding: 0 3px;
   }
+
+  /* v4.1 compact app switcher: reduces overlap on smaller windows */
+  .suite-nav-widget{bottom:12px !important;right:12px !important;z-index:1200 !important}
+  .sn-menu{padding:6px !important;gap:2px !important;margin-bottom:8px !important;max-height:min(52vh,360px);overflow-y:auto;overflow-x:hidden;transform:scale(.95) translateY(8px) !important;transform-origin:100% 100%}
+  .suite-nav-widget:hover .sn-menu,.suite-nav-widget:focus-within .sn-menu,.suite-nav-widget.open .sn-menu{transform:scale(1) translateY(0) !important}
+  .sn-item{width:min(205px,68vw) !important;padding:6px 9px !important;font-size:11px !important;border-radius:7px !important;gap:7px !important;line-height:1.2}
+  .sn-icon{width:14px !important;font-size:13px !important}
+  .sn-fab{width:38px !important;height:38px !important;box-shadow:0 2px 10px rgba(40,120,255,.22) !important}
+  .sn-fab svg{width:15px;height:15px}
+  .sn-menu::-webkit-scrollbar{width:6px}
+  .sn-menu::-webkit-scrollbar-thumb{background:rgba(138,149,170,.45);border-radius:999px}
+   (hover: none), (pointer: coarse){
+    .suite-nav-widget:hover .sn-menu{transform:scale(.95) translateY(8px) !important;opacity:0;pointer-events:none}
+  }
+  @media (max-width: 768px){
+    .suite-nav-widget{bottom:8px !important;right:8px !important}
+    .sn-menu{max-height:40vh;width:auto}
+    .sn-item{width:min(168px,66vw) !important;padding:6px 8px !important;font-size:10.5px !important}
+    .sn-fab{width:34px !important;height:34px !important}
+    .sn-fab svg{width:13px;height:13px}
+  }
 </style>
 </head>
 <body>
@@ -635,6 +656,11 @@
       <div class="toc-card-icon">🚀</div>
       <div class="toc-card-title">Getting Started</div>
       <div class="toc-card-desc">Setup, login & first audit run</div>
+    </a>
+    <a href="#org-onboarding" class="toc-card">
+      <div class="toc-card-icon">🧭</div>
+      <div class="toc-card-title">New Org Rollout</div>
+      <div class="toc-card-desc">Latest features + end-to-end operating flow</div>
     </a>
     <a href="#agents" class="toc-card">
       <div class="toc-card-icon">🤖</div>
@@ -698,6 +724,7 @@
       <div class="nav-group-title">Introduction</div>
       <a href="#overview" class="sidebar-link active">🏠 Suite Overview</a>
       <a href="#getting-started" class="sidebar-link">🚀 Getting Started</a>
+      <a href="#org-onboarding" class="sidebar-link">🧭 New Org Rollout</a>
       <div class="nav-group-title">Core Features</div>
       <a href="#agents" class="sidebar-link">🤖 The 10 AI Agents</a>
       <a href="#itgc" class="sidebar-link">🔒 ITGC Testing</a>
@@ -1053,6 +1080,204 @@
         <div class="alert-content">
           <strong>You're Ready!</strong>
           Once you've completed setup, the dashboard is your control center. The green dots in the Agent Status panel confirm your agents are online and ready to receive tasks.
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================
+         SECTION 2B: NEW ORG ROLLOUT
+         ============================ -->
+    <section class="help-section" id="org-onboarding">
+      <div class="section-header">
+        <div class="section-icon">🧭</div>
+        <div>
+          <h2>New Organization Rollout</h2>
+          <p class="section-subtitle">LATEST FEATURES · DAY 0 TO GO-LIVE FLOW</p>
+        </div>
+      </div>
+
+      <div class="prose">
+        <p>This section is designed for first-time organizations adopting the suite. It explains what is new in v4.0 ENTERPRISE and the recommended operating flow from initial setup through audit sign-off.</p>
+      </div>
+
+      <h3 class="sub-heading">What's New in the Latest Build</h3>
+      <table class="data-table">
+        <thead>
+          <tr><th>Feature</th><th>What It Adds</th><th>Where To Use It</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Compact App Switcher</strong></td>
+            <td>Smaller floating navigation with responsive sizing to reduce overlap on smaller windows and dense dashboards.</td>
+            <td>Available on all suite pages via the lower-right switcher button.</td>
+          </tr>
+          <tr>
+            <td><strong>Tap/Click App Switcher Toggle</strong></td>
+            <td>Switcher now supports click/tap and keyboard toggle in addition to hover, improving usability on touch devices.</td>
+            <td>Use the switcher button on mobile/tablet or when hover behavior is unavailable.</td>
+          </tr>
+          <tr>
+            <td><strong>UAT Console Guardrails</strong></td>
+            <td>Prominent Admin/Developer-only warning to prevent unauthorized operational usage.</td>
+            <td><code>uat.html</code> for controlled testing and release validation.</td>
+          </tr>
+          <tr>
+            <td><strong>Evidence Vault Demo Continuity</strong></td>
+            <td>Deterministic fallback rows ensure vault UI always renders meaningful records in static/demo mode.</td>
+            <td><code>vault.html</code> for evidence traceability walkthroughs and demos.</td>
+          </tr>
+          <tr>
+            <td><strong>ITGC/ITAC Stable Rendering</strong></td>
+            <td>Table rendering now initializes reliably on load with consistent control IDs and filters.</td>
+            <td><code>itgc-controls.html</code> and <code>itac-testing.html</code>.</td>
+          </tr>
+          <tr>
+            <td><strong>Governance Demo Fallbacks</strong></td>
+            <td>KPI and risk widgets populate with fallback values when backend feeds are unavailable.</td>
+            <td><code>governance.html</code> for executive readiness and risk snapshots.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 class="sub-heading">Page-by-Page Functional Flow</h3>
+      <table class="data-table">
+        <thead>
+          <tr><th>Page</th><th>Primary Use</th><th>What New Teams Should Do First</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>index.html</code></td>
+            <td>Suite entry point and orientation</td>
+            <td>Review advisory framing, then move to the Master Audit Suite using the App Switcher.</td>
+          </tr>
+          <tr>
+            <td><code>app.html</code></td>
+            <td>Main audit workspace and orchestration entry</td>
+            <td>Set your initial scope (process, period, domain) and run first pilot tasks.</td>
+          </tr>
+          <tr>
+            <td><code>itgc-controls.html</code> / <code>itac-testing.html</code></td>
+            <td>Control-level testing execution</td>
+            <td>Validate control population, filter by domain, and confirm evidence/test alignment.</td>
+          </tr>
+          <tr>
+            <td><code>vault.html</code></td>
+            <td>Evidence traceability and integrity view</td>
+            <td>Verify each high-risk finding has evidence lineage and review status progression.</td>
+          </tr>
+          <tr>
+            <td><code>governance.html</code></td>
+            <td>Executive KPIs, risks, and oversight</td>
+            <td>Use weekly governance reviews to prioritize remediation and ownership.</td>
+          </tr>
+          <tr>
+            <td><code>reports.html</code></td>
+            <td>Management and audit reporting outputs</td>
+            <td>Generate stakeholder packs and confirm message consistency with governance priorities.</td>
+          </tr>
+          <tr>
+            <td><code>settings.html</code></td>
+            <td>Configuration and data source administration</td>
+            <td>Finalize source access, refresh cadence, and environment-level controls.</td>
+          </tr>
+          <tr>
+            <td><code>uat.html</code></td>
+            <td>Controlled UAT and release validation</td>
+            <td>Run pre-release checks with admin/dev users before broad rollout.</td>
+          </tr>
+          <tr>
+            <td><code>help.html</code></td>
+            <td>Operating model, standards, troubleshooting</td>
+            <td>Use this page as the onboarding source of truth for all new users.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 class="sub-heading">Role-Based First-Week Checklist</h3>
+      <table class="data-table">
+        <thead>
+          <tr><th>Role</th><th>Week 1 Priorities</th><th>Success Criteria</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Platform Admin</strong></td>
+            <td>Configure users/roles, validate data connectors, finalize environment settings.</td>
+            <td>All core users onboarded and source connections tested successfully.</td>
+          </tr>
+          <tr>
+            <td><strong>Audit Manager</strong></td>
+            <td>Define pilot scope, assign reviewers, set risk thresholds and escalation paths.</td>
+            <td>Pilot control set approved with clear review cadence and owners.</td>
+          </tr>
+          <tr>
+            <td><strong>Auditor</strong></td>
+            <td>Execute ITGC/ITAC tests, validate evidence, triage findings for remediation.</td>
+            <td>Initial test cycle completed with documented rationale and next actions.</td>
+          </tr>
+          <tr>
+            <td><strong>Risk/Compliance Lead</strong></td>
+            <td>Review governance risk posture, challenge ratings, and confirm remediation SLAs.</td>
+            <td>Top-risk backlog prioritized with accountable owners and timelines.</td>
+          </tr>
+          <tr>
+            <td><strong>Executive Stakeholder</strong></td>
+            <td>Review dashboard narrative, sign off operating rhythm, approve reporting format.</td>
+            <td>Agreement on monthly/quarterly reporting pack and decision checkpoints.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 class="sub-heading">Recommended End-to-End Flow for a New Organization</h3>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">Foundation and Access Setup</div>
+            <div class="step-desc">Confirm deployment environment, create role-based users (Admin, Manager, Auditor), and validate local authentication or your planned identity integration.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">Data Source Onboarding</div>
+            <div class="step-desc">Connect read-only ERP/Directory/Cloud sources, run test connections, and define scoped datasets for initial pilot periods.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">Control Library Baseline</div>
+            <div class="step-desc">Review ITGC and ITAC control sets, map domains, and align test procedures to your internal policy and SOX control inventory.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <div class="step-title">Pilot Execution (2-4 Weeks)</div>
+            <div class="step-desc">Run a pilot in one business unit, review exceptions in governance and reports, and calibrate thresholds, sampling, and remediation routing.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-body">
+            <div class="step-title">Operational Rollout</div>
+            <div class="step-desc">Expand to additional entities/processes, enable recurring run cadence, and use the vault to preserve evidence lineage for audit review.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">6</div>
+          <div class="step-body">
+            <div class="step-title">Executive and External Reporting</div>
+            <div class="step-desc">Publish management-ready reports, issue trackers, and SOX-ready documentation packs for internal stakeholders and external auditors.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert info">
+        <span class="alert-icon">📌</span>
+        <div class="alert-content">
+          <strong>Suggested Operating Rhythm</strong>
+          Weekly: run high-risk controls and review exceptions. Monthly: governance/risk review and remediation follow-up. Quarterly: full reporting pack with SOX mapping and evidence completeness checks.
         </div>
       </div>
     </section>
@@ -2233,6 +2458,68 @@
   </div>
 </div>
 <!-- END GLOBAL SUITE NAVIGATOR -->
+<script>
+(function(){
+  var widgets = document.querySelectorAll(".suite-nav-widget");
+  if (!widgets.length) return;
+
+  widgets.forEach(function(widget){
+    var fab = widget.querySelector(".sn-fab");
+    var menu = widget.querySelector(".sn-menu");
+    if (!fab || !menu) return;
+
+    if (!menu.id) menu.id = "suite-nav-menu-" + Math.random().toString(36).slice(2, 8);
+
+    fab.classList.add("suite-nav-toggle");
+    fab.setAttribute("role", "button");
+    fab.setAttribute("tabindex", "0");
+    fab.setAttribute("aria-controls", menu.id);
+    fab.setAttribute("aria-expanded", "false");
+    fab.setAttribute("aria-label", "Toggle app switcher");
+
+    var closeMenu = function(){
+      widget.classList.remove("open");
+      fab.setAttribute("aria-expanded", "false");
+    };
+
+    var openMenu = function(){
+      widget.classList.add("open");
+      fab.setAttribute("aria-expanded", "true");
+    };
+
+    fab.addEventListener("click", function(event){
+      event.preventDefault();
+      event.stopPropagation();
+      if (widget.classList.contains("open")) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
+    });
+
+    fab.addEventListener("keydown", function(event){
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        fab.click();
+      }
+      if (event.key === "Escape") closeMenu();
+    });
+
+    menu.addEventListener("click", function(event){
+      var item = event.target.closest("a.sn-item");
+      if (item) closeMenu();
+    });
+
+    document.addEventListener("click", function(event){
+      if (!widget.contains(event.target)) closeMenu();
+    });
+
+    document.addEventListener("keydown", function(event){
+      if (event.key === "Escape") closeMenu();
+    });
+  });
+})();
+</script>
 </body>
 
 </html>

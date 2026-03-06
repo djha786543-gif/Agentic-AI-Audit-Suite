@@ -40,7 +40,28 @@
     .suite-nav-widget:hover .sn-menu{transform:scale(1) translateY(0);opacity:1;pointer-events:auto}
     .sn-item{display:flex;align-items:center;gap:12px;padding:10px 16px;color:#edf0f7!important;text-decoration:none!important;font-size:14px;font-weight:600;border-radius:8px;width:260px}.sn-item:hover{background:rgba(40,120,255,.15)!important;color:#2878ff!important}
     .sn-icon{font-size:16px;width:20px;text-align:center}.sn-fab{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#1254CC,#2878FF);display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.2)}
-  </style>
+  
+  /* v4.1 compact app switcher: reduces overlap on smaller windows */
+  .suite-nav-widget{bottom:12px !important;right:12px !important;z-index:1200 !important}
+  .sn-menu{padding:6px !important;gap:2px !important;margin-bottom:8px !important;max-height:min(52vh,360px);overflow-y:auto;overflow-x:hidden;transform:scale(.95) translateY(8px) !important;transform-origin:100% 100%}
+  .suite-nav-widget:hover .sn-menu,.suite-nav-widget:focus-within .sn-menu,.suite-nav-widget.open .sn-menu{transform:scale(1) translateY(0) !important}
+  .sn-item{width:min(205px,68vw) !important;padding:6px 9px !important;font-size:11px !important;border-radius:7px !important;gap:7px !important;line-height:1.2}
+  .sn-icon{width:14px !important;font-size:13px !important}
+  .sn-fab{width:38px !important;height:38px !important;box-shadow:0 2px 10px rgba(40,120,255,.22) !important}
+  .sn-fab svg{width:15px;height:15px}
+  .sn-menu::-webkit-scrollbar{width:6px}
+  .sn-menu::-webkit-scrollbar-thumb{background:rgba(138,149,170,.45);border-radius:999px}
+   (hover: none), (pointer: coarse){
+    .suite-nav-widget:hover .sn-menu{transform:scale(.95) translateY(8px) !important;opacity:0;pointer-events:none}
+  }
+  @media (max-width: 768px){
+    .suite-nav-widget{bottom:8px !important;right:8px !important}
+    .sn-menu{max-height:40vh;width:auto}
+    .sn-item{width:min(168px,66vw) !important;padding:6px 8px !important;font-size:10.5px !important}
+    .sn-fab{width:34px !important;height:34px !important}
+    .sn-fab svg{width:13px;height:13px}
+  }
+</style>
 </head>
 <body>
   <div class="advisory-banner">
@@ -173,5 +194,67 @@
       if (riskFilter) riskFilter.addEventListener('change', applyFilters);
     });
   </script>
+<script>
+(function(){
+  var widgets = document.querySelectorAll(".suite-nav-widget");
+  if (!widgets.length) return;
+
+  widgets.forEach(function(widget){
+    var fab = widget.querySelector(".sn-fab");
+    var menu = widget.querySelector(".sn-menu");
+    if (!fab || !menu) return;
+
+    if (!menu.id) menu.id = "suite-nav-menu-" + Math.random().toString(36).slice(2, 8);
+
+    fab.classList.add("suite-nav-toggle");
+    fab.setAttribute("role", "button");
+    fab.setAttribute("tabindex", "0");
+    fab.setAttribute("aria-controls", menu.id);
+    fab.setAttribute("aria-expanded", "false");
+    fab.setAttribute("aria-label", "Toggle app switcher");
+
+    var closeMenu = function(){
+      widget.classList.remove("open");
+      fab.setAttribute("aria-expanded", "false");
+    };
+
+    var openMenu = function(){
+      widget.classList.add("open");
+      fab.setAttribute("aria-expanded", "true");
+    };
+
+    fab.addEventListener("click", function(event){
+      event.preventDefault();
+      event.stopPropagation();
+      if (widget.classList.contains("open")) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
+    });
+
+    fab.addEventListener("keydown", function(event){
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        fab.click();
+      }
+      if (event.key === "Escape") closeMenu();
+    });
+
+    menu.addEventListener("click", function(event){
+      var item = event.target.closest("a.sn-item");
+      if (item) closeMenu();
+    });
+
+    document.addEventListener("click", function(event){
+      if (!widget.contains(event.target)) closeMenu();
+    });
+
+    document.addEventListener("keydown", function(event){
+      if (event.key === "Escape") closeMenu();
+    });
+  });
+})();
+</script>
 </body>
 </html>
