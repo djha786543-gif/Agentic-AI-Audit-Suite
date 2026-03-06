@@ -1,2 +1,219 @@
-﻿<!doctype html><html><head><meta charset="utf-8"><title>Reports</title></head><body>
-<h1>Reports</h1><p><a href="app.html">Back</a></p></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audit Reports & Workpapers - AuditAI Suite v4.0</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --ink:#070A10;--ink2:#0B0F1A;--ink3:#101828;--ink4:#161F32;
+      --b1:rgba(255,255,255,0.06);--b2:rgba(255,255,255,0.10);
+      --tx1:#EDF0F7;--tx2:#8895AD;--tx3:#505D75;
+      --blue:#2878FF;--blue2:#1254CC;--bdim:rgba(40,120,255,0.12);--bbord:rgba(40,120,255,0.28);
+      --gold:#C89B28;--green:#18B86A;--orange:#F07020;--red:#E03E43;
+      --fd:'Sora',sans-serif;--fb:'Outfit',system-ui,sans-serif;--fm:'JetBrains Mono',monospace;
+    }
+    body{background:var(--ink);color:var(--tx1);font-family:var(--fb);line-height:1.6;min-height:100vh}
+    .advisory-banner{position:sticky;top:0;z-index:2500;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 20px;background:#1a0a00;border-bottom:1px solid #f59e0b;color:#fcd34d;font-size:12px}
+    .advisory-right{margin-left:auto;white-space:nowrap;font-family:var(--fm)}
+    .nav{position:sticky;top:33px;z-index:900;height:62px;background:rgba(7,10,16,.88);backdrop-filter:blur(18px);border-bottom:1px solid var(--b1);display:flex;align-items:center;padding:0 24px}
+    .nav-inner{max-width:1180px;width:100%;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
+    .nav-brand{display:flex;align-items:center;gap:10px}
+    .nav-logomark{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--blue),var(--blue2));display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:11px;font-weight:600}
+    .nav-name{font-family:var(--fd);font-weight:700;font-size:15px}
+    .nav-pill{font-family:var(--fm);font-size:9px;color:var(--blue);background:var(--bdim);border:1px solid var(--bbord);padding:2px 8px;border-radius:20px;text-transform:uppercase}
+    .nav-links{display:flex;gap:18px;list-style:none}
+    .nav-links a{font-size:13px;color:var(--tx2);text-decoration:none}
+    .nav-links a:hover,.nav-links a.on{color:var(--tx1)}
+    .wrap{max-width:1180px;margin:0 auto;padding:34px 24px 80px}
+    h1{font-family:var(--fd);font-size:2rem;line-height:1.2}
+    .sub{color:var(--tx2);margin-top:6px}
+    .top-actions{margin-top:18px}
+    .btn{border:none;border-radius:10px;padding:10px 16px;font-weight:600;font-family:var(--fb);cursor:pointer}
+    .btn-primary{background:var(--blue);color:#fff}
+    .btn-primary:hover{background:var(--blue2)}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:26px}
+    .card{background:var(--ink3);border:1px solid var(--b1);border-radius:14px;padding:18px}
+    .card h3{font-family:var(--fd);font-size:1rem;margin-bottom:10px}
+    .meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+    .meta div{background:var(--ink4);border:1px solid var(--b1);border-radius:8px;padding:8px}
+    .meta-k{font-family:var(--fm);font-size:10px;color:var(--tx3);text-transform:uppercase}
+    .meta-v{font-size:13px;color:var(--tx1);font-weight:600}
+    .status-ready{color:var(--green)} .status-archived{color:var(--gold)}
+    .op-adverse{color:var(--red)} .op-qualified{color:var(--orange)} .op-clean{color:var(--green)}
+    .card-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .btn-sub{background:transparent;border:1px solid var(--b2);color:var(--tx2);padding:8px 12px;border-radius:8px;font-size:12px}
+    .btn-sub:hover{border-color:var(--blue);color:var(--blue)}
+    .footer{border-top:1px solid var(--b1);padding:18px 24px;color:var(--tx2);font-size:12px;text-align:center}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(3,6,12,.75);display:none;align-items:center;justify-content:center;z-index:3000}
+    .modal-backdrop.show{display:flex}
+    .modal{width:min(560px,92vw);background:var(--ink3);border:1px solid var(--b2);border-radius:14px;padding:18px}
+    .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+    .modal h2{font-family:var(--fd);font-size:1.1rem}
+    .close{background:transparent;border:none;color:var(--tx2);font-size:18px;cursor:pointer}
+    .fields{display:grid;gap:10px}
+    label{font-size:12px;color:var(--tx2)}
+    input,select{width:100%;padding:10px 12px;background:var(--ink2);border:1px solid var(--b2);border-radius:8px;color:var(--tx1);font-family:var(--fb)}
+    .suite-nav-widget{position:fixed;bottom:30px;right:30px;z-index:999999;display:flex;flex-direction:column;align-items:flex-end;font-family:var(--fb)}
+    .sn-menu{background:rgba(10,15,25,.95);backdrop-filter:blur(16px);border:1px solid rgba(40,120,255,.3);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:4px;margin-bottom:16px;transform:scale(.9) translateY(20px);opacity:0;pointer-events:none;transition:all .3s cubic-bezier(.175,.885,.32,1.275);box-shadow:0 10px 40px rgba(0,0,0,.5),0 0 20px rgba(40,120,255,.15)}
+    .suite-nav-widget:hover .sn-menu{transform:scale(1) translateY(0);opacity:1;pointer-events:auto}
+    .sn-item{display:flex;align-items:center;gap:12px;padding:10px 16px;color:#edf0f7!important;text-decoration:none!important;font-size:14px;font-weight:600;border-radius:8px;transition:background .2s,color .2s;width:260px}
+    .sn-item:hover{background:rgba(40,120,255,.15)!important;color:#2878ff!important}
+    .sn-icon{font-size:16px;width:20px;text-align:center}
+    .sn-fab{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#1254CC,#2878FF);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 20px rgba(40,120,255,.4);border:1px solid rgba(255,255,255,.2)}
+  </style>
+</head>
+<body>
+  <div class="advisory-banner">
+    <span>⚠️ ADVISORY: AuditAI Suite findings are advisory only. No output constitutes an audit opinion, conclusion, or attestation under PCAOB AS 2201 or ISA 315. All findings require professional review by a qualified auditor before use in any compliance or financial reporting context.</span>
+    <span class="advisory-right">AuditAI Suite v4.0</span>
+  </div>
+
+  <header class="nav">
+    <div class="nav-inner">
+      <div class="nav-brand">
+        <div class="nav-logomark">AI</div>
+        <div class="nav-name">AuditAI Suite</div>
+        <div class="nav-pill">v4.0 Enterprise</div>
+      </div>
+      <ul class="nav-links">
+        <li><a href="index.html">Landing</a></li>
+        <li><a href="app.html">Master Audit Suite</a></li>
+        <li><a href="vault.html">Evidence Vault</a></li>
+        <li><a href="governance.html">Governance</a></li>
+        <li><a href="reports.html" class="on">Reports</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <h1>Audit Reports & Workpapers</h1>
+    <p class="sub">Pre-built report packs and generated workpapers for enterprise audit committees.</p>
+    <div class="top-actions">
+      <button class="btn btn-primary" id="openGenerator">Generate New Report</button>
+    </div>
+
+    <section class="grid" aria-label="Report library">
+      <article class="card">
+        <h3>Q1 FY2026 SOX 404 — ITGC Testing</h3>
+        <div class="meta">
+          <div><div class="meta-k">Status</div><div class="meta-v status-ready">Ready</div></div>
+          <div><div class="meta-k">Date</div><div class="meta-v">2026-03-10</div></div>
+          <div><div class="meta-k">Findings</div><div class="meta-v">23</div></div>
+          <div><div class="meta-k">Opinion</div><div class="meta-v op-adverse">Adverse</div></div>
+        </div>
+        <div class="card-actions">
+          <button class="btn-sub">View Summary</button>
+          <button class="btn-sub">Download PDF</button>
+          <button class="btn-sub">Download DOCX</button>
+        </div>
+      </article>
+
+      <article class="card">
+        <h3>Q4 FY2025 SOX 404 — Full Scope</h3>
+        <div class="meta">
+          <div><div class="meta-k">Status</div><div class="meta-v status-archived">Archived</div></div>
+          <div><div class="meta-k">Date</div><div class="meta-v">2025-12-31</div></div>
+          <div><div class="meta-k">Findings</div><div class="meta-v">14</div></div>
+          <div><div class="meta-k">Opinion</div><div class="meta-v op-qualified">Qualified</div></div>
+        </div>
+        <div class="card-actions">
+          <button class="btn-sub">View Summary</button>
+          <button class="btn-sub">Download PDF</button>
+          <button class="btn-sub">Download DOCX</button>
+        </div>
+      </article>
+
+      <article class="card">
+        <h3>Q3 FY2025 — Change Management Only</h3>
+        <div class="meta">
+          <div><div class="meta-k">Status</div><div class="meta-v status-archived">Archived</div></div>
+          <div><div class="meta-k">Date</div><div class="meta-v">2025-09-30</div></div>
+          <div><div class="meta-k">Findings</div><div class="meta-v">6</div></div>
+          <div><div class="meta-k">Opinion</div><div class="meta-v op-clean">Clean</div></div>
+        </div>
+        <div class="card-actions">
+          <button class="btn-sub">View Summary</button>
+          <button class="btn-sub">Download PDF</button>
+          <button class="btn-sub">Download DOCX</button>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <footer class="footer">
+    Advisory only. Outputs support audit workflows but do not replace professional judgment, attestation, or formal audit opinion.
+  </footer>
+
+  <div class="modal-backdrop" id="reportModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-head">
+        <h2 id="modalTitle">Generate New Report</h2>
+        <button class="close" id="closeGenerator" aria-label="Close">✕</button>
+      </div>
+      <div class="fields">
+        <div>
+          <label for="reportName">Report Name</label>
+          <input id="reportName" type="text" placeholder="e.g., FY2026 SOX 404 Full Scope">
+        </div>
+        <div>
+          <label for="auditPeriod">Audit Period</label>
+          <input id="auditPeriod" type="text" placeholder="e.g., Q2 FY2026">
+        </div>
+        <div>
+          <label for="reportScope">Scope</label>
+          <select id="reportScope">
+            <option>Full SOX</option>
+            <option>ITGC Only</option>
+            <option>ITAC Only</option>
+            <option>Custom</option>
+          </select>
+        </div>
+        <div>
+          <button class="btn btn-primary" id="generateNow">Generate</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="suite-nav-widget">
+    <div class="sn-menu">
+      <div style="font-size:10px;color:#8895ad;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;padding-left:16px;font-weight:700;">App Switcher</div>
+      <a href="index.html" class="sn-item"><span class="sn-icon">🏠</span> Landing Page</a>
+      <a href="app.html" class="sn-item"><span class="sn-icon">📊</span> Master Audit Suite</a>
+      <a href="vault.html" class="sn-item"><span class="sn-icon">🔐</span> Evidence Vault</a>
+      <a href="governance.html" class="sn-item"><span class="sn-icon">🏛️</span> Governance</a>
+      <a href="reports.html" class="sn-item"><span class="sn-icon">📄</span> Reports</a>
+      <a href="itgc-controls.html" class="sn-item"><span class="sn-icon">🔒</span> ITGC Controls</a>
+      <a href="itac-testing.html" class="sn-item"><span class="sn-icon">⚙️</span> ITAC Testing</a>
+      <a href="settings.html" class="sn-item"><span class="sn-icon">⚙️</span> Settings</a>
+      <a href="help.html" class="sn-item"><span class="sn-icon">📖</span> Help & Docs</a>
+    </div>
+    <div class="sn-fab">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"></circle>
+        <circle cx="19" cy="12" r="3"></circle>
+        <circle cx="5" cy="12" r="3"></circle>
+      </svg>
+    </div>
+  </div>
+
+  <script>
+    const modal = document.getElementById('reportModal');
+    document.getElementById('openGenerator').addEventListener('click', () => modal.classList.add('show'));
+    document.getElementById('closeGenerator').addEventListener('click', () => modal.classList.remove('show'));
+    modal.addEventListener('click', (event) => {
+      if (event.target === modal) modal.classList.remove('show');
+    });
+    document.getElementById('generateNow').addEventListener('click', () => {
+      const name = document.getElementById('reportName').value.trim() || 'New Report';
+      alert('Generation queued: ' + name);
+      modal.classList.remove('show');
+    });
+  </script>
+</body>
+</html>

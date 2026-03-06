@@ -1,2 +1,173 @@
-﻿<!doctype html><html><head><meta charset="utf-8"><title>Settings</title></head><body>
-<h1>Settings</h1><p><a href="app.html">Back</a></p></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings - AuditAI Suite v4.0</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--ink:#070A10;--ink2:#0B0F1A;--ink3:#101828;--ink4:#161F32;--b1:rgba(255,255,255,.06);--b2:rgba(255,255,255,.1);--tx1:#EDF0F7;--tx2:#8895AD;--tx3:#505D75;--blue:#2878FF;--blue2:#1254CC;--green:#18B86A;--orange:#F07020;--fd:'Sora',sans-serif;--fb:'Outfit',system-ui,sans-serif;--fm:'JetBrains Mono',monospace}
+    body{background:var(--ink);color:var(--tx1);font-family:var(--fb);min-height:100vh}
+    .advisory-banner{position:sticky;top:0;z-index:2500;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 20px;background:#1a0a00;border-bottom:1px solid #f59e0b;color:#fcd34d;font-size:12px}
+    .advisory-right{margin-left:auto;white-space:nowrap;font-family:var(--fm)}
+    .nav{position:sticky;top:33px;z-index:900;height:62px;background:rgba(7,10,16,.88);backdrop-filter:blur(18px);border-bottom:1px solid var(--b1);display:flex;align-items:center;padding:0 24px}
+    .nav-inner{max-width:1200px;width:100%;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
+    .brand{display:flex;gap:10px;align-items:center}.mark{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--blue),var(--blue2));display:grid;place-items:center;font-family:var(--fm);font-size:11px}.name{font-family:var(--fd);font-size:15px;font-weight:700}
+    .links{display:flex;gap:18px;list-style:none}.links a{font-size:13px;color:var(--tx2);text-decoration:none}.links a:hover,.links a.on{color:var(--tx1)}
+    .wrap{max-width:1200px;margin:0 auto;padding:28px 24px 80px}
+    h1{font-family:var(--fd);font-size:2rem}.sub{margin-top:6px;color:var(--tx2)}
+    .layout{display:grid;grid-template-columns:220px 1fr;gap:18px;margin-top:20px}
+    @media(max-width:900px){.layout{grid-template-columns:1fr}}
+    .side{background:var(--ink3);border:1px solid var(--b1);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:6px}
+    .tab{background:transparent;border:1px solid transparent;color:var(--tx2);padding:10px 12px;border-radius:8px;text-align:left;cursor:pointer;font-weight:600}
+    .tab.on{background:rgba(40,120,255,.12);border-color:rgba(40,120,255,.28);color:#cfe1ff}
+    .panel{background:var(--ink3);border:1px solid var(--b1);border-radius:12px;padding:16px;display:none}
+    .panel.on{display:block}
+    .fields{display:grid;gap:10px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media(max-width:700px){.row{grid-template-columns:1fr}}
+    label{font-size:12px;color:var(--tx2)}
+    input,select{width:100%;padding:10px 12px;background:var(--ink2);border:1px solid var(--b2);border-radius:8px;color:var(--tx1)}
+    .readonly{opacity:.8}
+    .btn{border:none;border-radius:10px;padding:10px 14px;font-weight:600;cursor:pointer}
+    .btn-primary{background:var(--blue);color:#fff}.btn-primary:hover{background:var(--blue2)}
+    .btn-secondary{background:transparent;border:1px solid var(--b2);color:var(--tx2)}
+    .status{display:inline-flex;align-items:center;gap:8px;font-size:12px;margin-top:6px}
+    .dot{width:8px;height:8px;border-radius:50%;background:var(--orange)}
+    .table-wrap{overflow:auto;border:1px solid var(--b1);border-radius:10px}
+    table{width:100%;border-collapse:collapse;min-width:580px} th,td{padding:10px;border-bottom:1px solid var(--b1);text-align:left;font-size:13px} th{font-family:var(--fm);font-size:10px;text-transform:uppercase;color:var(--tx3)}
+    .not-connected{color:var(--orange);font-weight:700}
+    .toggle{display:flex;align-items:center;justify-content:space-between;background:var(--ink2);border:1px solid var(--b1);border-radius:8px;padding:10px 12px}
+    .toggle input{width:auto}
+    .security-list{display:grid;gap:8px}
+    .security-item{background:var(--ink2);border:1px solid var(--b1);border-radius:8px;padding:10px 12px}
+    .suite-nav-widget{position:fixed;bottom:30px;right:30px;z-index:999999;display:flex;flex-direction:column;align-items:flex-end;font-family:var(--fb)}
+    .sn-menu{background:rgba(10,15,25,.95);backdrop-filter:blur(16px);border:1px solid rgba(40,120,255,.3);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:4px;margin-bottom:16px;transform:scale(.9) translateY(20px);opacity:0;pointer-events:none;transition:all .3s cubic-bezier(.175,.885,.32,1.275)}
+    .suite-nav-widget:hover .sn-menu{transform:scale(1) translateY(0);opacity:1;pointer-events:auto}
+    .sn-item{display:flex;align-items:center;gap:12px;padding:10px 16px;color:#edf0f7!important;text-decoration:none!important;font-size:14px;font-weight:600;border-radius:8px;width:260px}.sn-item:hover{background:rgba(40,120,255,.15)!important;color:#2878ff!important}
+    .sn-icon{font-size:16px;width:20px;text-align:center}.sn-fab{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#1254CC,#2878FF);display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.2)}
+  </style>
+</head>
+<body>
+  <div class="advisory-banner">
+    <span>⚠️ ADVISORY: AuditAI Suite findings are advisory only. No output constitutes an audit opinion, conclusion, or attestation under PCAOB AS 2201 or ISA 315. All findings require professional review by a qualified auditor before use in any compliance or financial reporting context.</span>
+    <span class="advisory-right">AuditAI Suite v4.0</span>
+  </div>
+
+  <header class="nav"><div class="nav-inner"><div class="brand"><div class="mark">AI</div><div class="name">AuditAI Suite</div></div><ul class="links"><li><a href="index.html">Landing</a></li><li><a href="app.html">Master Audit Suite</a></li><li><a href="settings.html" class="on">Settings</a></li></ul></div></header>
+
+  <main class="wrap">
+    <h1>Settings</h1>
+    <p class="sub">Configuration for organization profile, data connectors, notifications, and security.</p>
+
+    <div class="layout">
+      <aside class="side">
+        <button class="tab on" data-target="general">General</button>
+        <button class="tab" data-target="data">Data Sources</button>
+        <button class="tab" data-target="api">API Keys</button>
+        <button class="tab" data-target="notifications">Notifications</button>
+        <button class="tab" data-target="security">Security</button>
+      </aside>
+
+      <section>
+        <div class="panel on" id="general">
+          <div class="fields">
+            <div class="row">
+              <div><label>Organization Name</label><input type="text" value="NorthStar Financial Group"></div>
+              <div><label>Audit Lead Name</label><input type="text" value="Jordan Lee"></div>
+            </div>
+            <div class="row">
+              <div><label>Default Audit Period</label><input type="text" value="Q1 FY2026"></div>
+              <div><label>Fiscal Year End Month</label><input type="text" value="December"></div>
+            </div>
+            <div><label>Preferred Export Format</label><select><option>PDF</option><option>DOCX</option><option>CSV</option></select></div>
+            <div><button class="btn btn-primary">Save Settings</button></div>
+          </div>
+        </div>
+
+        <div class="panel" id="api">
+          <div class="fields">
+            <div><label>Claude API Key</label><input type="password" placeholder="sk-ant-..."></div>
+            <div><button class="btn btn-secondary" id="testConnection">Test Connection</button></div>
+            <div class="status"><span class="dot" id="apiDot"></span><span id="apiStatus">Not tested</span></div>
+            <div><label>Model</label><input class="readonly" type="text" value="Model: claude-sonnet-4-6" readonly></div>
+            <p style="font-size:12px;color:var(--tx2)">Your key is stored in browser memory only and never transmitted externally.</p>
+            <div><button class="btn btn-primary">Save Settings</button></div>
+          </div>
+        </div>
+
+        <div class="panel" id="data">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Connector</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody>
+                <tr><td>SAP</td><td class="not-connected">Not Connected</td><td><button class="btn btn-secondary">Configure</button></td></tr>
+                <tr><td>ServiceNow</td><td class="not-connected">Not Connected</td><td><button class="btn btn-secondary">Configure</button></td></tr>
+                <tr><td>Azure Blob</td><td class="not-connected">Not Connected</td><td><button class="btn btn-secondary">Configure</button></td></tr>
+                <tr><td>AWS S3</td><td class="not-connected">Not Connected</td><td><button class="btn btn-secondary">Configure</button></td></tr>
+                <tr><td>SFTP</td><td class="not-connected">Not Connected</td><td><button class="btn btn-secondary">Configure</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="margin-top:12px"><button class="btn btn-primary">Save Settings</button></div>
+        </div>
+
+        <div class="panel" id="notifications">
+          <div class="fields">
+            <label class="toggle"><span>Email on Critical Finding</span><input type="checkbox" checked></label>
+            <label class="toggle"><span>Email on Audit Complete</span><input type="checkbox" checked></label>
+            <label class="toggle"><span>SLA Breach Alerts</span><input type="checkbox" checked></label>
+            <div><button class="btn btn-primary">Save Settings</button></div>
+          </div>
+        </div>
+
+        <div class="panel" id="security">
+          <div class="security-list">
+            <div class="security-item"><strong>Session Timeout:</strong> 30 minutes</div>
+            <div class="security-item"><strong>Data Retention:</strong> 7 years</div>
+            <div class="security-item"><strong>Encryption:</strong> AES-256 at rest, TLS 1.3 in transit</div>
+          </div>
+          <div style="margin-top:12px"><button class="btn btn-primary">Save Settings</button></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div class="suite-nav-widget">
+    <div class="sn-menu">
+      <div style="font-size:10px;color:#8895ad;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;padding-left:16px;font-weight:700;">App Switcher</div>
+      <a href="index.html" class="sn-item"><span class="sn-icon">🏠</span> Landing Page</a>
+      <a href="app.html" class="sn-item"><span class="sn-icon">📊</span> Master Audit Suite</a>
+      <a href="vault.html" class="sn-item"><span class="sn-icon">🔐</span> Evidence Vault</a>
+      <a href="governance.html" class="sn-item"><span class="sn-icon">🏛️</span> Governance</a>
+      <a href="reports.html" class="sn-item"><span class="sn-icon">📄</span> Reports</a>
+      <a href="itgc-controls.html" class="sn-item"><span class="sn-icon">🔒</span> ITGC Controls</a>
+      <a href="itac-testing.html" class="sn-item"><span class="sn-icon">⚙️</span> ITAC Testing</a>
+      <a href="settings.html" class="sn-item"><span class="sn-icon">⚙️</span> Settings</a>
+      <a href="help.html" class="sn-item"><span class="sn-icon">📖</span> Help & Docs</a>
+    </div>
+    <div class="sn-fab"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><circle cx="19" cy="12" r="3"></circle><circle cx="5" cy="12" r="3"></circle></svg></div>
+  </div>
+
+  <script>
+    const tabs = document.querySelectorAll('.tab');
+    const panels = document.querySelectorAll('.panel');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('on'));
+        panels.forEach(p => p.classList.remove('on'));
+        tab.classList.add('on');
+        document.getElementById(tab.dataset.target).classList.add('on');
+      });
+    });
+
+    document.getElementById('testConnection').addEventListener('click', () => {
+      document.getElementById('apiDot').style.background = 'var(--green)';
+      document.getElementById('apiStatus').textContent = 'Connection successful';
+    });
+  </script>
+</body>
+</html>
