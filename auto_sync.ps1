@@ -22,11 +22,6 @@ function Write-Log {
     Write-Host "[$ts] $Message" -ForegroundColor $Color
 }
 
-function Invoke-Git {
-    param([Parameter(ValueFromRemainingArguments = $true)][string[]]$Args = @())
-    & git @Args
-}
-
 function Get-Count {
     param([string]$Spec)
     $value = (& git rev-list --count $Spec 2>$null)
@@ -49,7 +44,7 @@ if ($AutoPush) {
 
 while ($true) {
     try {
-        Invoke-Git fetch $Remote --prune | Out-Null
+        & git fetch $Remote --prune | Out-Null
 
         $behind = Get-Count "$Branch..$Remote/$Branch"
         $ahead = Get-Count "$Remote/$Branch..$Branch"
@@ -60,7 +55,7 @@ while ($true) {
                 Write-Log "Skip pull: working tree has local changes and branch is behind by $behind commit(s)." "Yellow"
             } else {
                 Write-Log "Pulling $behind commit(s) from $Remote/$Branch..." "Green"
-                Invoke-Git pull --ff-only $Remote $Branch | Out-Null
+                & git pull --ff-only $Remote $Branch | Out-Null
                 Write-Log "Pull complete." "Green"
             }
         }
@@ -69,7 +64,7 @@ while ($true) {
             $dirty = Is-Dirty
             if ($dirty) {
                 $msg = "$CommitPrefix [$syncTag] $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
-                Invoke-Git add -A | Out-Null
+                & git add -A | Out-Null
                 & git commit -m $msg | Out-Null
                 Write-Log "Committed local changes." "Green"
                 $ahead = Get-Count "$Remote/$Branch..$Branch"
@@ -77,7 +72,7 @@ while ($true) {
 
             if ($ahead -gt 0) {
                 Write-Log "Pushing $ahead commit(s) to $Remote/$Branch..." "Green"
-                Invoke-Git push $Remote $Branch | Out-Null
+                & git push $Remote $Branch | Out-Null
                 Write-Log "Push complete." "Green"
             }
         }
