@@ -464,14 +464,31 @@ def _autopilot_loop(max_cycles: int, scale: str, seed: int, base_url: str, poll_
                 break
 
             _AUTOPILOT_STATE["status"] = "generating_patch"
-            patch_obj = _build_retry_hardening_patch()
-            cycle_record["recipe_id"] = patch_obj.get("recipe_id")
+            candidate_recipes: List[str] = ["retry_hardening_uat_agent_v1"]
+            if profile["server_error_count"] > 0:
+                candidate_recipes.append("retry_hardening_uat_agent_v2")
 
-            if patch_obj.get("already_applied"):
-                reason = "recipe_already_applied_but_not_industry_ready"
+            cycle_record["recipe_attempts"] = []
+            patch_obj: Optional[Dict[str, Any]] = None
+            for candidate in candidate_recipes:
+                current_patch = _build_phase2_patch(candidate)
+                cycle_record["recipe_attempts"].append(
+                    {
+                        "recipe_id": candidate,
+                        "already_applied": bool(current_patch.get("already_applied")),
+                    }
+                )
+                if not current_patch.get("already_applied"):
+                    patch_obj = current_patch
+                    break
+
+            if patch_obj is None:
+                reason = "all_supported_recipes_already_applied"
                 cycle_record["status"] = reason
                 history.append(cycle_record)
                 break
+
+            cycle_record["recipe_id"] = patch_obj.get("recipe_id")
 
             stamp = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
             patch_file = f"{patch_obj['recipe_id']}_{stamp}.patch"
@@ -741,6 +758,265 @@ def _build_retry_hardening_patch() -> Dict[str, Any]:
     }
 
 
+def _build_retry_hardening_patch_v2() -> Dict[str, Any]:
+    repo_root = Path(__file__).resolve().parents[3]
+    target = repo_root / "agents" / "uat_enterprise_agent.py"
+    if not target.exists():
+        raise HTTPException(status_code=404, detail="Patch target file not found: agents/uat_enterprise_agent.py")
+
+    original = target.read_text(encoding="utf-8")
+    old_block = """    def _request(
+        self,
+        name: str,
+        method: str,
+        path: str,
+        expected_status: Optional[List[int]] = None,
+        required: bool = False,
+        **kwargs: Any,
+    ) -> Tuple[Optional[requests.Response], Any]:
+        url = f\"{self.base_url}{API_PREFIX}{path}\"
+        started = time.perf_counter()
+        status_code = 0
+        body: Any = None
+        max_retries = 2
+        attempts = max_retries + 1
+        retryable_server_codes = {500, 502, 503, 504}
+
+        for attempt in range(1, attempts + 1):
+            try:
+                response = self.session.request(method, url, timeout=REQUEST_TIMEOUT, **kwargs)
+                status_code = response.status_code
+
+                try:
+                    body = response.json()
+                except Exception:
+                    body = response.text
+
+                success = expected_status is None or status_code in expected_status
+                retryable_status = status_code in retryable_server_codes and attempt < attempts
+
+                if not success and retryable_status:
+                    time.sleep(0.2 * attempt)
+                    continue
+
+                latency_ms = (time.perf_counter() - started) * 1000.0
+                self.latencies_ms.append(latency_ms)
+                details = {\"url\": url, \"attempts\": attempt}
+                self._record_step(
+                    name=name,
+                    method=method,
+                    path=path,
+                    status_code=status_code,
+                    latency_ms=latency_ms,
+                    success=success,
+                    details=details,
+                    error=None if success else f\"Unexpected status: {status_code}\",
+                )
+
+                if required and not success:
+                    raise RuntimeError(f\"{name} failed with status {status_code}: {body}\")
+                return response, body
+
+            except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as exc:
+                if attempt < attempts:
+                    time.sleep(0.2 * attempt)
+                    continue
+
+                latency_ms = (time.perf_counter() - started) * 1000.0
+                self.latencies_ms.append(latency_ms)
+                self._record_step(
+                    name=name,
+                    method=method,
+                    path=path,
+                    status_code=status_code,
+                    latency_ms=latency_ms,
+                    success=False,
+                    error=str(exc),
+                )
+                if required:
+                    raise
+                return None, None
+
+            except Exception as exc:
+                latency_ms = (time.perf_counter() - started) * 1000.0
+                self.latencies_ms.append(latency_ms)
+                self._record_step(
+                    name=name,
+                    method=method,
+                    path=path,
+                    status_code=status_code,
+                    latency_ms=latency_ms,
+                    success=False,
+                    error=str(exc),
+                )
+                if required:
+                    raise
+                return None, None
+
+        return None, None
+"""
+    new_block = """    def _request(
+        self,
+        name: str,
+        method: str,
+        path: str,
+        expected_status: Optional[List[int]] = None,
+        required: bool = False,
+        **kwargs: Any,
+    ) -> Tuple[Optional[requests.Response], Any]:
+        url = f\"{self.base_url}{API_PREFIX}{path}\"
+        started = time.perf_counter()
+        status_code = 0
+        body: Any = None
+        max_retries = 4
+        attempts = max_retries + 1
+        base_backoff_s = 0.35
+        retryable_server_codes = {500, 502, 503, 504}
+        retryable_client_codes = {408, 425, 429}
+
+        for attempt in range(1, attempts + 1):
+            try:
+                timeout_s = REQUEST_TIMEOUT + (attempt - 1) * 5
+                response = self.session.request(method, url, timeout=timeout_s, **kwargs)
+                status_code = response.status_code
+
+                try:
+                    body = response.json()
+                except Exception:
+                    body = response.text
+
+                success = expected_status is None or status_code in expected_status
+                retryable_status = (
+                    status_code in retryable_server_codes or status_code in retryable_client_codes
+                ) and attempt < attempts
+
+                retry_after_s = 0.0
+                retry_after_raw = response.headers.get(\"Retry-After\")
+                if retry_after_raw:
+                    try:
+                        retry_after_s = float(retry_after_raw)
+                    except Exception:
+                        retry_after_s = 0.0
+
+                if not success and retryable_status:
+                    jitter = self.rand.uniform(0.0, 0.2)
+                    sleep_s = max(base_backoff_s * attempt + jitter, retry_after_s)
+                    time.sleep(min(sleep_s, 6.0))
+                    continue
+
+                latency_ms = (time.perf_counter() - started) * 1000.0
+                self.latencies_ms.append(latency_ms)
+                details = {
+                    \"url\": url,
+                    \"attempts\": attempt,
+                    \"retry_budget\": attempts,
+                    \"timeout_s\": timeout_s,
+                }
+                self._record_step(
+                    name=name,
+                    method=method,
+                    path=path,
+                    status_code=status_code,
+                    latency_ms=latency_ms,
+                    success=success,
+                    details=details,
+                    error=None if success else f\"Unexpected status: {status_code}\",
+                )
+
+                if required and not success:
+                    raise RuntimeError(f\"{name} failed with status {status_code}: {body}\")
+                return response, body
+
+            except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as exc:
+                if attempt < attempts:
+                    jitter = self.rand.uniform(0.0, 0.2)
+                    time.sleep(min(base_backoff_s * attempt + jitter, 6.0))
+                    continue
+
+                latency_ms = (time.perf_counter() - started) * 1000.0
+                self.latencies_ms.append(latency_ms)
+                self._record_step(
+                    name=name,
+                    method=method,
+                    path=path,
+                    status_code=status_code,
+                    latency_ms=latency_ms,
+                    success=False,
+                    error=str(exc),
+                )
+                if required:
+                    raise
+                return None, None
+
+            except Exception as exc:
+                latency_ms = (time.perf_counter() - started) * 1000.0
+                self.latencies_ms.append(latency_ms)
+                self._record_step(
+                    name=name,
+                    method=method,
+                    path=path,
+                    status_code=status_code,
+                    latency_ms=latency_ms,
+                    success=False,
+                    error=str(exc),
+                )
+                if required:
+                    raise
+                return None, None
+
+        return None, None
+"""
+
+    if new_block in original:
+        return {
+            "recipe_id": "retry_hardening_uat_agent_v2",
+            "title": "Add adaptive retry backoff and timeout expansion for stubborn 5xx",
+            "target_file": "agents/uat_enterprise_agent.py",
+            "already_applied": True,
+            "patch": "",
+            "patch_sha256": None,
+        }
+
+    if old_block not in original:
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                "Could not generate v2 retry patch because target code block no longer matches expected baseline. "
+                "Regenerate recipe with latest file context."
+            ),
+        )
+
+    updated = original.replace(old_block, new_block, 1)
+
+    diff_lines = list(
+        difflib.unified_diff(
+            original.splitlines(),
+            updated.splitlines(),
+            fromfile="a/agents/uat_enterprise_agent.py",
+            tofile="b/agents/uat_enterprise_agent.py",
+            lineterm="",
+        )
+    )
+    patch_text = "\n".join(diff_lines) + "\n"
+    patch_hash = hashlib.sha256(patch_text.encode("utf-8")).hexdigest()
+
+    return {
+        "recipe_id": "retry_hardening_uat_agent_v2",
+        "title": "Add adaptive retry backoff and timeout expansion for stubborn 5xx",
+        "target_file": "agents/uat_enterprise_agent.py",
+        "patch": patch_text,
+        "patch_sha256": patch_hash,
+    }
+
+
+def _build_phase2_patch(recipe_id: str) -> Dict[str, Any]:
+    if recipe_id == "retry_hardening_uat_agent_v1":
+        return _build_retry_hardening_patch()
+    if recipe_id == "retry_hardening_uat_agent_v2":
+        return _build_retry_hardening_patch_v2()
+    raise HTTPException(status_code=400, detail=f"Unsupported recipe_id: {recipe_id}")
+
+
 def _summary_from_report(path: Path, report: Dict[str, Any]) -> Dict[str, Any]:
     summary = report.get("summary", {})
     top_failures: Dict[str, int] = {}
@@ -948,6 +1224,16 @@ def phase2_plan(payload: Dict[str, Any] = Body(default={})) -> Dict[str, Any]:
                 ),
             }
         )
+    if profile["server_error_count"] > 0:
+        recipes.append(
+            {
+                "recipe_id": "retry_hardening_uat_agent_v2",
+                "title": "Increase retry budget with adaptive backoff and timeout scaling",
+                "reason": (
+                    "Use when v1 is already present or persistent 5xx remains above pilot threshold."
+                ),
+            }
+        )
 
     return {
         "phase": "phase2_plan",
@@ -961,10 +1247,7 @@ def phase2_plan(payload: Dict[str, Any] = Body(default={})) -> Dict[str, Any]:
 @router.post("/phase2/patch")
 def phase2_patch(payload: Dict[str, Any] = Body(default={})) -> Dict[str, Any]:
     recipe_id = str(payload.get("recipe_id") or "retry_hardening_uat_agent_v1")
-    if recipe_id != "retry_hardening_uat_agent_v1":
-        raise HTTPException(status_code=400, detail=f"Unsupported recipe_id: {recipe_id}")
-
-    patch_obj = _build_retry_hardening_patch()
+    patch_obj = _build_phase2_patch(recipe_id)
 
     if patch_obj.get("already_applied"):
         return {
