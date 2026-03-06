@@ -293,6 +293,17 @@ def _build_retry_hardening_patch() -> Dict[str, Any]:
         return None, None
 """
 
+    # If already patched, return an explicit no-op signal rather than hard failing.
+    if new_block in original:
+        return {
+            "recipe_id": "retry_hardening_uat_agent_v1",
+            "title": "Add retries for transient UAT transport and 5xx failures",
+            "target_file": "agents/uat_enterprise_agent.py",
+            "already_applied": True,
+            "patch": "",
+            "patch_sha256": None,
+        }
+
     if old_block not in original:
         raise HTTPException(
             status_code=409,
@@ -591,6 +602,18 @@ def phase2_patch(payload: Dict[str, Any] = Body(default={})) -> Dict[str, Any]:
         raise HTTPException(status_code=400, detail=f"Unsupported recipe_id: {recipe_id}")
 
     patch_obj = _build_retry_hardening_patch()
+
+    if patch_obj.get("already_applied"):
+        return {
+            "phase": "phase2_patch",
+            "recipe_id": patch_obj["recipe_id"],
+            "title": patch_obj["title"],
+            "target_file": patch_obj["target_file"],
+            "already_applied": True,
+            "message": "Retry hardening is already present in agents/uat_enterprise_agent.py",
+            "next": "Run UAT again and compare latest runs",
+        }
+
     stamp = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
     patch_file = f"{patch_obj['recipe_id']}_{stamp}.patch"
     patch_path = _phase2_patch_dir() / patch_file

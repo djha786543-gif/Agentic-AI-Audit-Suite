@@ -78,7 +78,8 @@ if (-not (Test-Path $reportsDir)) {
     New-Item -ItemType Directory -Path $reportsDir | Out-Null
 }
 $portFile = Join-Path $reportsDir "local_api_port.txt"
-Set-Content -Path $portFile -Value "$selectedPort" -Encoding UTF8
+# Write plain ASCII so batch "set /p" does not read a UTF BOM as part of the port.
+Set-Content -Path $portFile -Value "$selectedPort" -Encoding Ascii
 
 $uvicornArgs = @("-m", "uvicorn", "main:app", "--host", "127.0.0.1", "--port", "$selectedPort")
 if (-not $NoReload) {

@@ -109,6 +109,21 @@
     .warn { color: var(--warn); }
     .bad { color: var(--bad); }
 
+    .chip {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      border: 1px solid var(--line);
+    }
+
+    .chip-ok { color: #baf4d7; background: rgba(31, 191, 117, 0.12); border-color: rgba(31, 191, 117, 0.4); }
+    .chip-warn { color: #ffe5b3; background: rgba(241, 183, 74, 0.12); border-color: rgba(241, 183, 74, 0.45); }
+    .chip-bad { color: #ffc0c8; background: rgba(241, 91, 108, 0.14); border-color: rgba(241, 91, 108, 0.45); }
+
     .layout {
       display: grid;
       grid-template-columns: 1.2fr .8fr;
@@ -204,6 +219,22 @@
       <div class="card"><div class="k">Latest P95 Latency</div><div class="v" id="kP95">-</div></div>
     </div>
 
+    <div class="panel" style="margin-bottom:12px;">
+      <h2>Readiness Gate (First Industry Use Case)</h2>
+      <div style="padding:12px; display:grid; gap:8px;">
+        <div>
+          <span id="readinessChip" class="chip chip-bad">Not Evaluated</span>
+          <span id="readinessSummary" style="margin-left:8px; color:#bdd0ed; font-size:0.85rem;">Load reports to evaluate readiness.</span>
+        </div>
+        <div style="color:#9ab0d1; font-size:0.82rem;">
+          <strong>Industry-ready threshold:</strong> total failures <= 2%, transport disconnects (status 0) = 0, server errors (5xx) <= 1%, p95 latency <= 1000 ms.
+        </div>
+        <div style="color:#9ab0d1; font-size:0.82rem;">
+          <strong>Pilot-ready threshold:</strong> total failures <= 8%, transport disconnects <= 1%, server errors <= 3%, p95 latency <= 1500 ms.
+        </div>
+      </div>
+    </div>
+
     <div class="layout">
       <div class="panel">
         <h2>Recent UAT Reports</h2>
@@ -253,6 +284,19 @@
         Run "Phase 2 Plan" to inspect latest failures and get recommended patch recipes.
       </div>
     </div>
+
+    <div class="panel" style="margin-top:12px;">
+      <h2>UAT Closure Guide</h2>
+      <div style="padding:12px; color:#bdd0ed; font-size:0.84rem; line-height:1.45;">
+        1. Click <strong>Start UAT Run</strong> with <code>small</code> scale first to validate service stability.
+        <br>2. Click <strong>Refresh Reports</strong> and open the latest report.
+        <br>3. If status <code>0</code> appears in top failures, stabilize runtime first (avoid reload mode, verify DB health).
+        <br>4. If <code>500</code> dominates, fix backend exceptions before tuning performance.
+        <br>5. Use <strong>Compare Latest 2 Runs</strong> to confirm failed steps and 5xx counts trend downward.
+        <br>6. Promote to <code>medium/deep</code> only after small scale is stable.
+        <br>7. Close UAT when readiness gate reaches <strong>Industry Ready</strong> on at least 3 consecutive runs.
+      </div>
+    </div>
   </div>
 
   <script>
@@ -291,6 +335,85 @@
     function fmtNum(v) {
       if (v === null || v === undefined) return '-';
       return `${v}`;
+    }
+
+    function countByStatus(topFailures, code) {
+      if (!Array.isArray(topFailures)) return 0;
+      let total = 0;
+      for (const item of topFailures) {
+        const endpoint = String(item.endpoint || '');
+        if (endpoint.endsWith(`-> ${code}`)) {
+          total += Number(item.count || 0);
+        }
+      }
+      return total;
+    }
+
+    function evaluateReadiness(latest) {
+      if (!latest || !latest.summary) {
+        return {
+          level: 'Not Evaluated',
+          chipClass: 'chip-bad',
+          summary: 'No latest report available.',
+        };
+      }
+
+      const total = Number(latest.summary.total_steps || 0);
+      const failed = Number(latest.summary.failed_steps || 0);
+      const failPct = total > 0 ? (failed / total) * 100 : 100;
+      const p95 = Number(latest.summary.p95_latency_ms || 0);
+      const status0 = countByStatus(latest.top_failures || [], 0);
+      const status5xx = countByStatus(latest.top_failures || [], 500) +
+        countByStatus(latest.top_failures || [], 502) +
+        countByStatus(latest.top_failures || [], 503) +
+        countByStatus(latest.top_failures || [], 504);
+      const status0Pct = total > 0 ? (status0 / total) * 100 : 100;
+      const status5xxPct = total > 0 ? (status5xx / total) * 100 : 100;
+
+      const industryReady =
+        failPct <= 2 &&
+        status0 === 0 &&
+        status5xxPct <= 1 &&
+        p95 <= 1000;
+
+      const pilotReady =
+        failPct <= 8 &&
+        status0Pct <= 1 &&
+        status5xxPct <= 3 &&
+        p95 <= 1500;
+
+      if (industryReady) {
+        return {
+          level: 'Industry Ready',
+          chipClass: 'chip-ok',
+          summary: `fail=${failPct.toFixed(2)}%, status0=${status0}, 5xx=${status5xx} (${status5xxPct.toFixed(2)}%), p95=${p95}ms`,
+        };
+      }
+
+      if (pilotReady) {
+        return {
+          level: 'Pilot Ready',
+          chipClass: 'chip-warn',
+          summary: `fail=${failPct.toFixed(2)}%, status0=${status0}, 5xx=${status5xx} (${status5xxPct.toFixed(2)}%), p95=${p95}ms`,
+        };
+      }
+
+      return {
+        level: 'Not Ready',
+        chipClass: 'chip-bad',
+        summary: `fail=${failPct.toFixed(2)}%, status0=${status0}, 5xx=${status5xx} (${status5xxPct.toFixed(2)}%), p95=${p95}ms`,
+      };
+    }
+
+    function renderReadiness(reports) {
+      const latest = reports && reports.length ? reports[0] : null;
+      const evalResult = evaluateReadiness(latest);
+      const chip = document.getElementById('readinessChip');
+      const summary = document.getElementById('readinessSummary');
+
+      chip.className = `chip ${evalResult.chipClass}`;
+      chip.textContent = evalResult.level;
+      summary.textContent = evalResult.summary;
     }
 
     function renderKPIs(reports) {
@@ -334,6 +457,7 @@
 
       document.getElementById('dirHint').textContent = `Reports dir: ${data.reports_dir}`;
       renderKPIs(reports);
+      renderReadiness(reports);
 
       const body = document.getElementById('reportsBody');
       body.innerHTML = '';

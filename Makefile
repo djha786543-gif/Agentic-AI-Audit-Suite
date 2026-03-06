@@ -7,7 +7,7 @@
 # make test      — run tests
 # make shell     — open psql shell in the DB container
 
-.PHONY: up down logs restart watcher worker beat test shell env
+.PHONY: up down logs restart watcher worker beat test shell env sync sync-watch
 
 # ── Docker Compose ────────────────────────────────────────
 
@@ -78,3 +78,11 @@ test:
 
 install:
 	pip install -r requirements.txt
+
+# ── Git Sync ─────────────────────────────────────────────
+
+sync:
+	powershell -NoProfile -ExecutionPolicy Bypass -File ./auto_sync.ps1 -Once
+
+sync-watch:
+	powershell -NoProfile -ExecutionPolicy Bypass -File ./auto_sync.ps1 -IntervalSec 20
