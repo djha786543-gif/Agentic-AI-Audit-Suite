@@ -144,52 +144,82 @@ class UATAgent:
         started = time.perf_counter()
         status_code = 0
         body: Any = None
+        max_retries = 2
+        attempts = max_retries + 1
+        retryable_server_codes = {500, 502, 503, 504}
 
-        try:
-            response = self.session.request(method, url, timeout=REQUEST_TIMEOUT, **kwargs)
-            status_code = response.status_code
-            latency_ms = (time.perf_counter() - started) * 1000.0
-            self.latencies_ms.append(latency_ms)
-
+        for attempt in range(1, attempts + 1):
             try:
-                body = response.json()
-            except Exception:
-                body = response.text
+                response = self.session.request(method, url, timeout=REQUEST_TIMEOUT, **kwargs)
+                status_code = response.status_code
 
-            success = True
-            if expected_status is not None and status_code not in expected_status:
-                success = False
+                try:
+                    body = response.json()
+                except Exception:
+                    body = response.text
 
-            self._record_step(
-                name=name,
-                method=method,
-                path=path,
-                status_code=status_code,
-                latency_ms=latency_ms,
-                success=success,
-                details={"url": url},
-                error=None if success else f"Unexpected status: {status_code}",
-            )
+                success = expected_status is None or status_code in expected_status
+                retryable_status = status_code in retryable_server_codes and attempt < attempts
 
-            if required and not success:
-                raise RuntimeError(f"{name} failed with status {status_code}: {body}")
-            return response, body
+                if not success and retryable_status:
+                    time.sleep(0.2 * attempt)
+                    continue
 
-        except Exception as exc:
-            latency_ms = (time.perf_counter() - started) * 1000.0
-            self.latencies_ms.append(latency_ms)
-            self._record_step(
-                name=name,
-                method=method,
-                path=path,
-                status_code=status_code,
-                latency_ms=latency_ms,
-                success=False,
-                error=str(exc),
-            )
-            if required:
-                raise
-            return None, None
+                latency_ms = (time.perf_counter() - started) * 1000.0
+                self.latencies_ms.append(latency_ms)
+                details = {"url": url, "attempts": attempt}
+                self._record_step(
+                    name=name,
+                    method=method,
+                    path=path,
+                    status_code=status_code,
+                    latency_ms=latency_ms,
+                    success=success,
+                    details=details,
+                    error=None if success else f"Unexpected status: {status_code}",
+                )
+
+                if required and not success:
+                    raise RuntimeError(f"{name} failed with status {status_code}: {body}")
+                return response, body
+
+            except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as exc:
+                if attempt < attempts:
+                    time.sleep(0.2 * attempt)
+                    continue
+
+                latency_ms = (time.perf_counter() - started) * 1000.0
+                self.latencies_ms.append(latency_ms)
+                self._record_step(
+                    name=name,
+                    method=method,
+                    path=path,
+                    status_code=status_code,
+                    latency_ms=latency_ms,
+                    success=False,
+                    error=str(exc),
+                )
+                if required:
+                    raise
+                return None, None
+
+            except Exception as exc:
+                latency_ms = (time.perf_counter() - started) * 1000.0
+                self.latencies_ms.append(latency_ms)
+                self._record_step(
+                    name=name,
+                    method=method,
+                    path=path,
+                    status_code=status_code,
+                    latency_ms=latency_ms,
+                    success=False,
+                    error=str(exc),
+                )
+                if required:
+                    raise
+                return None, None
+
+        return None, None
 
     def authenticate(self) -> None:
         payload = {"username": self.username, "password": self.password}

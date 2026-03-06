@@ -1,0 +1,3568 @@
+{
+  "run_id": "20260306T150957Z",
+  "started_at": "2026-03-06T15:09:57.504871+00:00",
+  "config": {
+    "base_url": "http://127.0.0.1:8000",
+    "username": "admin",
+    "scale": "deep",
+    "seed": 42
+  },
+  "steps": [
+    {
+      "name": "auth_login",
+      "method": "POST",
+      "path": "/auth/login",
+      "status_code": 200,
+      "latency_ms": 34.62,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/auth/login"
+      }
+    },
+    {
+      "name": "seed_evidence_0",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 168.05,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_1",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 55.35,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_2",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 13.94,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_3",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 12.43,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_4",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 14.68,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_5",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 12.87,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_6",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 34.76,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_7",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 16.93,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_8",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 13.91,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_9",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 11.48,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_10",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 13.52,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_11",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 12.76,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_12",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 14.96,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_13",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 15.38,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_14",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 21.89,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_15",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 12.7,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_16",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 12.97,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_17",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 12.06,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_18",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 13.75,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_19",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 13.11,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_20",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 34.17,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_21",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 13.11,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_22",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 32.35,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_23",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 9.94,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_24",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 11.82,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_25",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 12.36,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_26",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 12.45,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_27",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 15.7,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_28",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 10.73,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_29",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 12.53,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_30",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 14.52,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_31",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 16.27,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_32",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 13.47,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_33",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 11.59,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_34",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 28.02,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_35",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 16.31,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_36",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 13.21,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_37",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 17.52,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_38",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 36.33,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_39",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 17.67,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_40",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 11.62,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_41",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 15.89,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_42",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 14.1,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_43",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 12.14,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_44",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 16.5,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_45",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 13.02,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_46",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 15.51,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_47",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 10.12,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_48",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 29.56,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_49",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 10.9,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_50",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 14.48,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_51",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 12.72,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_52",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 12.66,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_53",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 11.37,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_54",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 14.15,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_55",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 10.41,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_56",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 11.88,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_57",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 15.27,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_58",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 13.13,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_59",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 6.75,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_60",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 34.65,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_61",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 12.48,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_62",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 38.6,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_63",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 12.6,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_64",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 12.89,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_65",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 10.8,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_66",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 21.2,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_67",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 13.09,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_68",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 34.1,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_69",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 11.72,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_70",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 12.19,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_71",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 11.93,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_72",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 12.59,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_73",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 11.89,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_74",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 30.86,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_75",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 15.59,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_76",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 13.84,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_77",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 13.42,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_78",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 17.28,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_79",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 10.12,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_80",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 15.8,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_81",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 12.47,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_82",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 15.83,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_83",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 14.39,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_84",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 13.39,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_85",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 12.09,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_86",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 13.95,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_87",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 13.34,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_evidence_88",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 500,
+      "latency_ms": 13.26,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_evidence_89",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 0,
+      "latency_ms": 11.59,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_control_eval_0",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 32.82,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_control_eval_1",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 0,
+      "latency_ms": 12.03,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_control_eval_2",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 29.25,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_control_eval_3",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 0,
+      "latency_ms": 11.25,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_control_eval_4",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 34.14,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_control_eval_5",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 0,
+      "latency_ms": 11.77,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_control_eval_6",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 11.11,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_control_eval_7",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 0,
+      "latency_ms": 11.14,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_control_eval_8",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 9.78,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_control_eval_9",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 0,
+      "latency_ms": 11.46,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_control_eval_10",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 14.3,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_control_eval_11",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 0,
+      "latency_ms": 10.17,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_control_eval_12",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 11.67,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_control_eval_13",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 0,
+      "latency_ms": 12.71,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_control_eval_14",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 11.39,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_control_eval_15",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 0,
+      "latency_ms": 16.85,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_control_eval_16",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 12.5,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_control_eval_17",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 0,
+      "latency_ms": 9.39,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_control_eval_18",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 10.25,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_control_eval_19",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 0,
+      "latency_ms": 10.16,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_control_eval_20",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 27.43,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_control_eval_21",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 0,
+      "latency_ms": 13.67,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_control_eval_22",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 10.35,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_control_eval_23",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 0,
+      "latency_ms": 11.41,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_control_eval_24",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 38.23,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_control_eval_25",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 0,
+      "latency_ms": 8.94,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_control_eval_26",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 31.65,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_control_eval_27",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 0,
+      "latency_ms": 13.08,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_control_eval_28",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 22.28,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_control_eval_29",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 0,
+      "latency_ms": 11.55,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_control_eval_30",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 13.27,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_control_eval_31",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 0,
+      "latency_ms": 10.12,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_control_eval_32",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 13.04,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_control_eval_33",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 0,
+      "latency_ms": 15.6,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_control_eval_34",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 12.46,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_control_eval_35",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 0,
+      "latency_ms": 12.11,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_control_eval_36",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 13.93,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_control_eval_37",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 0,
+      "latency_ms": 10.65,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_control_eval_38",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 14.12,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_control_eval_39",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 0,
+      "latency_ms": 12.19,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_control_eval_40",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 13.79,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_control_eval_41",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 0,
+      "latency_ms": 11.32,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_control_eval_42",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 25.03,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_control_eval_43",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 0,
+      "latency_ms": 11.44,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_control_eval_44",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 11.31,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_control_eval_45",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 0,
+      "latency_ms": 13.85,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_control_eval_46",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 13.12,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_control_eval_47",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 0,
+      "latency_ms": 10.38,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_sod_0",
+      "method": "POST",
+      "path": "/evaluation/sod",
+      "status_code": 500,
+      "latency_ms": 11.32,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/sod"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_sod_1",
+      "method": "POST",
+      "path": "/evaluation/sod",
+      "status_code": 0,
+      "latency_ms": 10.5,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_sod_2",
+      "method": "POST",
+      "path": "/evaluation/sod",
+      "status_code": 500,
+      "latency_ms": 11.35,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/sod"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_sod_3",
+      "method": "POST",
+      "path": "/evaluation/sod",
+      "status_code": 0,
+      "latency_ms": 12.22,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_sod_4",
+      "method": "POST",
+      "path": "/evaluation/sod",
+      "status_code": 500,
+      "latency_ms": 11.31,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/sod"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_sod_5",
+      "method": "POST",
+      "path": "/evaluation/sod",
+      "status_code": 0,
+      "latency_ms": 9.28,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_sod_6",
+      "method": "POST",
+      "path": "/evaluation/sod",
+      "status_code": 500,
+      "latency_ms": 32.1,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/sod"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_sod_7",
+      "method": "POST",
+      "path": "/evaluation/sod",
+      "status_code": 0,
+      "latency_ms": 9.02,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_sod_8",
+      "method": "POST",
+      "path": "/evaluation/sod",
+      "status_code": 500,
+      "latency_ms": 11.75,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/sod"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_sod_9",
+      "method": "POST",
+      "path": "/evaluation/sod",
+      "status_code": 0,
+      "latency_ms": 13.0,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_sod_10",
+      "method": "POST",
+      "path": "/evaluation/sod",
+      "status_code": 500,
+      "latency_ms": 15.1,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/sod"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_sod_11",
+      "method": "POST",
+      "path": "/evaluation/sod",
+      "status_code": 0,
+      "latency_ms": 13.36,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_sod_12",
+      "method": "POST",
+      "path": "/evaluation/sod",
+      "status_code": 500,
+      "latency_ms": 14.55,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/sod"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_sod_13",
+      "method": "POST",
+      "path": "/evaluation/sod",
+      "status_code": 0,
+      "latency_ms": 13.48,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_sod_14",
+      "method": "POST",
+      "path": "/evaluation/sod",
+      "status_code": 500,
+      "latency_ms": 23.01,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/sod"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_sod_15",
+      "method": "POST",
+      "path": "/evaluation/sod",
+      "status_code": 0,
+      "latency_ms": 18.71,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_sod_16",
+      "method": "POST",
+      "path": "/evaluation/sod",
+      "status_code": 500,
+      "latency_ms": 20.01,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/sod"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_sod_17",
+      "method": "POST",
+      "path": "/evaluation/sod",
+      "status_code": 0,
+      "latency_ms": 11.83,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_sod_18",
+      "method": "POST",
+      "path": "/evaluation/sod",
+      "status_code": 500,
+      "latency_ms": 12.43,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/sod"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_sod_19",
+      "method": "POST",
+      "path": "/evaluation/sod",
+      "status_code": 0,
+      "latency_ms": 12.49,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_sod_20",
+      "method": "POST",
+      "path": "/evaluation/sod",
+      "status_code": 500,
+      "latency_ms": 13.32,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/sod"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_sod_21",
+      "method": "POST",
+      "path": "/evaluation/sod",
+      "status_code": 0,
+      "latency_ms": 12.08,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "seed_sod_22",
+      "method": "POST",
+      "path": "/evaluation/sod",
+      "status_code": 500,
+      "latency_ms": 30.97,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/sod"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "seed_sod_23",
+      "method": "POST",
+      "path": "/evaluation/sod",
+      "status_code": 0,
+      "latency_ms": 10.65,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "list_controls_for_exceptions",
+      "method": "GET",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 17.09,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_framework_SOX404",
+      "method": "POST",
+      "path": "/governance/frameworks",
+      "status_code": 0,
+      "latency_ms": 11.97,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_framework_ISO27001",
+      "method": "POST",
+      "path": "/governance/frameworks",
+      "status_code": 500,
+      "latency_ms": 36.83,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/frameworks"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_framework_COBIT2019",
+      "method": "POST",
+      "path": "/governance/frameworks",
+      "status_code": 0,
+      "latency_ms": 11.46,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_policy_0",
+      "method": "POST",
+      "path": "/governance/policies",
+      "status_code": 500,
+      "latency_ms": 34.05,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/policies"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_policy_1",
+      "method": "POST",
+      "path": "/governance/policies",
+      "status_code": 0,
+      "latency_ms": 13.69,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_policy_2",
+      "method": "POST",
+      "path": "/governance/policies",
+      "status_code": 500,
+      "latency_ms": 17.48,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/policies"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_policy_3",
+      "method": "POST",
+      "path": "/governance/policies",
+      "status_code": 0,
+      "latency_ms": 12.39,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_policy_4",
+      "method": "POST",
+      "path": "/governance/policies",
+      "status_code": 500,
+      "latency_ms": 28.76,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/policies"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_policy_5",
+      "method": "POST",
+      "path": "/governance/policies",
+      "status_code": 0,
+      "latency_ms": 10.77,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_policy_6",
+      "method": "POST",
+      "path": "/governance/policies",
+      "status_code": 500,
+      "latency_ms": 29.3,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/policies"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_policy_7",
+      "method": "POST",
+      "path": "/governance/policies",
+      "status_code": 0,
+      "latency_ms": 11.93,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_mapping_0",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 500,
+      "latency_ms": 16.65,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/mappings"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_mapping_1",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 0,
+      "latency_ms": 12.16,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_mapping_2",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 500,
+      "latency_ms": 16.95,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/mappings"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_mapping_3",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 0,
+      "latency_ms": 12.65,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_mapping_4",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 500,
+      "latency_ms": 16.98,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/mappings"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_mapping_5",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 0,
+      "latency_ms": 15.41,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_mapping_6",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 500,
+      "latency_ms": 16.0,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/mappings"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_mapping_7",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 0,
+      "latency_ms": 9.13,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_mapping_8",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 500,
+      "latency_ms": 11.97,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/mappings"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_mapping_9",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 0,
+      "latency_ms": 10.56,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_mapping_10",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 500,
+      "latency_ms": 13.12,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/mappings"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_mapping_11",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 0,
+      "latency_ms": 12.37,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_mapping_12",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 500,
+      "latency_ms": 16.57,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/mappings"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_mapping_13",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 0,
+      "latency_ms": 9.33,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_mapping_14",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 500,
+      "latency_ms": 15.79,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/mappings"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_mapping_15",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 0,
+      "latency_ms": 12.19,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_mapping_16",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 500,
+      "latency_ms": 30.77,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/mappings"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_mapping_17",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 0,
+      "latency_ms": 10.94,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_mapping_18",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 500,
+      "latency_ms": 13.81,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/mappings"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_mapping_19",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 0,
+      "latency_ms": 13.62,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_mapping_20",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 500,
+      "latency_ms": 14.87,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/mappings"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_mapping_21",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 0,
+      "latency_ms": 11.52,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_mapping_22",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 500,
+      "latency_ms": 27.51,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/mappings"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_mapping_23",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 0,
+      "latency_ms": 9.9,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_mapping_24",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 500,
+      "latency_ms": 13.07,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/mappings"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_mapping_25",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 0,
+      "latency_ms": 18.63,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_mapping_26",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 500,
+      "latency_ms": 11.87,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/mappings"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_mapping_27",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 0,
+      "latency_ms": 10.67,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_risk_0",
+      "method": "POST",
+      "path": "/governance/risks",
+      "status_code": 500,
+      "latency_ms": 11.69,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/risks"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_risk_1",
+      "method": "POST",
+      "path": "/governance/risks",
+      "status_code": 0,
+      "latency_ms": 7.84,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_risk_2",
+      "method": "POST",
+      "path": "/governance/risks",
+      "status_code": 500,
+      "latency_ms": 14.33,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/risks"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_risk_3",
+      "method": "POST",
+      "path": "/governance/risks",
+      "status_code": 0,
+      "latency_ms": 10.72,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_risk_4",
+      "method": "POST",
+      "path": "/governance/risks",
+      "status_code": 500,
+      "latency_ms": 10.17,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/risks"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_risk_5",
+      "method": "POST",
+      "path": "/governance/risks",
+      "status_code": 0,
+      "latency_ms": 17.75,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_risk_6",
+      "method": "POST",
+      "path": "/governance/risks",
+      "status_code": 500,
+      "latency_ms": 15.49,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/risks"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_risk_7",
+      "method": "POST",
+      "path": "/governance/risks",
+      "status_code": 0,
+      "latency_ms": 8.97,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_risk_8",
+      "method": "POST",
+      "path": "/governance/risks",
+      "status_code": 500,
+      "latency_ms": 13.78,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/risks"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_risk_9",
+      "method": "POST",
+      "path": "/governance/risks",
+      "status_code": 0,
+      "latency_ms": 10.98,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_risk_10",
+      "method": "POST",
+      "path": "/governance/risks",
+      "status_code": 500,
+      "latency_ms": 11.78,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/risks"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_risk_11",
+      "method": "POST",
+      "path": "/governance/risks",
+      "status_code": 0,
+      "latency_ms": 11.64,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_risk_12",
+      "method": "POST",
+      "path": "/governance/risks",
+      "status_code": 500,
+      "latency_ms": 16.15,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/risks"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_risk_13",
+      "method": "POST",
+      "path": "/governance/risks",
+      "status_code": 0,
+      "latency_ms": 14.95,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_risk_14",
+      "method": "POST",
+      "path": "/governance/risks",
+      "status_code": 500,
+      "latency_ms": 16.19,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/risks"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_risk_15",
+      "method": "POST",
+      "path": "/governance/risks",
+      "status_code": 0,
+      "latency_ms": 14.39,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_risk_16",
+      "method": "POST",
+      "path": "/governance/risks",
+      "status_code": 500,
+      "latency_ms": 14.55,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/risks"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_risk_17",
+      "method": "POST",
+      "path": "/governance/risks",
+      "status_code": 0,
+      "latency_ms": 10.36,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_risk_18",
+      "method": "POST",
+      "path": "/governance/risks",
+      "status_code": 500,
+      "latency_ms": 15.97,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/risks"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_risk_19",
+      "method": "POST",
+      "path": "/governance/risks",
+      "status_code": 0,
+      "latency_ms": 13.75,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_alert_rule_0",
+      "method": "POST",
+      "path": "/alerts/rules",
+      "status_code": 500,
+      "latency_ms": 16.76,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/rules"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_alert_rule_1",
+      "method": "POST",
+      "path": "/alerts/rules",
+      "status_code": 0,
+      "latency_ms": 13.82,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_alert_rule_2",
+      "method": "POST",
+      "path": "/alerts/rules",
+      "status_code": 500,
+      "latency_ms": 17.58,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/rules"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_alert_rule_3",
+      "method": "POST",
+      "path": "/alerts/rules",
+      "status_code": 0,
+      "latency_ms": 13.13,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_alert_rule_4",
+      "method": "POST",
+      "path": "/alerts/rules",
+      "status_code": 500,
+      "latency_ms": 16.06,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/rules"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_alert_rule_5",
+      "method": "POST",
+      "path": "/alerts/rules",
+      "status_code": 0,
+      "latency_ms": 10.93,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_alert_rule_6",
+      "method": "POST",
+      "path": "/alerts/rules",
+      "status_code": 500,
+      "latency_ms": 15.93,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/rules"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_alert_rule_7",
+      "method": "POST",
+      "path": "/alerts/rules",
+      "status_code": 0,
+      "latency_ms": 14.68,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_alert_0",
+      "method": "POST",
+      "path": "/alerts/",
+      "status_code": 500,
+      "latency_ms": 27.18,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_alert_1",
+      "method": "POST",
+      "path": "/alerts/",
+      "status_code": 0,
+      "latency_ms": 12.76,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_alert_2",
+      "method": "POST",
+      "path": "/alerts/",
+      "status_code": 500,
+      "latency_ms": 15.48,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_alert_3",
+      "method": "POST",
+      "path": "/alerts/",
+      "status_code": 0,
+      "latency_ms": 14.02,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_alert_4",
+      "method": "POST",
+      "path": "/alerts/",
+      "status_code": 500,
+      "latency_ms": 16.59,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_alert_5",
+      "method": "POST",
+      "path": "/alerts/",
+      "status_code": 0,
+      "latency_ms": 93.68,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_alert_6",
+      "method": "POST",
+      "path": "/alerts/",
+      "status_code": 500,
+      "latency_ms": 12.28,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_alert_7",
+      "method": "POST",
+      "path": "/alerts/",
+      "status_code": 0,
+      "latency_ms": 11.36,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_alert_8",
+      "method": "POST",
+      "path": "/alerts/",
+      "status_code": 500,
+      "latency_ms": 15.92,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_alert_9",
+      "method": "POST",
+      "path": "/alerts/",
+      "status_code": 0,
+      "latency_ms": 10.37,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_alert_10",
+      "method": "POST",
+      "path": "/alerts/",
+      "status_code": 500,
+      "latency_ms": 13.56,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_alert_11",
+      "method": "POST",
+      "path": "/alerts/",
+      "status_code": 0,
+      "latency_ms": 13.75,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_alert_12",
+      "method": "POST",
+      "path": "/alerts/",
+      "status_code": 500,
+      "latency_ms": 11.55,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_alert_13",
+      "method": "POST",
+      "path": "/alerts/",
+      "status_code": 0,
+      "latency_ms": 8.86,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_alert_14",
+      "method": "POST",
+      "path": "/alerts/",
+      "status_code": 500,
+      "latency_ms": 11.07,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_alert_15",
+      "method": "POST",
+      "path": "/alerts/",
+      "status_code": 0,
+      "latency_ms": 12.3,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_alert_16",
+      "method": "POST",
+      "path": "/alerts/",
+      "status_code": 500,
+      "latency_ms": 15.19,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_alert_17",
+      "method": "POST",
+      "path": "/alerts/",
+      "status_code": 0,
+      "latency_ms": 13.45,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_alert_18",
+      "method": "POST",
+      "path": "/alerts/",
+      "status_code": 500,
+      "latency_ms": 36.96,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_alert_19",
+      "method": "POST",
+      "path": "/alerts/",
+      "status_code": 0,
+      "latency_ms": 12.47,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_alert_20",
+      "method": "POST",
+      "path": "/alerts/",
+      "status_code": 500,
+      "latency_ms": 14.76,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_alert_21",
+      "method": "POST",
+      "path": "/alerts/",
+      "status_code": 0,
+      "latency_ms": 12.94,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "create_alert_22",
+      "method": "POST",
+      "path": "/alerts/",
+      "status_code": 500,
+      "latency_ms": 13.57,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "create_alert_23",
+      "method": "POST",
+      "path": "/alerts/",
+      "status_code": 0,
+      "latency_ms": 13.82,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "engine_health",
+      "method": "GET",
+      "path": "/engine/health",
+      "status_code": 200,
+      "latency_ms": 6.09,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/health"
+      }
+    },
+    {
+      "name": "engine_analyze_sod",
+      "method": "POST",
+      "path": "/engine/analyze/sod",
+      "status_code": 200,
+      "latency_ms": 13.98,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/analyze/sod"
+      }
+    },
+    {
+      "name": "run_report_executive_summary",
+      "method": "POST",
+      "path": "/reports/runs",
+      "status_code": 500,
+      "latency_ms": 11.87,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/reports/runs"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "run_report_compliance_status",
+      "method": "POST",
+      "path": "/reports/runs",
+      "status_code": 0,
+      "latency_ms": 11.46,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "run_report_kpi_dashboard",
+      "method": "POST",
+      "path": "/reports/runs",
+      "status_code": 500,
+      "latency_ms": 13.16,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/reports/runs"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "run_report_audit_findings",
+      "method": "POST",
+      "path": "/reports/runs",
+      "status_code": 0,
+      "latency_ms": 11.51,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "run_report_sod_matrix",
+      "method": "POST",
+      "path": "/reports/runs",
+      "status_code": 500,
+      "latency_ms": 13.6,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/reports/runs"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "run_report_risk_register",
+      "method": "POST",
+      "path": "/reports/runs",
+      "status_code": 0,
+      "latency_ms": 11.73,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "run_report_continuous_assurance",
+      "method": "POST",
+      "path": "/reports/runs",
+      "status_code": 500,
+      "latency_ms": 12.24,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/reports/runs"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "ai_audit_analyze_0_users_toxic_sod",
+      "method": "POST",
+      "path": "/engine/analyze",
+      "status_code": 0,
+      "latency_ms": 10.74,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "ai_audit_analyze_1_users_dormant_privileged",
+      "method": "POST",
+      "path": "/engine/analyze",
+      "status_code": 200,
+      "latency_ms": 45.73,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/analyze"
+      }
+    },
+    {
+      "name": "ai_audit_verdict_1",
+      "method": "PATCH",
+      "path": "/engine/findings/8f586ac2-a7b4-4fd5-989a-287972b5f7b8/verdict",
+      "status_code": 500,
+      "latency_ms": 10.3,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/findings/8f586ac2-a7b4-4fd5-989a-287972b5f7b8/verdict"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "ai_audit_analyze_2_changes_self_approval",
+      "method": "POST",
+      "path": "/engine/analyze",
+      "status_code": 0,
+      "latency_ms": 12.38,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "ai_audit_analyze_3_transactions_three_way_bypass",
+      "method": "POST",
+      "path": "/engine/analyze",
+      "status_code": 200,
+      "latency_ms": 7.85,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/analyze"
+      }
+    },
+    {
+      "name": "ai_audit_analyze_4_interfaces_recon_mismatch",
+      "method": "POST",
+      "path": "/engine/analyze",
+      "status_code": 200,
+      "latency_ms": 19.23,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/analyze"
+      }
+    },
+    {
+      "name": "ai_audit_verdict_4",
+      "method": "PATCH",
+      "path": "/engine/findings/6a9e5e19-b7c7-459c-9629-ebe5d532eea3/verdict",
+      "status_code": 500,
+      "latency_ms": 14.68,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/findings/6a9e5e19-b7c7-459c-9629-ebe5d532eea3/verdict"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "ai_audit_analyze_5_users_toxic_sod",
+      "method": "POST",
+      "path": "/engine/analyze",
+      "status_code": 0,
+      "latency_ms": 13.83,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "ai_audit_analyze_6_users_dormant_privileged",
+      "method": "POST",
+      "path": "/engine/analyze",
+      "status_code": 200,
+      "latency_ms": 25.48,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/analyze"
+      }
+    },
+    {
+      "name": "ai_audit_verdict_6",
+      "method": "PATCH",
+      "path": "/engine/findings/8d440793-4b1e-459e-ae26-cfca72e66d36/verdict",
+      "status_code": 500,
+      "latency_ms": 15.94,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/findings/8d440793-4b1e-459e-ae26-cfca72e66d36/verdict"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "ai_audit_analyze_7_changes_self_approval",
+      "method": "POST",
+      "path": "/engine/analyze",
+      "status_code": 0,
+      "latency_ms": 12.11,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "ai_audit_analyze_8_transactions_three_way_bypass",
+      "method": "POST",
+      "path": "/engine/analyze",
+      "status_code": 200,
+      "latency_ms": 9.26,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/analyze"
+      }
+    },
+    {
+      "name": "ai_audit_analyze_9_interfaces_recon_mismatch",
+      "method": "POST",
+      "path": "/engine/analyze",
+      "status_code": 200,
+      "latency_ms": 16.77,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/analyze"
+      }
+    },
+    {
+      "name": "ai_audit_verdict_9",
+      "method": "PATCH",
+      "path": "/engine/findings/d739cbee-0fbb-4f20-8550-c2eac425c19c/verdict",
+      "status_code": 500,
+      "latency_ms": 13.01,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/findings/d739cbee-0fbb-4f20-8550-c2eac425c19c/verdict"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "ai_audit_analyze_10_users_toxic_sod",
+      "method": "POST",
+      "path": "/engine/analyze",
+      "status_code": 0,
+      "latency_ms": 10.71,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "ai_audit_analyze_11_users_dormant_privileged",
+      "method": "POST",
+      "path": "/engine/analyze",
+      "status_code": 200,
+      "latency_ms": 22.36,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/analyze"
+      }
+    },
+    {
+      "name": "ai_audit_verdict_11",
+      "method": "PATCH",
+      "path": "/engine/findings/d0d281cc-8a02-42c0-a6bc-c6d39507b59d/verdict",
+      "status_code": 500,
+      "latency_ms": 12.56,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/findings/d0d281cc-8a02-42c0-a6bc-c6d39507b59d/verdict"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "ai_audit_analyze_12_changes_self_approval",
+      "method": "POST",
+      "path": "/engine/analyze",
+      "status_code": 0,
+      "latency_ms": 12.7,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "ai_audit_analyze_13_transactions_three_way_bypass",
+      "method": "POST",
+      "path": "/engine/analyze",
+      "status_code": 200,
+      "latency_ms": 8.82,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/analyze"
+      }
+    },
+    {
+      "name": "ai_audit_analyze_14_interfaces_recon_mismatch",
+      "method": "POST",
+      "path": "/engine/analyze",
+      "status_code": 200,
+      "latency_ms": 15.55,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/analyze"
+      }
+    },
+    {
+      "name": "ai_audit_verdict_14",
+      "method": "PATCH",
+      "path": "/engine/findings/9c885832-6686-4d78-a6c7-c7e232ee0e6b/verdict",
+      "status_code": 500,
+      "latency_ms": 13.7,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/findings/9c885832-6686-4d78-a6c7-c7e232ee0e6b/verdict"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "ai_audit_analyze_15_users_toxic_sod",
+      "method": "POST",
+      "path": "/engine/analyze",
+      "status_code": 0,
+      "latency_ms": 11.75,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "ai_audit_analyze_16_users_dormant_privileged",
+      "method": "POST",
+      "path": "/engine/analyze",
+      "status_code": 200,
+      "latency_ms": 24.3,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/analyze"
+      }
+    },
+    {
+      "name": "ai_audit_verdict_16",
+      "method": "PATCH",
+      "path": "/engine/findings/f2af29c6-02d6-4df6-9a56-3a2702a68bb0/verdict",
+      "status_code": 500,
+      "latency_ms": 13.84,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/findings/f2af29c6-02d6-4df6-9a56-3a2702a68bb0/verdict"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "ai_audit_analyze_17_changes_self_approval",
+      "method": "POST",
+      "path": "/engine/analyze",
+      "status_code": 0,
+      "latency_ms": 13.18,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "ai_audit_analyze_18_transactions_three_way_bypass",
+      "method": "POST",
+      "path": "/engine/analyze",
+      "status_code": 200,
+      "latency_ms": 8.59,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/analyze"
+      }
+    },
+    {
+      "name": "ai_audit_analyze_19_interfaces_recon_mismatch",
+      "method": "POST",
+      "path": "/engine/analyze",
+      "status_code": 200,
+      "latency_ms": 18.32,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/analyze"
+      }
+    },
+    {
+      "name": "ai_audit_verdict_19",
+      "method": "PATCH",
+      "path": "/engine/findings/bd01e3e4-906e-46e8-bfa5-4af7b2514113/verdict",
+      "status_code": 500,
+      "latency_ms": 13.0,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/findings/bd01e3e4-906e-46e8-bfa5-4af7b2514113/verdict"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "ai_audit_analyze_20_users_toxic_sod",
+      "method": "POST",
+      "path": "/engine/analyze",
+      "status_code": 0,
+      "latency_ms": 12.64,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "ai_audit_analyze_21_users_dormant_privileged",
+      "method": "POST",
+      "path": "/engine/analyze",
+      "status_code": 200,
+      "latency_ms": 19.71,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/analyze"
+      }
+    },
+    {
+      "name": "ai_audit_verdict_21",
+      "method": "PATCH",
+      "path": "/engine/findings/d5b5dee8-e972-4701-b2ef-94f6212638db/verdict",
+      "status_code": 500,
+      "latency_ms": 12.4,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/findings/d5b5dee8-e972-4701-b2ef-94f6212638db/verdict"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "ai_audit_analyze_22_changes_self_approval",
+      "method": "POST",
+      "path": "/engine/analyze",
+      "status_code": 0,
+      "latency_ms": 12.39,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "ai_audit_analyze_23_transactions_three_way_bypass",
+      "method": "POST",
+      "path": "/engine/analyze",
+      "status_code": 200,
+      "latency_ms": 8.53,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/analyze"
+      }
+    },
+    {
+      "name": "ai_audit_validate_invalid_schema",
+      "method": "POST",
+      "path": "/engine/analyze/validate",
+      "status_code": 200,
+      "latency_ms": 3.55,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/analyze/validate"
+      }
+    },
+    {
+      "name": "ai_audit_accuracy",
+      "method": "GET",
+      "path": "/engine/accuracy",
+      "status_code": 500,
+      "latency_ms": 13.25,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/accuracy"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "snapshot_vault_summary",
+      "method": "GET",
+      "path": "/audit/vault/summary",
+      "status_code": 0,
+      "latency_ms": 11.24,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "snapshot_controls",
+      "method": "GET",
+      "path": "/evaluation/controls",
+      "status_code": 500,
+      "latency_ms": 15.99,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "snapshot_sod",
+      "method": "GET",
+      "path": "/evaluation/sod",
+      "status_code": 0,
+      "latency_ms": 13.73,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "snapshot_exceptions",
+      "method": "GET",
+      "path": "/evaluation/exceptions",
+      "status_code": 500,
+      "latency_ms": 14.96,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/exceptions"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "snapshot_risks",
+      "method": "GET",
+      "path": "/governance/risks",
+      "status_code": 0,
+      "latency_ms": 11.75,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "snapshot_alerts",
+      "method": "GET",
+      "path": "/alerts/",
+      "status_code": 500,
+      "latency_ms": 15.8,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "snapshot_dashboard",
+      "method": "GET",
+      "path": "/reports/dashboard",
+      "status_code": 0,
+      "latency_ms": 16.33,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "snapshot_kpis",
+      "method": "GET",
+      "path": "/reports/kpis",
+      "status_code": 500,
+      "latency_ms": 15.72,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/reports/kpis"
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "snapshot_report_runs",
+      "method": "GET",
+      "path": "/reports/runs",
+      "status_code": 0,
+      "latency_ms": 11.71,
+      "success": false,
+      "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+    },
+    {
+      "name": "snapshot_engine_accuracy",
+      "method": "GET",
+      "path": "/engine/accuracy",
+      "status_code": 500,
+      "latency_ms": 32.96,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/accuracy"
+      },
+      "error": "Unexpected status: 500"
+    }
+  ],
+  "summary": {
+    "total_steps": 309,
+    "failed_steps": 291,
+    "success_rate_pct": 5.83,
+    "p95_latency_ms": 34.07,
+    "created_counts": {
+      "evidence_ids": 0,
+      "control_ids": 0,
+      "exception_ids": 0,
+      "framework_ids": 0,
+      "policy_ids": 0,
+      "mapping_ids": 0,
+      "risk_ids": 0,
+      "alert_rule_ids": 0,
+      "alert_ids": 0,
+      "report_run_ids": 0,
+      "ai_audit_case_ids": 24
+    },
+    "improvement_candidates": 2
+  },
+  "improvement_candidates": [
+    {
+      "type": "api_failures",
+      "severity": "high",
+      "summary": "291 API steps failed during UAT run",
+      "evidence": [
+        {
+          "name": "seed_evidence_0",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 500,
+          "latency_ms": 168.05,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+          },
+          "error": "Unexpected status: 500"
+        },
+        {
+          "name": "seed_evidence_1",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 0,
+          "latency_ms": 55.35,
+          "success": false,
+          "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+        },
+        {
+          "name": "seed_evidence_2",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 500,
+          "latency_ms": 13.94,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+          },
+          "error": "Unexpected status: 500"
+        },
+        {
+          "name": "seed_evidence_3",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 0,
+          "latency_ms": 12.43,
+          "success": false,
+          "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+        },
+        {
+          "name": "seed_evidence_4",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 500,
+          "latency_ms": 14.68,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+          },
+          "error": "Unexpected status: 500"
+        },
+        {
+          "name": "seed_evidence_5",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 0,
+          "latency_ms": 12.87,
+          "success": false,
+          "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+        },
+        {
+          "name": "seed_evidence_6",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 500,
+          "latency_ms": 34.76,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+          },
+          "error": "Unexpected status: 500"
+        },
+        {
+          "name": "seed_evidence_7",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 0,
+          "latency_ms": 16.93,
+          "success": false,
+          "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+        },
+        {
+          "name": "seed_evidence_8",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 500,
+          "latency_ms": 13.91,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+          },
+          "error": "Unexpected status: 500"
+        },
+        {
+          "name": "seed_evidence_9",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 0,
+          "latency_ms": 11.48,
+          "success": false,
+          "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+        },
+        {
+          "name": "seed_evidence_10",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 500,
+          "latency_ms": 13.52,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+          },
+          "error": "Unexpected status: 500"
+        },
+        {
+          "name": "seed_evidence_11",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 0,
+          "latency_ms": 12.76,
+          "success": false,
+          "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+        },
+        {
+          "name": "seed_evidence_12",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 500,
+          "latency_ms": 14.96,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+          },
+          "error": "Unexpected status: 500"
+        },
+        {
+          "name": "seed_evidence_13",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 0,
+          "latency_ms": 15.38,
+          "success": false,
+          "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+        },
+        {
+          "name": "seed_evidence_14",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 500,
+          "latency_ms": 21.89,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+          },
+          "error": "Unexpected status: 500"
+        },
+        {
+          "name": "seed_evidence_15",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 0,
+          "latency_ms": 12.7,
+          "success": false,
+          "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+        },
+        {
+          "name": "seed_evidence_16",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 500,
+          "latency_ms": 12.97,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+          },
+          "error": "Unexpected status: 500"
+        },
+        {
+          "name": "seed_evidence_17",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 0,
+          "latency_ms": 12.06,
+          "success": false,
+          "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+        },
+        {
+          "name": "seed_evidence_18",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 500,
+          "latency_ms": 13.75,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/audit/evidence"
+          },
+          "error": "Unexpected status: 500"
+        },
+        {
+          "name": "seed_evidence_19",
+          "method": "POST",
+          "path": "/audit/evidence",
+          "status_code": 0,
+          "latency_ms": 13.11,
+          "success": false,
+          "error": "('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+        }
+      ]
+    },
+    {
+      "type": "ai_audit_coverage",
+      "severity": "high",
+      "summary": "AI-audit complex scenarios show low pass rate in engine endpoints",
+      "evidence": {
+        "total_ai_audit_cases": 24,
+        "successful_cases": 14
+      }
+    }
+  ],
+  "artifacts": {
+    "snapshots": {
+      "vault_summary": null,
+      "controls": "Internal Server Error",
+      "sod": null,
+      "exceptions": "Internal Server Error",
+      "risks": null,
+      "alerts": "Internal Server Error",
+      "dashboard": null,
+      "kpis": "Internal Server Error",
+      "report_runs": null,
+      "engine_accuracy": "Internal Server Error"
+    },
+    "created_objects": {
+      "evidence_ids": [],
+      "control_ids": [],
+      "exception_ids": [],
+      "framework_ids": [],
+      "policy_ids": [],
+      "mapping_ids": [],
+      "risk_ids": [],
+      "alert_rule_ids": [],
+      "alert_ids": [],
+      "report_run_ids": [],
+      "ai_audit_case_ids": [
+        "AIAUD-50957Z-000",
+        "AIAUD-50957Z-001",
+        "AIAUD-50957Z-002",
+        "AIAUD-50957Z-003",
+        "AIAUD-50957Z-004",
+        "AIAUD-50957Z-005",
+        "AIAUD-50957Z-006",
+        "AIAUD-50957Z-007",
+        "AIAUD-50957Z-008",
+        "AIAUD-50957Z-009",
+        "AIAUD-50957Z-010",
+        "AIAUD-50957Z-011",
+        "AIAUD-50957Z-012",
+        "AIAUD-50957Z-013",
+        "AIAUD-50957Z-014",
+        "AIAUD-50957Z-015",
+        "AIAUD-50957Z-016",
+        "AIAUD-50957Z-017",
+        "AIAUD-50957Z-018",
+        "AIAUD-50957Z-019",
+        "AIAUD-50957Z-020",
+        "AIAUD-50957Z-021",
+        "AIAUD-50957Z-022",
+        "AIAUD-50957Z-023"
+      ]
+    }
+  },
+  "finished_at": "2026-03-06T15:10:02.487189+00:00"
+}
