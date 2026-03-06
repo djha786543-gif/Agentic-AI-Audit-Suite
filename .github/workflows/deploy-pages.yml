@@ -1,0 +1,64 @@
+name: Deploy Pages From Main
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/deploy-pages.yml'
+      - '.github/workflows/pages-smoke-test.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Prepare gh-pages worktree
+        run: |
+          set -euo pipefail
+          git fetch origin gh-pages
+          git worktree add /tmp/gh-pages gh-pages
+
+      - name: Sync static site content
+        run: |
+          set -euo pipefail
+          target="/tmp/gh-pages"
+
+          # Keep a full frontend directory for deep links and asset-relative paths.
+          rsync -av --delete frontend/ "$target/frontend/"
+
+          # Promote core HTML pages to repo root for canonical Pages URLs.
+          while IFS= read -r -d '' file; do
+            base="$(basename "$file")"
+            cp "$file" "$target/$base"
+          done < <(find frontend -maxdepth 1 -type f -name '*.html' -print0)
+
+          # Keep common static assets available at root as well.
+          if [ -f frontend/styles.css ]; then cp frontend/styles.css "$target/styles.css"; fi
+          if [ -f frontend/script.js ]; then cp frontend/script.js "$target/script.js"; fi
+          if [ -d frontend/images ]; then rsync -av --delete frontend/images/ "$target/images/"; fi
+
+      - name: Commit and push if changed
+        run: |
+          set -euo pipefail
+          cd /tmp/gh-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if git diff --quiet && git diff --cached --quiet; then
+            echo "No pages changes to publish."
+            exit 0
+          fi
+
+          git add -A
+          git commit -m "pages: publish from main @ ${GITHUB_SHA::7}"
+          git push origin gh-pages

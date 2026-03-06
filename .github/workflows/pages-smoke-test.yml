@@ -1,0 +1,42 @@
+name: Pages Smoke Test
+
+on:
+  workflow_run:
+    workflows:
+      - Deploy Pages From Main
+    types:
+      - completed
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Smoke test core pages
+        env:
+          BASE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+        run: |
+          set -euo pipefail
+
+          urls=(
+            "$BASE_URL/"
+            "$BASE_URL/index.html"
+            "$BASE_URL/app.html"
+            "$BASE_URL/vault.html"
+            "$BASE_URL/governance.html"
+            "$BASE_URL/reports.html"
+            "$BASE_URL/itgc-controls.html"
+            "$BASE_URL/itac-testing.html"
+            "$BASE_URL/settings.html"
+            "$BASE_URL/help.html"
+          )
+
+          for u in "${urls[@]}"; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "$u?cb=$(date +%s)")
+            echo "$code $u"
+            if [ "$code" -ne 200 ]; then
+              echo "Smoke test failed for $u"
+              exit 1
+            fi
+          done

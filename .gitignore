@@ -47,6 +47,10 @@ audit_intelligence.db
 celerybeat-schedule
 celerybeat.pid
 
+# Runtime UAT artifacts
+uat_reports/*.log
+uat_reports/uat_runner.log
+
 # IDE and OS files
 .vscode/
 .idea/
