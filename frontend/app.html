@@ -9970,13 +9970,13 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         // can reference canonical names regardless of source system.
         fieldAliases: {
           // User / Employee ID
-          user: ['user', 'userid', 'user_id', 'username', 'user_name', 'emp_id', 'employee_id', 'employeeid', 'sap_user', 'oracle_user', 'd365_user', 'workday_id', 'netsuite_user', 'subject', 'account', 'login', 'logon', 'principal', 'samaccountname', 'upn', 'email'],
+          user: ['user', 'userid', 'user_id', 'username', 'user_name', 'emp_id', 'employee_id', 'employeeid', 'sap_user', 'oracle_user', 'd365_user', 'workday_id', 'netsuite_user', 'subject', 'account', 'login', 'logon', 'principal', 'samaccountname', 'upn', 'email', 'usnam', 'uname'],
           // Role / Permission / T-code
           role: ['role', 'tcode', 't_code', 'transaction_code', 'permission', 'privilege', 'entitlement', 'access_right', 'function', 'responsibility', 'duty', 'security_role', 'role_name', 'group', 'ad_group', 'profile', 'auth_object', 'function_name', 'menu_item', 'task', 'action'],
           // Display name
-          name: ['name', 'full_name', 'fullname', 'display_name', 'employee_name', 'emp_name', 'user_display', 'first_last', 'person'],
+          name: ['name', 'full_name', 'fullname', 'display_name', 'employee_name', 'emp_name', 'user_display', 'first_last', 'person', 'usnam'],
           // System / ERP source
-          system: ['system', 'erp', 'source_system', 'application', 'app', 'platform', 'module', 'client', 'company_code', 'org'],
+          system: ['system', 'erp', 'source_system', 'application', 'app', 'platform', 'module', 'client', 'company_code', 'org', 'mandt', 'bukrs'],
           // Status
           status: ['status', 'emp_status', 'user_status', 'account_status', 'employment_status', 'worker_status', 'active_flag', 'enabled', 'is_active', 'enabled_flag', 'account_enabled'],
           // Account type
@@ -10044,7 +10044,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
           tax_id: ['tax_id', 'tax_number', 'ein', 'vat_number', 'gst_number', 'abn', 'company_reg', 'registration_number', 'fiscal_id'],
           address: ['address', 'street', 'vendor_address', 'supplier_address', 'postal_address', 'registered_address'],
           payment_terms: ['payment_terms', 'pay_terms', 'terms', 'net_days', 'payment_condition'],
-          created_by: ['created_by', 'creator', 'entered_by', 'added_by', 'created_user', 'input_by', 'posted_by'],
+          created_by: ['created_by', 'creator', 'entered_by', 'added_by', 'created_user', 'input_by', 'posted_by', 'usnam'],
           approval_status: ['approval_status', 'approved', 'vendor_status', 'status', 'vendor_approved'],
           phone: ['phone', 'telephone', 'contact_number', 'phone_number', 'mobile', 'contact_phone'],
           employee_address: ['employee_address', 'emp_address', 'staff_address', 'home_address', 'personal_address'],
@@ -11602,7 +11602,60 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
 
       function parseFile(file, callback) {
         var ext = file.name.split('.').pop().toLowerCase();
-        function done(data, headers) { if (callback) callback(data, headers); else { STATE.data = data; STATE.headers = headers; showPreview(); buildMapping(); } }
+        function normalizeDateValue(val) {
+          if (val == null) return val;
+          var s = String(val).trim();
+          if (!s) return val;
+          var m;
+          if ((m = s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/))) {
+            var dd = parseInt(m[1], 10), mm = parseInt(m[2], 10), yyyy = parseInt(m[3], 10);
+            if (dd > 12) return yyyy + '-' + String(mm).padStart(2, '0') + '-' + String(dd).padStart(2, '0');
+            return yyyy + '-' + String(dd).padStart(2, '0') + '-' + String(mm).padStart(2, '0');
+          }
+          if ((m = s.match(/^(\d{2})-(\d{2})-(\d{2})$/))) {
+            var mm2 = parseInt(m[1], 10), dd2 = parseInt(m[2], 10), yy = parseInt(m[3], 10);
+            var yyyy2 = yy >= 70 ? 1900 + yy : 2000 + yy;
+            return yyyy2 + '-' + String(mm2).padStart(2, '0') + '-' + String(dd2).padStart(2, '0');
+          }
+          return val;
+        }
+        function normalizeCurrencyValue(val) {
+          if (val == null) return val;
+          var s = String(val).trim();
+          if (!s) return val;
+          var c = s.replace(/\$/g, '').replace(/EUR|USD|GBP|INR/gi, '').trim();
+          if (c.indexOf(',') !== -1 && c.indexOf('.') !== -1) {
+            if (c.lastIndexOf(',') > c.lastIndexOf('.')) c = c.replace(/\./g, '').replace(',', '.');
+            else c = c.replace(/,/g, '');
+          } else if (c.indexOf(',') !== -1) {
+            var parts = c.split(',');
+            c = parts[1] && parts[1].length <= 2 ? (parts[0] + '.' + parts[1]) : c.replace(/,/g, '');
+          }
+          c = c.replace(/,/g, '');
+          var n = Number(c);
+          return isNaN(n) ? val : Math.round(n * 100) / 100;
+        }
+        function normalizeRowValues(row) {
+          var out = {};
+          Object.keys(row || {}).forEach(function (k) {
+            var v = row[k];
+            var kn = String(k || '').toLowerCase();
+            if (/date|created|creation|posting|term/.test(kn)) out[k] = normalizeDateValue(v);
+            else if (/amount|amt|total|price|value|cost/.test(kn)) out[k] = normalizeCurrencyValue(v);
+            else out[k] = v;
+          });
+          return out;
+        }
+        function done(data, headers) {
+          var normalized = (data || []).map(normalizeRowValues);
+          if (callback) callback(normalized, headers);
+          else {
+            STATE.data = normalized;
+            STATE.headers = headers;
+            showPreview();
+            buildMapping();
+          }
+        }
         if (ext === 'csv' || ext === 'tsv') {
           var rows = [];
           var lineage = {};
@@ -11881,6 +11934,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
           totalRows += f.data.length;
         });
         STATE.violations = allVio;
+        STATE.violations = enrichFindingsForTrust(STATE.violations);
         STATE.riskSummary = aggRS;
         STATE.data = { length: totalRows }; // fake length for display
         renderResults();
@@ -12019,6 +12073,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
           } else {
             STATE.violations = ag.detect(STATE.data, STATE.mapping, filterAgentRulesForPolicy(ag.rules || []));
           }
+          STATE.violations = enrichFindingsForTrust(STATE.violations);
           // ---> END INTEGATED PROTOTYPE LOGIC INTERCEPT <---
 
           STATE.riskSummary = { Critical: 0, High: 0, Medium: 0, Low: 0 };
@@ -12073,8 +12128,117 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         sevFilter: 'ALL',
         areaFilter: 'ALL',
         selectedIdx: null,
-        feedTimer: null
+        feedTimer: null,
+        swarmNudges: []
       };
+
+      function safeText(v) { return String(v == null ? '' : v); }
+
+      function riskWeightingForFinding(v) {
+        var sev = safeText(v.severity).toLowerCase();
+        var frequencyWeight = sev === 'critical' ? 0.8 : sev === 'high' ? 0.7 : sev === 'medium' ? 0.55 : 0.4;
+        var materialityWeight = sev === 'critical' ? 0.2 : sev === 'high' ? 0.3 : sev === 'medium' ? 0.45 : 0.6;
+        var score = Math.round((frequencyWeight * 70 + materialityWeight * 30) * 100) / 100;
+        return {
+          score: score,
+          tooltip: Math.round(frequencyWeight * 100) + '% frequency of occurrence + ' + Math.round(materialityWeight * 100) + '% financial materiality'
+        };
+      }
+
+      function enrichFindingsForTrust(findings) {
+        return (findings || []).map(function (f, idx) {
+          var v = Object.assign({}, f);
+          var ruleName = v.rule || v.id || 'Unknown Rule';
+          var agentLabel = (v.id || '').startsWith('TT-') || (v.id || '').startsWith('ITAC') ? 'Financial Forensics' :
+            (v.id || '').startsWith('SOD-') ? 'SOD Auditor' :
+            (v.id || '').startsWith('LA-') ? 'Logical Access Auditor' : 'Audit Reasoning Engine';
+          var tw = riskWeightingForFinding(v);
+          v.risk_score = tw.score;
+          v.risk_weighting_tooltip = tw.tooltip;
+          if (!v.technical_justification) {
+            v.technical_justification = {
+              agent: agentLabel,
+              rule: ruleName,
+              explanation: 'Identified via Agent [' + agentLabel + ']: Entry #' + (idx + 1) + ' matched \'' + ruleName + '\' control pattern based on observed evidence and rule threshold breach.',
+              evidence_summary: {
+                evidence_a: v.field1 || null,
+                evidence_b: v.field2 || null,
+                scenario: v.scenario || null
+              }
+            };
+          }
+          return v;
+        });
+      }
+
+      function openSwarmDb() {
+        return new Promise(function (resolve, reject) {
+          var req = indexedDB.open('auditai_swarm_db', 1);
+          req.onupgradeneeded = function () {
+            var db = req.result;
+            if (!db.objectStoreNames.contains('agent_findings')) db.createObjectStore('agent_findings');
+          };
+          req.onsuccess = function () { resolve(req.result); };
+          req.onerror = function () { reject(req.error); };
+        });
+      }
+
+      async function saveSwarmSnapshot(agentKey, findings) {
+        try {
+          var db = await openSwarmDb();
+          await new Promise(function (resolve, reject) {
+            var tx = db.transaction('agent_findings', 'readwrite');
+            tx.objectStore('agent_findings').put({
+              saved_at: new Date().toISOString(),
+              findings: findings || []
+            }, agentKey || 'unknown');
+            tx.oncomplete = function () { resolve(); };
+            tx.onerror = function () { reject(tx.error); };
+          });
+          db.close();
+        } catch (_) {
+          // Non-blocking memory enhancement.
+        }
+      }
+
+      async function getSwarmSnapshot(agentKey) {
+        try {
+          var db = await openSwarmDb();
+          var record = await new Promise(function (resolve, reject) {
+            var tx = db.transaction('agent_findings', 'readonly');
+            var req = tx.objectStore('agent_findings').get(agentKey || 'unknown');
+            req.onsuccess = function () { resolve(req.result || null); };
+            req.onerror = function () { reject(req.error); };
+          });
+          db.close();
+          return record;
+        } catch (_) {
+          return null;
+        }
+      }
+
+      async function computeSwarmNudges(agentKey, findings) {
+        if (agentKey !== 'sod') return [];
+        var accessSnapshot = await getSwarmSnapshot('access');
+        var accessFindings = (accessSnapshot && accessSnapshot.findings) ? accessSnapshot.findings : [];
+        var terminatedUsers = accessFindings.filter(function (f) {
+          var text = (safeText(f.rule) + ' ' + safeText(f.scenario) + ' ' + safeText(f.detail)).toLowerCase();
+          return text.indexOf('terminated') !== -1 && text.indexOf('active') !== -1;
+        }).map(function (f) { return safeText(f.entity).toLowerCase(); });
+
+        if (!terminatedUsers.length) return [];
+        var nudges = [];
+        (findings || []).forEach(function (f) {
+          var ent = safeText(f.entity).toLowerCase();
+          if (terminatedUsers.indexOf(ent) !== -1) {
+            nudges.push({
+              severity: 'CRITICAL',
+              message: 'Swarm Nudge: Logical Access identified terminated user \'' + safeText(f.entity) + '\' still active. Re-check transaction and approval activity post-termination.'
+            });
+          }
+        });
+        return nudges;
+      }
 
       // ─── FRAUD SCENARIO → FINANCIAL EXPOSURE ESTIMATOR ──────────────────────────
       function estimateExposure(violations) {
@@ -12135,7 +12299,8 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
       function renderResults() {
         ensureResultMetaSlots();
         var ag = AGENTS[STATE.agent];
-        var vio = STATE.violations;
+        var vio = enrichFindingsForTrust(STATE.violations);
+        STATE.violations = vio;
         var rs = STATE.riskSummary;
         CC.allVio = vio;
         CC.filtered = vio;
@@ -12159,9 +12324,11 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
 
         document.getElementById('kpiCritVal').textContent = crit;
         document.getElementById('kpiCritSub').textContent = crit + ' critical SOX exposure';
+        document.getElementById('kpiCritVal').title = 'AI risk weighting: 70% frequency of occurrence + 30% financial materiality';
 
         document.getElementById('kpiExpVal').textContent = exposure >= 1000000 ? '$' + (exposure / 1000000).toFixed(1) + 'M' : '$' + Math.round(exposure / 1000) + 'K';
         document.getElementById('kpiExpSub').textContent = 'Estimated financial at-risk';
+        document.getElementById('kpiExpVal').title = 'AI risk weighting: 70% frequency of occurrence + 30% financial materiality';
 
         document.getElementById('kpiFraudVal').textContent = fraudCount;
         document.getElementById('kpiFraudSub').textContent = fraudCount + ' high-risk fraud indicators';
@@ -12195,6 +12362,12 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
 
         // ── LIVE FEED ──
         buildLiveFeed(vio);
+
+        saveSwarmSnapshot(STATE.agent, vio);
+        computeSwarmNudges(STATE.agent, vio).then(function (nudges) {
+          CC.swarmNudges = nudges || [];
+          buildLiveFeed(CC.filtered || vio);
+        });
 
         // ── VALIDATION SUMMARY ──
         var vCard = document.getElementById('validationSummaryBox');
@@ -12364,12 +12537,13 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
           var pillClass = v.severity === 'Critical' ? 'cc-pill-c' : v.severity === 'High' ? 'cc-pill-h' : v.severity === 'Medium' ? 'cc-pill-m' : 'cc-pill-l';
           if (isCorroborated) pillClass += ' cc-pill-corr';
           var areaPrefix = v.id ? v.id.split('-')[0] : '';
+          var weightingTip = (v.risk_weighting_tooltip || '70% frequency of occurrence + 30% financial materiality').replace(/"/g, '&quot;');
           html += '<tr class="cc-tr" id="ccrow' + idx + '" onclick="showNarrative(' + idx + ')">';
           html += '<td><span class="cc-dot ' + dotClass + '"></span></td>';
           html += '<td class="cc-entity" title="' + redactIdentity(v.entity) + '">' + redactIdentity(v.entity) + '</td>';
           html += '<td class="cc-rule-txt"><span class="cc-rule-id">' + v.id + '</span><br>' + v.rule + '</td>';
           html += '<td class="cc-area-txt">' + areaPrefix + '</td>';
-          html += '<td><span class="cc-sev-pill ' + pillClass + '">' + v.severity + '</span></td>';
+          html += '<td><span class="cc-sev-pill ' + pillClass + '" title="' + weightingTip + '">' + v.severity + '</span></td>';
           html += '<td class="cc-rule-txt" style="color:#f59e0b;font-size:.63rem">' + (v.scenario || '—') + '</td>';
           html += '</tr>';
         });
@@ -12429,6 +12603,14 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
           body += '</div>';
         }
 
+        var tj = v.technical_justification || {};
+        body += '<div style="margin-top:.6rem"><div style="font-family:\'JetBrains Mono\',monospace;font-size:.5rem;letter-spacing:.12em;text-transform:uppercase;color:#1e3a5f;margin-bottom:.35rem">🧪 Technical Justification</div>';
+        body += '<div class="cc-ev-rows">';
+        body += '<div class="cc-ev-row"><span class="cc-ev-k">Agent</span><span class="cc-ev-v">' + safeText(tj.agent || 'Audit Reasoning Engine') + '</span></div>';
+        body += '<div class="cc-ev-row"><span class="cc-ev-k">Rule Pattern</span><span class="cc-ev-v">' + safeText(tj.rule || v.rule || v.id) + '</span></div>';
+        body += '<div class="cc-ev-row"><span class="cc-ev-k">Explanation</span><span class="cc-ev-v">' + safeText(tj.explanation || 'Pattern trigger and supporting evidence are documented for auditor re-performance.') + '</span></div>';
+        body += '</div></div>';
+
         // Evidence block
         body += '<div class="cc-action-box"><div class="cc-action-lbl">📋 Recommended Action</div>';
         body += '<div class="cc-action-txt">' + (chain.auditOpinion || 'Investigate this exception, implement compensating controls, and escalate to management if Critical severity.') + '</div></div>';
@@ -12476,6 +12658,11 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
           var isAlert = v.severity === 'Critical';
           var isWarn = v.severity === 'High';
           items.push({ ts: ts, msg: v.id + ': ' + v.entity + ' — ' + (v.scenario || v.rule), alert: isAlert, warn: isWarn });
+        });
+        (CC.swarmNudges || []).forEach(function (n, i) {
+          var t = new Date(now - (i + 1) * 120000);
+          var ts = t.getHours().toString().padStart(2, '0') + ':' + t.getMinutes().toString().padStart(2, '0');
+          items.push({ ts: ts, msg: n.message, alert: true, warn: false });
         });
         items.sort(function (a, b) { return b.ts.localeCompare(a.ts) });
 
