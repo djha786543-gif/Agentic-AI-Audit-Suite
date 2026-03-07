@@ -216,6 +216,9 @@ See `docs/COMPLIANCE_EVIDENCE_PACK.md` for details.
 - `docs/ORGANIZATION_OPERATING_MODEL.md`
 - `docs/PAGE_FLOW_REFERENCE.md`
 - `docs/API_DATAFLOW_REFERENCE.md`
+- `docs/ROLE_BASED_SOPS.md`
+- `docs/READINESS_TEMPLATES.md`
+- `docs/ACCEPTANCE_CRITERIA_MATRIX.md`
 
 ### Prerequisites
 * **Python 3.10+** (Required for `asyncpg` and FastAPI compatibility)
