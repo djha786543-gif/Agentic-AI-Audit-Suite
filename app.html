@@ -11840,7 +11840,10 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
             },
             complete: function (res) {
               STATE.lineageMap = lineage;
-              done(rows, res.meta.fields || []);
+              var safeHeaders = (res && res.meta && Array.isArray(res.meta.fields))
+                ? res.meta.fields
+                : (rows.length ? Object.keys(rows[0]) : []);
+              done(rows, safeHeaders);
             }
           });
         } else if (ext === 'xlsx' || ext === 'xls') {
@@ -14546,8 +14549,10 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         Papa.parse(csv, {
           header: true, skipEmptyLines: true, worker: true, fastMode: true,
           complete: function (res) {
-            STATE.data = res.data;
-            STATE.headers = res.meta.fields || [];
+            STATE.data = (res && Array.isArray(res.data)) ? res.data : [];
+            STATE.headers = (res && res.meta && Array.isArray(res.meta.fields))
+              ? res.meta.fields
+              : (STATE.data.length ? Object.keys(STATE.data[0]) : []);
             // Switch back to structured panel
             switchIPE('structured');
             showPreview();
@@ -14576,9 +14581,12 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         Papa.parse(text, {
           header: true, skipEmptyLines: true, worker: true, fastMode: true,
           complete: function (res) {
-            if (!res.data.length) { alert('Could not parse data. Make sure the first line is column headers.'); return; }
-            STATE.data = res.data;
-            STATE.headers = res.meta.fields || [];
+            var parsedRows = (res && Array.isArray(res.data)) ? res.data : [];
+            if (!parsedRows.length) { alert('Could not parse data. Make sure the first line is column headers.'); return; }
+            STATE.data = parsedRows;
+            STATE.headers = (res && res.meta && Array.isArray(res.meta.fields))
+              ? res.meta.fields
+              : Object.keys(parsedRows[0] || {});
             switchIPE('structured');
             showPreview();
             buildMapping();
