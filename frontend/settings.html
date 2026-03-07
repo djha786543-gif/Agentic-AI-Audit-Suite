@@ -350,6 +350,12 @@
       }, 1600);
     }
 
+    if (!window.toast || typeof window.toast.show !== 'function') {
+      window.toast = {
+        show: showSettingsToast
+      };
+    }
+
     function saveSettings() {
       const payload = {
         organization_name: (document.getElementById('orgNameInput') || {}).value || '',
@@ -361,7 +367,8 @@
       };
 
       localStorage.setItem('auditai_settings_v1', JSON.stringify(payload));
-      showSettingsToast('Settings Saved');
+      localStorage.setItem('auditai_organization_name', payload.organization_name || '');
+      window.toast.show('Settings Saved');
     }
 
     function loadSettings() {

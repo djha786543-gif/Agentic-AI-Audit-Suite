@@ -796,7 +796,15 @@
                 return;
             }
 
-            var vaultedRecords = allVaultData;
+            var vaultedRecords = allVaultData.filter(function (log) {
+                return deriveVerificationStatus(log, null) === 'PENDING';
+            });
+
+            if (!vaultedRecords.length) {
+                renderTable();
+                alert('No pending records to verify.');
+                return;
+            }
 
             let verified = 0;
             let tampered = 0;
@@ -832,13 +840,21 @@
                 });
             }
 
+            const statusTotals = (allVaultData || []).reduce(function (acc, log) {
+                const status = deriveVerificationStatus(log, null);
+                if (status === 'VERIFIED') acc.verified += 1;
+                else if (status === 'TAMPERED') acc.tampered += 1;
+                else acc.pending += 1;
+                return acc;
+            }, { verified: 0, tampered: 0, pending: 0 });
+
             const certificateBody = {
                 certificate_type: 'Forensic Integrity Certificate',
                 generated_at: new Date().toISOString(),
                 total_records: allVaultData.length,
-                verified_records: verified,
-                tampered_records: tampered,
-                pending_records: pending,
+                verified_records: statusTotals.verified,
+                tampered_records: statusTotals.tampered,
+                pending_records: statusTotals.pending,
                 environment: isDemoMode ? 'DEMO' : 'LIVE',
                 details: details
             };
@@ -846,7 +862,7 @@
             latestIntegrityCertificate = Object.assign({}, certificateBody, { certificate_hash: certHash });
 
             renderTable();
-            alert('Verification completed. Verified=' + verified + ' records. Forensic Integrity Certificate generated.');
+            alert('Verification completed. Processed ' + vaultedRecords.length + ' pending record(s). Forensic Integrity Certificate generated.');
         }
 
         async function buildIntegrityCertificatePdfPayload() {
