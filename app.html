@@ -8818,8 +8818,9 @@
             <div style="font-size:.82rem;color:#5c5650;line-height:1.7;max-width:700px">This tool starts with a
               <strong>completely clean slate</strong> on every load. All findings, KPI numbers, and AI narratives are
               generated exclusively from the data <strong>you upload</strong> in Step 2. There is no simulated or
-              placeholder data. Upload your actual ERP export and the agent will analyse it from scratch — see the
-              <strong>Help Guide</strong> for sample CSV layouts per agent.
+              placeholder data. Upload raw ERP exports directly (including SAP technical headers like
+              <strong>MANDT / BNAME / AGR_NAME / USNAM</strong>) and the Semantic Header Interpreter will auto-map
+              columns without template files.
             </div>
           </div>
         </div>
@@ -9305,6 +9306,33 @@
           <div class="mapping-grid" id="mappingGrid"></div>
         </div>
 
+        <div id="dataIntegrityScorecard" style="display:none;margin-top:12px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(9,14,24,.65);padding:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+            <div>
+              <div style="font-family:var(--font-mono);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:#93c5fd">Data Integrity Scorecard</div>
+              <div id="integrityScoreValue" style="font-size:1.25rem;font-weight:800;color:#4ade80">—</div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(4,minmax(110px,1fr));gap:8px;flex:1;min-width:300px">
+              <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:8px">
+                <div style="font-size:.6rem;color:#94a3b8">Missing Values</div>
+                <div id="integrityMissing" style="font-family:var(--font-mono);font-size:.82rem">—</div>
+              </div>
+              <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:8px">
+                <div style="font-size:.6rem;color:#94a3b8">Duplicates</div>
+                <div id="integrityDupes" style="font-family:var(--font-mono);font-size:.82rem">—</div>
+              </div>
+              <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:8px">
+                <div style="font-size:.6rem;color:#94a3b8">Date Inconsistency</div>
+                <div id="integrityDateFormats" style="font-family:var(--font-mono);font-size:.82rem">—</div>
+              </div>
+              <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:8px">
+                <div style="font-size:.6rem;color:#94a3b8">Status</div>
+                <div id="integrityStatus" style="font-family:var(--font-mono);font-size:.82rem">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="btn-row">
           <button class="btn btn-secondary" onclick="goStep(1)">&larr; Back</button>
           <button class="btn btn-primary" id="btnRun" disabled onclick="runAudit()">&#x1f680; Run Audit Agent</button>
@@ -9583,6 +9611,7 @@
                         <th>Area</th>
                         <th>Severity</th>
                         <th>Fraud Scenario</th>
+                        <th>Logic Trace</th>
                       </tr>
                     </thead>
                     <tbody id="ccFindingsTbody"></tbody>
@@ -9727,6 +9756,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
       var STATE = {
         agent: null,
         file: null,
+        rawData: [],
         data: [],
         headers: [],
         lineageMap: {},
@@ -9970,9 +10000,9 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         // can reference canonical names regardless of source system.
         fieldAliases: {
           // User / Employee ID
-          user: ['user', 'userid', 'user_id', 'username', 'user_name', 'emp_id', 'employee_id', 'employeeid', 'sap_user', 'oracle_user', 'd365_user', 'workday_id', 'netsuite_user', 'subject', 'account', 'login', 'logon', 'principal', 'samaccountname', 'upn', 'email', 'usnam', 'uname'],
+          user: ['user', 'userid', 'user_id', 'username', 'user_name', 'emp_id', 'employee_id', 'employeeid', 'sap_user', 'oracle_user', 'd365_user', 'workday_id', 'netsuite_user', 'subject', 'account', 'login', 'logon', 'principal', 'samaccountname', 'upn', 'email', 'usnam', 'uname', 'bname'],
           // Role / Permission / T-code
-          role: ['role', 'tcode', 't_code', 'transaction_code', 'permission', 'privilege', 'entitlement', 'access_right', 'function', 'responsibility', 'duty', 'security_role', 'role_name', 'group', 'ad_group', 'profile', 'auth_object', 'function_name', 'menu_item', 'task', 'action'],
+          role: ['role', 'tcode', 't_code', 'transaction_code', 'permission', 'privilege', 'entitlement', 'access_right', 'function', 'responsibility', 'duty', 'security_role', 'role_name', 'group', 'ad_group', 'profile', 'auth_object', 'function_name', 'menu_item', 'task', 'action', 'agr_name', 'agrname', 'low'],
           // Display name
           name: ['name', 'full_name', 'fullname', 'display_name', 'employee_name', 'emp_name', 'user_display', 'first_last', 'person', 'usnam'],
           // System / ERP source
@@ -10094,15 +10124,49 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         // ── AUTO-MAP: build mapping object from data row keys ─────────────────
         autoMap: function (headers, fieldKeys) {
           var map = {};
+          function toks(s) {
+            return String(s || '').toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+          }
+          function tokenScore(a, b) {
+            var ta = toks(a), tb = toks(b);
+            if (!ta.length || !tb.length) return 0;
+            var setB = {};
+            tb.forEach(function (x) { setB[x] = 1; });
+            var overlap = 0;
+            ta.forEach(function (x) { if (setB[x]) overlap++; });
+            return overlap / Math.max(ta.length, tb.length);
+          }
+          function ngramScore(a, b) {
+            var sa = ERP.norm(a), sb = ERP.norm(b);
+            if (!sa || !sb) return 0;
+            function grams(s) {
+              var g = {};
+              if (s.length < 2) { g[s] = 1; return g; }
+              for (var i = 0; i < s.length - 1; i++) g[s.slice(i, i + 2)] = 1;
+              return g;
+            }
+            var ga = grams(sa), gb = grams(sb);
+            var inter = 0, uni = 0;
+            var seen = {};
+            Object.keys(ga).forEach(function (k) { seen[k] = 1; if (gb[k]) inter++; });
+            Object.keys(gb).forEach(function (k) { seen[k] = 1; });
+            uni = Object.keys(seen).length || 1;
+            return inter / uni;
+          }
           fieldKeys.forEach(function (fk) {
             var aliases = ERP.fieldAliases[fk] || [fk];
+            var best = { h: '', s: 0 };
             for (var i = 0; i < headers.length; i++) {
               var hn = ERP.norm(headers[i]);
               for (var j = 0; j < aliases.length; j++) {
-                if (hn === ERP.norm(aliases[j])) { map[fk] = headers[i]; break; }
+                var an = ERP.norm(aliases[j]);
+                if (hn === an) { map[fk] = headers[i]; best = { h: headers[i], s: 1 }; break; }
+                var s = Math.max(tokenScore(headers[i], aliases[j]), ngramScore(headers[i], aliases[j]));
+                if (s > best.s) best = { h: headers[i], s: s };
               }
               if (map[fk]) break;
             }
+            if (!map[fk] && best.h && best.s >= 0.42) map[fk] = best.h;
           });
           return map;
         },
@@ -11650,10 +11714,12 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
           var normalized = (data || []).map(normalizeRowValues);
           if (callback) callback(normalized, headers);
           else {
+            STATE.rawData = data || [];
             STATE.data = normalized;
             STATE.headers = headers;
             showPreview();
             buildMapping();
+            renderDataIntegrityScorecard(STATE.rawData, STATE.data, STATE.headers);
           }
         }
         if (ext === 'csv' || ext === 'tsv') {
@@ -11845,6 +11911,67 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         h += '</tbody>'; t.innerHTML = h;
         document.getElementById('rowCount').textContent = STATE.data.length + ' rows x ' + STATE.headers.length + ' columns';
         document.getElementById('dataPreview').classList.add('show');
+      }
+
+      function renderDataIntegrityScorecard(rawRows, normRows, headers) {
+        var box = document.getElementById('dataIntegrityScorecard');
+        if (!box) return;
+        var rows = Array.isArray(normRows) ? normRows : [];
+        var raw = Array.isArray(rawRows) ? rawRows : [];
+        var cols = Array.isArray(headers) ? headers : [];
+        if (!rows.length || !cols.length) {
+          box.style.display = 'none';
+          return;
+        }
+
+        var missing = 0;
+        rows.forEach(function (r) {
+          cols.forEach(function (c) {
+            var v = r[c];
+            if (v === '' || v == null) missing++;
+          });
+        });
+        var totalCells = rows.length * cols.length;
+        var missingPct = totalCells ? Math.round((missing / totalCells) * 1000) / 10 : 0;
+
+        var seen = {};
+        var dupes = 0;
+        rows.forEach(function (r) {
+          var fp = JSON.stringify(r);
+          if (seen[fp]) dupes++;
+          else seen[fp] = 1;
+        });
+
+        var formatFlags = { slash: 0, dash2: 0, iso: 0 };
+        raw.forEach(function (r) {
+          cols.forEach(function (c) {
+            var v = String((r && r[c]) || '').trim();
+            if (!v) return;
+            if (/^\d{2}\/\d{2}\/\d{4}$/.test(v)) formatFlags.slash++;
+            else if (/^\d{2}-\d{2}-\d{2}$/.test(v)) formatFlags.dash2++;
+            else if (/^\d{4}-\d{2}-\d{2}/.test(v)) formatFlags.iso++;
+          });
+        });
+        var dateFormatKinds = Object.keys(formatFlags).filter(function (k) { return formatFlags[k] > 0; }).length;
+        var dateInconsistent = dateFormatKinds > 1;
+
+        var integrity = 100;
+        integrity -= Math.min(40, missingPct * 0.6);
+        integrity -= Math.min(30, dupes * 0.8);
+        if (dateInconsistent) integrity -= 15;
+        integrity = Math.max(0, Math.round(integrity));
+
+        var status = integrity >= 90 ? 'Excellent' : integrity >= 75 ? 'Acceptable' : 'Needs remediation';
+        var statusColor = integrity >= 90 ? '#4ade80' : integrity >= 75 ? '#f59e0b' : '#f87171';
+
+        document.getElementById('integrityScoreValue').textContent = integrity + '/100';
+        document.getElementById('integrityScoreValue').style.color = statusColor;
+        document.getElementById('integrityMissing').textContent = missing + ' (' + missingPct + '%)';
+        document.getElementById('integrityDupes').textContent = String(dupes);
+        document.getElementById('integrityDateFormats').textContent = dateInconsistent ? 'Mixed formats detected' : 'Consistent';
+        document.getElementById('integrityStatus').textContent = status;
+        document.getElementById('integrityStatus').style.color = statusColor;
+        box.style.display = 'block';
       }
 
       function buildMapping() {
@@ -12218,7 +12345,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
       }
 
       async function computeSwarmNudges(agentKey, findings) {
-        if (agentKey !== 'sod') return [];
+        if (agentKey !== 'sod' && agentKey !== 'frr') return [];
         var accessSnapshot = await getSwarmSnapshot('access');
         var accessFindings = (accessSnapshot && accessSnapshot.findings) ? accessSnapshot.findings : [];
         var terminatedUsers = accessFindings.filter(function (f) {
@@ -12230,10 +12357,14 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         var nudges = [];
         (findings || []).forEach(function (f) {
           var ent = safeText(f.entity).toLowerCase();
-          if (terminatedUsers.indexOf(ent) !== -1) {
+          var fieldText = (safeText(f.field1) + ' ' + safeText(f.field2) + ' ' + safeText(f.rule)).toLowerCase();
+          var isTarget = terminatedUsers.indexOf(ent) !== -1 || terminatedUsers.some(function (u) { return fieldText.indexOf(u) !== -1; });
+          if (isTarget) {
             nudges.push({
               severity: 'CRITICAL',
-              message: 'Swarm Nudge: Logical Access identified terminated user \'' + safeText(f.entity) + '\' still active. Re-check transaction and approval activity post-termination.'
+              message: agentKey === 'frr'
+                ? 'High Priority Alert: Leaver account detected by Logical Access. JE Forensics must inspect post-termination journals and approvals immediately for user \'' + (safeText(f.entity) || 'unknown') + '\'.'
+                : 'Swarm Nudge: Logical Access identified terminated user \'' + safeText(f.entity) + '\' still active. Re-check transaction and approval activity post-termination.'
             });
           }
         });
@@ -12545,6 +12676,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
           html += '<td class="cc-area-txt">' + areaPrefix + '</td>';
           html += '<td><span class="cc-sev-pill ' + pillClass + '" title="' + weightingTip + '">' + v.severity + '</span></td>';
           html += '<td class="cc-rule-txt" style="color:#f59e0b;font-size:.63rem">' + (v.scenario || '—') + '</td>';
+          html += '<td><button class="btn" style="font-size:.62rem;padding:.22rem .5rem" onclick="showLogicTrace(' + idx + ', event)">Logic Trace</button></td>';
           html += '</tr>';
         });
         tbody.innerHTML = html;
@@ -12642,6 +12774,24 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
           severity: v.severity
         };
         alert('Re-performance payload:\n\n' + JSON.stringify(payload, null, 2));
+      }
+
+      function showLogicTrace(idx, ev) {
+        if (ev && ev.stopPropagation) ev.stopPropagation();
+        var vio = CC.filtered || [];
+        var v = vio[idx];
+        if (!v) return;
+        var tj = v.technical_justification || {};
+        var c = v.chain || {};
+        var trace =
+          'Agent: ' + (tj.agent || 'Audit Reasoning Engine') + '\n' +
+          'Rule: ' + (tj.rule || v.rule || v.id) + '\n\n' +
+          'IF entity "' + (v.entity || 'unknown') + '" satisfies policy condition(s):\n' +
+          '- ' + (c.access || v.field1 || 'Access/activity condition met') + '\n' +
+          '- ' + (c.controlFailure || v.field2 || 'Control failure observed') + '\n' +
+          'THEN raise exception "' + (v.id || 'FINDING') + '" with severity "' + (v.severity || 'Medium') + '"\n\n' +
+          'Explanation:\n' + (tj.explanation || 'Pattern threshold breach validated against configured control logic.');
+        alert(trace);
       }
 
       // ─── LIVE FEED BUILDER ───────────────────────────────────────────────────────

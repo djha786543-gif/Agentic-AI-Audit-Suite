@@ -396,6 +396,7 @@
           <div class="form-group"><label>Owner</label><input id="remOwner" placeholder="e.g. AP Process Owner"></div>
         </div>
         <div class="form-group" style="margin-bottom:12px"><label>Due Date</label><input id="remDueDate" type="date"></div>
+        <div class="form-group" style="margin-bottom:12px"><label>Actual Closure Date</label><input id="remClosureDate" type="date"></div>
         <div class="actions"><button class="btn btn-primary" onclick="assignRemediation()">Assign Owner & Due Date</button></div>
       </div>
     </div>
@@ -453,6 +454,35 @@
     const cls = { open: 'open', acknowledged: 'acknowledged', resolved: 'resolved',
                   active: 'active', draft: 'draft', retired: 'retired' };
     return `<span class="badge badge-${cls[s] || 'medium'}">${s}</span>`;
+  }
+
+  function getRemediationLedger() {
+    try {
+      return JSON.parse(localStorage.getItem('auditai_remediation_ledger_v1') || '[]');
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function upsertRemediationLedger(record) {
+    const ledger = getRemediationLedger();
+    const idx = ledger.findIndex(x => x.finding_id === record.finding_id);
+    const merged = idx >= 0 ? { ...ledger[idx], ...record } : record;
+    if (idx >= 0) ledger[idx] = merged; else ledger.push(merged);
+    localStorage.setItem('auditai_remediation_ledger_v1', JSON.stringify(ledger));
+  }
+
+  function buildMitigationPlanText(f) {
+    const control = (f.control_id || '').toUpperCase();
+    const owner = f.remediation_owner || 'Assigned Process Owner';
+    const entity = f.id;
+    if (control.includes('SOD') || control.includes('LA')) {
+      return `Remove conflicting SAP role(s) from user tied to finding ${entity}; enforce dual-authorization and complete access recertification. Owner: ${owner}.`;
+    }
+    if (control.includes('FRR') || control.includes('TT')) {
+      return `Block posting rights for affected preparer in finding ${entity}; require independent reviewer sign-off and retrospective JE validation. Owner: ${owner}.`;
+    }
+    return `Implement control remediation for finding ${entity}, add preventive validation in ERP workflow, and execute retest evidence package. Owner: ${owner}.`;
   }
 
   function switchTab(name) {
@@ -743,13 +773,17 @@
         el.innerHTML = '<div class="empty-state"><div class="empty-icon">🛠</div>No findings available</div>';
         return;
       }
-      el.innerHTML = `<table><thead><tr><th>ID</th><th>Control</th><th>Severity</th><th>Owner</th><th>Due</th><th>Status</th></tr></thead><tbody>
+      const ledger = getRemediationLedger();
+      const byFinding = Object.fromEntries(ledger.map(x => [x.finding_id, x]));
+      el.innerHTML = `<table><thead><tr><th>ID</th><th>Control</th><th>Severity</th><th>Owner</th><th>Due</th><th>Mitigation Plan</th><th>Closure</th><th>Status</th></tr></thead><tbody>
         ${data.map(f => `<tr>
           <td style="font-family:'JetBrains Mono',monospace;font-size:.7rem">${f.id}</td>
           <td>${f.control_id || '—'}</td>
           <td>${severityBadge((f.severity || '').toUpperCase())}</td>
           <td>${f.remediation_owner || 'Unassigned'}</td>
           <td>${f.remediation_due_date ? new Date(f.remediation_due_date).toLocaleDateString() : '—'}</td>
+          <td><button class="btn btn-outline" onclick="generateMitigationPlan('${f.id}')">Generate Mitigation Plan</button><div id="plan-${f.id}" style="margin-top:6px;font-size:.75rem;color:#9fb3d1">${(byFinding[f.id] && byFinding[f.id].mitigation_plan) || '—'}</div></td>
+          <td>${(byFinding[f.id] && byFinding[f.id].actual_closure_date) ? new Date(byFinding[f.id].actual_closure_date).toLocaleDateString() : 'Open'}</td>
           <td>${statusBadge(f.status || 'open')}</td>
         </tr>`).join('')}
       </tbody></table>`;
@@ -762,6 +796,7 @@
     const findingId = document.getElementById('remFindingId').value.trim();
     const owner = document.getElementById('remOwner').value.trim();
     const dueDate = document.getElementById('remDueDate').value;
+    const closureDate = document.getElementById('remClosureDate').value;
     if (!findingId || !owner || !dueDate) {
       showError('Finding ID, owner, and due date are required.');
       return;
@@ -771,11 +806,40 @@
       body: JSON.stringify({ remediation_owner: owner, remediation_due_date: new Date(dueDate).toISOString() })
     });
     if (r.ok) {
+      upsertRemediationLedger({
+        finding_id: findingId,
+        remediation_owner: owner,
+        remediation_due_date: dueDate ? new Date(dueDate).toISOString() : null,
+        actual_closure_date: closureDate ? new Date(closureDate).toISOString() : null,
+        updated_at: new Date().toISOString()
+      });
       showSuccess('Remediation assignment saved.');
       loadRemediation();
     } else {
       const err = await r.json();
       showError(err.detail || 'Failed to assign remediation owner.');
+    }
+  }
+
+  async function generateMitigationPlan(findingId) {
+    try {
+      const r = await fetch(`${API}/findings/`, { headers: headers() });
+      const data = await r.json();
+      const f = (data || []).find(x => x.id === findingId);
+      if (!f) { showError('Finding not found for mitigation plan.'); return; }
+      const plan = buildMitigationPlanText(f);
+      upsertRemediationLedger({
+        finding_id: findingId,
+        mitigation_plan: plan,
+        generated_at: new Date().toISOString(),
+        management_response: null,
+        actual_closure_date: null
+      });
+      const el = document.getElementById(`plan-${findingId}`);
+      if (el) el.textContent = plan;
+      showSuccess('Mitigation plan drafted and tracked in vault ledger.');
+    } catch (e) {
+      showError('Failed to generate mitigation plan.');
     }
   }
 
@@ -821,6 +885,13 @@
       })
     });
     if (r.ok) {
+      upsertRemediationLedger({
+        finding_id: findingId,
+        management_response: responseText,
+        responsible_owner: owner,
+        target_date: targetDate ? new Date(targetDate).toISOString() : null,
+        updated_at: new Date().toISOString()
+      });
       showSuccess('Management response submitted.');
       loadOwnerQueue();
     } else {

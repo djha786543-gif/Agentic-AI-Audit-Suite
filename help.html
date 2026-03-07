@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Help & Documentation | Agentic AI Internal Audit Suite v4.0 ENTERPRISE</title>
-<meta name="description" content="Reference documentation for setup, workflows, troubleshooting, and static-mode limitations in the audit suite.">
+<title>Help & Documentation | Agentic AI Internal Audit Suite v4.1 AUTONOMOUS</title>
+<meta name="description" content="Industrial end-user guide for autonomous monitoring, semantic ingestion, explainable AI logic traces, swarm alerts, remediation workflow, and evidence vault operations.">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -621,7 +621,7 @@
 </style>
 </head>
 <body>
-  <div class="advisory-banner" style="position:sticky;top:0;z-index:80;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:4px 10px;background:#1a0a00;border-bottom:1px solid #f59e0b;color:#fcd34d;font-size:10px;line-height:1.25;"><span>⚠️ ADVISORY: AuditAI Suite findings are advisory only. No output constitutes an audit opinion, conclusion, or attestation under PCAOB AS 2201 or ISA 315. All findings require professional review by a qualified auditor before use in any compliance or financial reporting context.</span><span style="margin-left:auto;white-space:nowrap;font-family:monospace;font-size:10px;opacity:.9;">AuditAI Suite v4.0 ENTERPRISE</span></div>
+  <div class="advisory-banner" style="position:sticky;top:0;z-index:80;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:4px 10px;background:#1a0a00;border-bottom:1px solid #f59e0b;color:#fcd34d;font-size:10px;line-height:1.25;"><span>⚠️ ADVISORY: AuditAI Suite findings are advisory only. No output constitutes an audit opinion, conclusion, or attestation under PCAOB AS 2201 or ISA 315. All findings require professional review by a qualified auditor before use in any compliance or financial reporting context.</span><span style="margin-left:auto;white-space:nowrap;font-family:monospace;font-size:10px;opacity:.9;">AuditAI Suite v4.1 AUTONOMOUS</span></div>
 
 <!-- BACK BAR -->
 <nav class="back-bar">
@@ -630,14 +630,14 @@
     Back to Suite
   </a>
   <span class="back-bar-title">Help &amp; Documentation</span>
-  <span class="version-badge">v4.0 ENTERPRISE</span>
+  <span class="version-badge">v4.1 AUTONOMOUS</span>
 </nav>
 
 <!-- HERO -->
 <section class="hero">
-  <p class="hero-eyebrow">📖 Complete Guide</p>
+  <p class="hero-eyebrow">📖 Industrial Operations Guide</p>
   <h1>Everything You Need to Know About the<br><em>Agentic AI Audit Suite</em></h1>
-  <p>A comprehensive guide covering every feature, agent, workflow, and security control — with diagrams and step-by-step instructions.</p>
+  <p>A practical end-user manual for autonomous audit monitoring: semantic ingestion, logic traces, cross-agent swarm alerts, remediation lifecycle, and evidentiary closure.</p>
   <div class="search-wrap">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     <input type="text" id="searchInput" placeholder="Search documentation..." oninput="searchDocs(this.value)">
@@ -717,6 +717,11 @@
       <div class="toc-card-title">FAQ</div>
       <div class="toc-card-desc">Frequently asked questions</div>
     </a>
+    <a href="#autonomous-ops" class="toc-card">
+      <div class="toc-card-icon">🛰️</div>
+      <div class="toc-card-title">Autonomous Ops</div>
+      <div class="toc-card-desc">Industrial operating model across App, Governance, Vault</div>
+    </a>
   </div>
 </div>
 
@@ -745,6 +750,7 @@
       <div class="nav-group-title">Support</div>
       <a href="#troubleshooting" class="sidebar-link">🔧 Troubleshooting</a>
       <a href="#faq" class="sidebar-link">💬 FAQ</a>
+      <a href="#autonomous-ops" class="sidebar-link">🛰️ Autonomous Ops</a>
     </nav>
   </aside>
 
@@ -2261,6 +2267,70 @@
 
 <span class="comment">// Step 3: Enter the Role ARN in Data Sources → AWS</span>
 <span class="comment">// The suite uses STS to assume the role temporarily (1 hour sessions)</span>
+      </div>
+    </section>
+
+    <!-- ============================
+         SECTION 11: AUTONOMOUS OPS
+         ============================ -->
+    <section class="help-section" id="autonomous-ops">
+      <div class="section-header">
+        <div class="section-icon">🛰️</div>
+        <div>
+          <h2>Autonomous Monitoring Operations</h2>
+          <p class="section-subtitle">ZERO-FRICTION INGESTION · XAI TRUST · SWARM ALERTING · REMEDIATION CLOSURE</p>
+        </div>
+      </div>
+
+      <div class="prose">
+        <p>This section defines the recommended <strong>industrial operating model</strong> for production teams using the current portal pages. The suite is now optimized for continuous monitoring, not one-off manual upload/testing.</p>
+      </div>
+
+      <h3 class="sub-heading">Portal Page Responsibilities</h3>
+      <table class="data-table">
+        <thead>
+          <tr><th>Page</th><th>Primary Operator</th><th>Core Responsibility</th><th>Frequency</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>app.html</code></td><td>Audit Analyst</td><td>Semantic ingestion, Data Integrity Scorecard, logic trace review, swarm-aware triage</td><td>Daily / per intake batch</td></tr>
+          <tr><td><code>governance.html</code></td><td>Control Owner + Internal Audit</td><td>Assign remediation, generate mitigation plan, capture management response, closure tracking</td><td>Daily status + weekly governance cadence</td></tr>
+          <tr><td><code>vault.html</code></td><td>Audit Manager / QA</td><td>Verify All cryptographic checks, forensic integrity certificate, remediation lifecycle evidence</td><td>Daily + pre-committee reporting</td></tr>
+          <tr><td><code>reports.html</code></td><td>Audit Lead</td><td>Residual risk heatmap and external read-only package distribution</td><td>Weekly / month-end / quarter-end</td></tr>
+        </tbody>
+      </table>
+
+      <h3 class="sub-heading">Operating Workflow (End-User View)</h3>
+      <ol class="ordered-list">
+        <li>Open <code>app.html</code> and upload raw ERP extracts (including SAP technical headers like <code>MANDT</code>, <code>BNAME</code>, <code>AGR_NAME</code>, <code>USNAM</code>).</li>
+        <li>Review the <strong>Data Integrity Scorecard</strong> before scan: missing values, duplicates, and date consistency are shown prior to execution.</li>
+        <li>Run agents and use <strong>Logic Trace</strong> on each exception to validate if-then reasoning before confirming action.</li>
+        <li>If high-priority leaver access appears, monitor <strong>swarm alerts</strong> to force JE Forensics follow-up on post-termination journals.</li>
+        <li>Move to <code>governance.html</code> and generate a mitigation plan per finding; assign owner, due date, response, and actual closure date.</li>
+        <li>Open <code>vault.html</code>, click <strong>Verify All</strong>, and archive the generated forensic integrity certificate with remediation lifecycle records.</li>
+      </ol>
+
+      <h3 class="sub-heading">Auditor Trust Controls Checklist</h3>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-card-icon">🧠</div>
+          <div class="feature-card-title">Explainability</div>
+          <div class="feature-card-desc">Every material exception must include Logic Trace output and technical justification before escalation.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card-icon">🔁</div>
+          <div class="feature-card-title">Cross-Agent Corroboration</div>
+          <div class="feature-card-desc">Leaver alerts from Logical Access should trigger JE Forensics review automatically through shared context memory.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card-icon">🛠️</div>
+          <div class="feature-card-title">Actionability</div>
+          <div class="feature-card-desc">Mitigation plans must be generated and management responses captured, with closure date evidence logged in vault.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card-icon">🔐</div>
+          <div class="feature-card-title">Integrity Assurance</div>
+          <div class="feature-card-desc">Run Verify All daily and preserve forensic integrity certificate exports in audit workpapers.</div>
+        </div>
       </div>
     </section>
 
