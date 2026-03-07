@@ -42,6 +42,21 @@ def _risk_rating(score: int) -> str:
     return "LOW"
 
 
+def _agent_name_for_finding(finding: Dict[str, Any]) -> str:
+    cid = str(finding.get("control_id") or "")
+    if cid.startswith("ITAC"):
+        return "Financial Forensics"
+    if cid.startswith("ITGC-SOD"):
+        return "SOD Auditor"
+    if cid.startswith("ITGC-LA"):
+        return "Logical Access Auditor"
+    if cid.startswith("ITGC-CM"):
+        return "Change Management Auditor"
+    if cid.startswith("ITGC-OPS"):
+        return "Operations Controls Auditor"
+    return "Audit Reasoning Engine"
+
+
 def run_audit_engine(
     parsed_data: Dict[str, Any],
     source_system: str = "Uploaded File",
@@ -261,6 +276,72 @@ def run_audit_engine(
                 },
             },
         )
+        finding.setdefault(
+            "technical_justification",
+            {
+                "agent": _agent_name_for_finding(finding),
+                "rule": finding.get("rule") or finding.get("finding_type") or finding.get("control_id"),
+                "entity": finding.get("entity") or finding.get("user_id") or finding.get("record_id"),
+                "explanation": (
+                    f"Identified via Agent [{_agent_name_for_finding(finding)}]: "
+                    f"{finding.get('entity') or finding.get('user_id') or 'Record'} matched '{finding.get('finding_type') or finding.get('rule') or finding.get('control_id')}' pattern."
+                ),
+                "evidence": finding.get("evidence") or {},
+            },
+        )
+
+    # Cross-agent swarm memory: nudge SOD when terminated users appear in post-termination activity.
+    swarm_nudges: List[Dict[str, Any]] = []
+    term_dates: Dict[str, datetime] = {}
+    for row in user_records:
+        user_id = str(row.get("user_id") or row.get("username") or "").strip()
+        if not user_id:
+            continue
+        raw_term = row.get("termination_date") or row.get("term_date")
+        if not raw_term:
+            continue
+        try:
+            term_dates[user_id] = datetime.fromisoformat(str(raw_term).replace("Z", "+00:00")).replace(tzinfo=None)
+        except Exception:
+            continue
+
+    la_terminated_findings = [f for f in all_findings if f.get("finding_type") == "TERMINATED_USER_ACTIVE"]
+    if la_terminated_findings and transaction_records:
+        for tx in transaction_records:
+            tx_user = str(
+                tx.get("user_id")
+                or tx.get("created_by")
+                or tx.get("posted_by")
+                or tx.get("initiator")
+                or ""
+            ).strip()
+            if not tx_user or tx_user not in term_dates:
+                continue
+            raw_tx_date = tx.get("txn_date") or tx.get("invoice_date") or tx.get("posting_date")
+            if not raw_tx_date:
+                continue
+            try:
+                tx_date = datetime.fromisoformat(str(raw_tx_date).replace("Z", "+00:00")).replace(tzinfo=None)
+            except Exception:
+                continue
+            if tx_date > term_dates[tx_user]:
+                swarm_nudges.append({
+                    "from_agent": "Logical Access Auditor",
+                    "to_agent": "SOD Auditor",
+                    "user_id": tx_user,
+                    "transaction_id": tx.get("invoice_id") or tx.get("txn_id") or tx.get("id"),
+                    "message": (
+                        f"Terminated user '{tx_user}' executed post-termination transaction activity. "
+                        "Re-check SoD conflicts and payment approval chain immediately."
+                    ),
+                    "severity": "CRITICAL",
+                })
+
+    if swarm_nudges:
+        domain_results["swarm_nudges"] = {
+            "count": len(swarm_nudges),
+            "nudges": swarm_nudges,
+        }
 
     risk_score = _compute_risk_score(all_findings)
     overall_rating = _risk_rating(risk_score)
@@ -285,6 +366,7 @@ def run_audit_engine(
         "findings_by_risk": by_risk,
         "domain_results": domain_results,
         "all_findings": all_findings,
+        "swarm_nudges": swarm_nudges,
         "generated_at": start_time.isoformat(),
         "processing_seconds": round(elapsed, 2),
         "status": "COMPLETE",

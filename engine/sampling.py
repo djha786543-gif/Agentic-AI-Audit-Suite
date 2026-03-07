@@ -6,6 +6,52 @@ import random
 from typing import Any, Dict, List
 
 
+def confidence_level_sampling(
+    population_size: int,
+    confidence_level: float = 0.95,
+    margin_error: float = 0.05,
+    expected_deviation: float = 0.5,
+    seed: int | None = 42,
+) -> Dict[str, Any]:
+    """
+    Generate a statistically valid sample size and random sample IDs.
+
+    Uses finite population correction with z-scores commonly used in audit sampling.
+    """
+    if population_size <= 0:
+        raise ValueError("population_size must be > 0")
+
+    z_lookup = {
+        0.90: 1.645,
+        0.95: 1.96,
+        0.99: 2.576,
+    }
+    rounded_conf = min(z_lookup.keys(), key=lambda c: abs(c - confidence_level))
+    z = z_lookup[rounded_conf]
+
+    p = min(max(expected_deviation, 0.01), 0.99)
+    e = min(max(margin_error, 0.005), 0.25)
+
+    n0 = (z * z * p * (1 - p)) / (e * e)
+    n = n0 / (1 + ((n0 - 1) / population_size))
+    sample_size = max(1, min(population_size, int(math.ceil(n))))
+
+    rnd = random.Random(seed)
+    sample_ids = sorted(rnd.sample(range(1, population_size + 1), sample_size))
+
+    return {
+        "method": "confidence_level_sampling",
+        "population_size": population_size,
+        "sample_size": sample_size,
+        "confidence_level": rounded_conf,
+        "z_score": z,
+        "margin_error": e,
+        "expected_deviation": p,
+        "sample_ids": sample_ids,
+        "pcaob_note": "Finite-population corrected sample size aligned to statistical audit sampling practice.",
+    }
+
+
 def attribute_sampling(population: List[Dict[str, Any]], sample_size: int, seed: int | None = 42) -> Dict[str, Any]:
     """Simple random attribute sampling."""
     if sample_size <= 0:

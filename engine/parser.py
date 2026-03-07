@@ -15,6 +15,7 @@ from __future__ import annotations
 import json
 import io
 import re
+from datetime import datetime
 from typing import List, Dict, Any, Tuple, Optional
 import logging
 
@@ -70,6 +71,128 @@ COLUMN_ALIASES = {
     "job status": "status", "backup status": "status", "result": "status",
 }
 
+# SAP short-field semantic dictionary for zero-prep ingestion.
+SAP_CODE_ALIASES = {
+    "mandt": "client",
+    "ersda": "creation_date",
+    "usnam": "user_name",
+    "erdat": "creation_date",
+    "aedat": "change_date",
+    "uname": "user_name",
+    "lifnr": "vendor_id",
+    "bukrs": "company_code",
+    "belnr": "invoice_id",
+    "bldat": "invoice_date",
+    "budat": "posting_date",
+    "wrbtr": "invoice_amount",
+    "dmbtr": "invoice_amount",
+}
+
+# Light semantic token map (LLM-style intent matching without external dependency).
+SEMANTIC_TOKENS = {
+    "client": {"client", "tenant", "mandant", "mandt"},
+    "creation_date": {"creation", "created", "create", "ersda", "erdat", "date"},
+    "user_name": {"user", "username", "usnam", "uname", "name", "logon"},
+    "invoice_amount": {"invoice", "amount", "value", "wrbtr", "dmbtr", "total"},
+    "invoice_date": {"invoice", "date", "doc", "bldat", "posting", "budat"},
+    "vendor_id": {"vendor", "supplier", "lifnr", "id", "code"},
+}
+
+
+def _tokenize(col: str) -> set[str]:
+    return {t for t in re.split(r"[^a-z0-9]+", col) if t}
+
+
+def _semantic_match(col: str) -> Optional[str]:
+    """Best-effort semantic mapping for zero-prep uploads."""
+    tokens = _tokenize(col)
+    if not tokens:
+        return None
+    best_key = None
+    best_score = 0.0
+    for canonical, semantic_tokens in SEMANTIC_TOKENS.items():
+        overlap = len(tokens & semantic_tokens)
+        if overlap == 0:
+            continue
+        score = overlap / max(1, len(semantic_tokens))
+        if score > best_score:
+            best_score = score
+            best_key = canonical
+    # Conservative threshold to reduce bad auto-maps.
+    return best_key if best_score >= 0.2 else None
+
+
+def _parse_date(value: Any) -> Any:
+    if value is None:
+        return value
+    s = str(value).strip()
+    if not s:
+        return value
+
+    formats = [
+        "%Y-%m-%d",
+        "%d/%m/%Y", "%m/%d/%Y",
+        "%d-%m-%Y", "%m-%d-%Y",
+        "%d-%m-%y", "%m-%d-%y",
+        "%d.%m.%Y", "%m.%d.%Y",
+    ]
+    for fmt in formats:
+        try:
+            return datetime.strptime(s, fmt).date().isoformat()
+        except ValueError:
+            continue
+    return value
+
+
+def _parse_currency(value: Any) -> Any:
+    if value is None:
+        return value
+    if isinstance(value, (int, float)):
+        return round(float(value), 2)
+
+    s = str(value).strip()
+    if not s:
+        return value
+
+    cleaned = s.replace("$", "").replace("EUR", "").replace("USD", "")
+    cleaned = cleaned.replace("GBP", "").replace("INR", "").strip()
+
+    # Handle decimal comma and thousand separators.
+    if "," in cleaned and "." in cleaned:
+        if cleaned.rfind(",") > cleaned.rfind("."):
+            cleaned = cleaned.replace(".", "").replace(",", ".")
+        else:
+            cleaned = cleaned.replace(",", "")
+    elif "," in cleaned and cleaned.count(",") == 1:
+        left, right = cleaned.split(",", 1)
+        if len(right) in (1, 2):
+            cleaned = left + "." + right
+        else:
+            cleaned = cleaned.replace(",", "")
+    else:
+        cleaned = cleaned.replace(",", "")
+
+    if re.fullmatch(r"[-+]?\d+(\.\d+)?", cleaned):
+        try:
+            return round(float(cleaned), 2)
+        except ValueError:
+            return value
+    return value
+
+
+def _normalize_values(row: Dict[str, Any]) -> Dict[str, Any]:
+    out: Dict[str, Any] = {}
+    for k, v in row.items():
+        key = str(k)
+        key_l = key.lower()
+        if any(t in key_l for t in ("date", "_dt", "posting", "created", "creation", "termination")):
+            out[key] = _parse_date(v)
+        elif any(t in key_l for t in ("amount", "amt", "price", "value", "total", "cost")):
+            out[key] = _parse_currency(v)
+        else:
+            out[key] = v
+    return out
+
 
 def _normalize_col(col: str) -> str:
     """Normalize column name for alias lookup."""
@@ -81,9 +204,16 @@ def _map_columns(row: Dict) -> Dict:
     mapped = {}
     for k, v in row.items():
         norm = _normalize_col(str(k))
-        canonical = COLUMN_ALIASES.get(norm, norm.replace(" ", "_"))
+        compact = re.sub(r"[^a-z0-9]", "", norm)
+        canonical = COLUMN_ALIASES.get(norm)
+        if canonical is None:
+            canonical = SAP_CODE_ALIASES.get(compact)
+        if canonical is None:
+            canonical = _semantic_match(norm)
+        if canonical is None:
+            canonical = norm.replace(" ", "_")
         mapped[canonical] = v
-    return mapped
+    return _normalize_values(mapped)
 
 
 def _detect_delimiter(content: str) -> str:
@@ -135,7 +265,8 @@ def parse_csv(content: str) -> Tuple[List[Dict], str]:
             "row_number": idx,
         }
         records.append(mapped)
-    data_type = _detect_data_type(reader.fieldnames or [])
+    inferred_columns = list(records[0].keys()) if records else (reader.fieldnames or [])
+    data_type = _detect_data_type(inferred_columns)
     logger.info("CSV parsed: %d records, type=%s, delimiter='%s'", len(records), data_type, repr(delimiter))
     return records, data_type
 
@@ -164,7 +295,8 @@ def parse_excel(file_bytes: bytes) -> Dict[str, Tuple[List[Dict], str]]:
                     "row_number": row_idx,
                 }
                 records.append(mapped)
-            data_type = _detect_data_type(headers)
+            inferred_columns = list(records[0].keys()) if records else headers
+            data_type = _detect_data_type(inferred_columns)
             result[sheet_name] = (records, data_type)
             logger.info("Excel sheet '%s': %d records, type=%s", sheet_name, len(records), data_type)
         return result
@@ -238,7 +370,8 @@ def parse_sap_txt(content: str) -> Tuple[List[Dict], str]:
             "row_number": idx,
         }
         records.append(mapped)
-    data_type = _detect_data_type(reader.fieldnames or [])
+    inferred_columns = list(records[0].keys()) if records else (reader.fieldnames or [])
+    data_type = _detect_data_type(inferred_columns)
     logger.info("SAP TXT parsed: %d records, type=%s", len(records), data_type)
     return records, data_type
 

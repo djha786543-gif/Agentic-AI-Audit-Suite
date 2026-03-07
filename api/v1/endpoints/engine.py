@@ -31,7 +31,7 @@ from engine.parser import parse_file
 from engine.runner import run_audit_engine
 from engine.sod import detect_sod_conflicts, summarize_sod_results
 from engine.privacy import tokenize_identities
-from engine.sampling import attribute_sampling, mus_sampling
+from engine.sampling import attribute_sampling, confidence_level_sampling, mus_sampling
 from engine.universal_erp import referential_integrity_check
 
 logger = logging.getLogger(__name__)
@@ -243,7 +243,15 @@ async def run_sampling(payload: dict):
             expected_misstatement=float(payload.get("expected_misstatement") or 1000.0),
             seed=payload.get("seed", 42),
         )
-    raise HTTPException(status_code=400, detail="Unsupported method. Use 'attribute' or 'mus'.")
+    if method in ("confidence", "confidence_level", "pcaob"):
+        return confidence_level_sampling(
+            population_size=int(payload.get("population_size") or 0),
+            confidence_level=float(payload.get("confidence_level") or 0.95),
+            margin_error=float(payload.get("margin_error") or 0.05),
+            expected_deviation=float(payload.get("expected_deviation") or 0.5),
+            seed=payload.get("seed", 42),
+        )
+    raise HTTPException(status_code=400, detail="Unsupported method. Use 'attribute', 'mus', or 'confidence'.")
 
 
 @router.post("/analyze/validate")
