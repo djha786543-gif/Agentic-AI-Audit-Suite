@@ -145,6 +145,9 @@
     </section>
 
     <section class="table-wrap">
+      <div style="margin:0 0 10px 2px;font-size:11px;color:var(--tx2);font-family:var(--fm);">
+        Shortcut: focus a <strong>Run Agent</strong> button and press <kbd style="padding:1px 6px;border:1px solid var(--b2);border-radius:4px;background:rgba(255,255,255,.04);font-family:var(--fm);font-size:10px;">Enter</kbd>.
+      </div>
       <table>
         <thead>
           <tr>
@@ -374,6 +377,16 @@
         tableBody.addEventListener('click', function (event) {
           var runBtn = event.target.closest('.run-btn');
           if (!runBtn) return;
+          mockProcessButton(runBtn, function () {
+            updateITGCRowStatus(runBtn.closest('tr'));
+          });
+        });
+
+        tableBody.addEventListener('keydown', function (event) {
+          if (event.key !== 'Enter' && event.key !== ' ') return;
+          var runBtn = event.target.closest('.run-btn');
+          if (!runBtn) return;
+          event.preventDefault();
           mockProcessButton(runBtn, function () {
             updateITGCRowStatus(runBtn.closest('tr'));
           });

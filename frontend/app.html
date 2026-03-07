@@ -9339,6 +9339,9 @@
           <button class="btn btn-primary" id="btnRunBatch" style="display:none" disabled
             onclick="runBatchAudit()">&#x1f4e6; Run Batch Audit (<span id="batchCountLbl">0</span> files)</button>
         </div>
+        <div style="margin-top:.55rem;font-size:.7rem;color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.01em;">
+          Shortcut: press <kbd style="padding:1px 6px;border:1px solid rgba(255,255,255,.25);border-radius:4px;background:rgba(255,255,255,.05);font-family:var(--font-mono);font-size:.66rem;">Enter</kbd> to run the selected audit mode from Step 2.
+        </div>
       </div>
 
       <!-- VIEW 3: Processing -->
@@ -11583,7 +11586,10 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         }
         if (n === 1) {
           STATE.agent = null; STATE.file = null; STATE.data = []; STATE.headers = []; STATE.mapping = {}; STATE.violations = []; STATE.batchFiles = [];
-          document.querySelectorAll('.agent-option').forEach(function (a) { a.classList.remove('selected') });
+          document.querySelectorAll('.agent-option').forEach(function (a) {
+            a.classList.remove('selected');
+            a.setAttribute('aria-pressed', 'false');
+          });
           document.getElementById('btnNext1').disabled = true; removeFile(); clearBatch(); setUploadMode('single');
         }
         if (n === 2) { renderDataSpec(); }
@@ -11607,8 +11613,12 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
       // AGENT SELECTION
       // =====================================================
       function selectAgent(el) {
-        document.querySelectorAll('.agent-option').forEach(function (a) { a.classList.remove('selected') });
+        document.querySelectorAll('.agent-option').forEach(function (a) {
+          a.classList.remove('selected');
+          a.setAttribute('aria-pressed', 'false');
+        });
         el.classList.add('selected');
+        el.setAttribute('aria-pressed', 'true');
         STATE.agent = el.getAttribute('data-agent');
         document.getElementById('btnNext1').disabled = false;
         var ag = AGENTS[STATE.agent];
@@ -11622,6 +11632,24 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
           document.getElementById('btnRun').disabled = false;
         }
       }
+
+      function wireAgentOptionKeyboardSupport() {
+        document.querySelectorAll('.agent-option').forEach(function (optionEl) {
+          if (optionEl.dataset.kbdBound === '1') return;
+          optionEl.dataset.kbdBound = '1';
+          optionEl.setAttribute('role', 'button');
+          optionEl.setAttribute('tabindex', '0');
+          optionEl.setAttribute('aria-pressed', optionEl.classList.contains('selected') ? 'true' : 'false');
+          optionEl.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              selectAgent(optionEl);
+            }
+          });
+        });
+      }
+
+      wireAgentOptionKeyboardSupport();
 
       function renderDataSpec() {
         var key = STATE.agent;
@@ -12162,6 +12190,40 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
           }
           runAudit();
         }, 2000);
+      }
+
+      function isTextEntryElement(el) {
+        if (!el) return false;
+        var tag = String(el.tagName || '').toUpperCase();
+        if (tag === 'TEXTAREA') return true;
+        if (el.isContentEditable) return true;
+        return false;
+      }
+
+      function triggerRunAuditFromEnter(event) {
+        if (event.key !== 'Enter' || event.shiftKey || event.ctrlKey || event.altKey || event.metaKey) return;
+        if (isTextEntryElement(event.target)) return;
+
+        var stepTwo = document.getElementById('v2');
+        if (!stepTwo || !stepTwo.classList.contains('active')) return;
+
+        var runBatch = document.getElementById('btnRunBatch');
+        if (STATE.mode === 'zip' && runBatch && runBatch.style.display !== 'none' && !runBatch.disabled) {
+          event.preventDefault();
+          runBatchAudit();
+          return;
+        }
+
+        var runSingle = document.getElementById('btnRun');
+        if (runSingle && runSingle.style.display !== 'none' && !runSingle.disabled) {
+          event.preventDefault();
+          processData();
+        }
+      }
+
+      if (!window.__auditRunEnterBound) {
+        document.addEventListener('keydown', triggerRunAuditFromEnter);
+        window.__auditRunEnterBound = true;
       }
 
       function wireGlobalRunAnalyzeHandlers() {
