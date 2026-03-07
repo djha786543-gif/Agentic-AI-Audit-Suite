@@ -25,6 +25,7 @@ _DEMO_USERS: dict = {
     "admin": ("Audit123!", "internal_auditor", "default-org"),
     "external": ("External123!", "external_auditor", "default-org"),
     "connector": ("Service123!", "connector_service", "default-org"),
+    "processowner": ("Owner123!", "process_owner", "default-org"),
 }
 
 

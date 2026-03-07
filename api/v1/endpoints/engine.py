@@ -20,7 +20,7 @@ from __future__ import annotations
 import json
 import logging
 from typing import Optional
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException, BackgroundTasks
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Depends
@@ -30,6 +30,9 @@ from sqlalchemy import text
 from engine.parser import parse_file
 from engine.runner import run_audit_engine
 from engine.sod import detect_sod_conflicts, summarize_sod_results
+from engine.privacy import tokenize_identities
+from engine.sampling import attribute_sampling, mus_sampling
+from engine.universal_erp import referential_integrity_check
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -78,6 +81,7 @@ async def analyze_file(
     file: UploadFile = File(...),
     source_system: str = Form(default="Uploaded File"),
     audit_period: Optional[str] = Form(default=None),
+    anonymize: bool = Form(default=False),
 ):
     """
     Upload a CSV, Excel, JSON, or SAP TXT file and run all applicable
@@ -127,6 +131,14 @@ async def analyze_file(
             audit_period=audit_period,
         )
 
+        if anonymize:
+            tokenized, reverse_map = tokenize_identities(result.get("all_findings", []))
+            result["all_findings"] = tokenized
+            result["anonymization"] = {
+                "enabled": True,
+                "token_count": len(reverse_map),
+            }
+
         if "validation" in parsed:
             result["validation_summary"] = parsed["validation"]
             
@@ -151,12 +163,28 @@ async def analyze_file(
                 
                 # Save into findings table
                 try:
-                    q = text("INSERT INTO findings (id, control_id, severity, description, status) VALUES (:id, :cid, :sev, :desc, 'open')")
+                    q = text(
+                        """
+                        INSERT INTO findings (
+                            id, control_id, severity, description, status, evidence, logic_breakdown, reperformance_payload
+                        ) VALUES (
+                            :id, :cid, :sev, :desc, 'open', :evidence, :logic_breakdown, :reperformance_payload
+                        )
+                        """
+                    )
                     await session.execute(q, {
                         "id": fid,
                         "cid": f.get("control_id", "AUTO"),
                         "sev": f.get("risk_level", "MEDIUM"),
-                        "desc": f.get("description", "")
+                        "desc": f.get("description", ""),
+                        "evidence": json.dumps({
+                            "lineage": (f.get("evidence") or {}).get("lineage"),
+                            "logic_breakdown": f.get("logic_breakdown"),
+                            "reperformance": f.get("reperformance"),
+                            "detection_rule": f.get("finding_type", "Rule check"),
+                        }),
+                        "logic_breakdown": f.get("logic_breakdown"),
+                        "reperformance_payload": json.dumps(f.get("reperformance") or {}),
                     })
                 except Exception as db_err:
                     pass # ignore if table structure misses, we want prototyping to work seamlessly
@@ -167,6 +195,55 @@ async def analyze_file(
         raise HTTPException(status_code=500, detail=f"Engine processing error: {str(e)}")
 
     return JSONResponse(content=result)
+
+
+@router.post("/integrity-check")
+async def integrity_check(payload: dict):
+    """
+    Referential integrity validation for Universal ERP Engine.
+
+    Payload:
+      {
+        "active_users": [{"user_id": "u1"}, ...],
+        "hr_master": [{"user_id": "u1"}, ...]
+      }
+    """
+    active_users = payload.get("active_users") or []
+    hr_master = payload.get("hr_master") or []
+    passed, issues = referential_integrity_check(active_users, hr_master)
+    return {
+        "passed": passed,
+        "issues": issues,
+        "issue_count": len(issues),
+        "standard_ref": "PCAOB AS 1105 - Reliable Source Data",
+    }
+
+
+@router.post("/sampling")
+async def run_sampling(payload: dict):
+    """
+    Statistical sampling endpoint:
+      - attribute sampling
+      - monetary unit sampling (MUS)
+    """
+    data = payload.get("population") or []
+    method = str(payload.get("method") or "attribute").lower()
+    if method in ("attribute", "attribute_sampling"):
+        return attribute_sampling(
+            data,
+            sample_size=int(payload.get("sample_size") or 25),
+            seed=payload.get("seed", 42),
+        )
+    if method in ("mus", "monetary_unit_sampling"):
+        return mus_sampling(
+            data,
+            amount_field=str(payload.get("amount_field") or "invoice_amount"),
+            confidence_factor=float(payload.get("confidence_factor") or 3.0),
+            tolerable_misstatement=float(payload.get("tolerable_misstatement") or 10000.0),
+            expected_misstatement=float(payload.get("expected_misstatement") or 1000.0),
+            seed=payload.get("seed", 42),
+        )
+    raise HTTPException(status_code=400, detail="Unsupported method. Use 'attribute' or 'mus'.")
 
 
 @router.post("/analyze/validate")

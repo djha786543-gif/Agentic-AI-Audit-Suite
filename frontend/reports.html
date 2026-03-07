@@ -165,6 +165,24 @@
         </div>
       </article>
     </section>
+
+    <section class="card" style="margin-top:18px;">
+      <h3>Residual Risk Heatmap (ERM 5x5)</h3>
+      <p class="sub" style="margin-bottom:10px;">Auto-generated from Governance risk register residual likelihood vs impact.</p>
+      <canvas id="riskHeatmapCanvas" width="520" height="320" style="max-width:100%;background:var(--ink2);border:1px solid var(--b1);border-radius:10px;"></canvas>
+    </section>
+
+    <section class="card" style="margin-top:16px;">
+      <h3>One-Click Workpaper Export</h3>
+      <p class="sub" style="margin-bottom:10px;">Export packages aligned to Workiva, Teammate+, and ServiceNow GRC formats.</p>
+      <div class="card-actions">
+        <button class="btn-sub" onclick="downloadWorkpaperExport('workiva')">Export Workiva JSON</button>
+        <button class="btn-sub" onclick="downloadWorkpaperExport('teammate')">Export Teammate+ JSON</button>
+        <button class="btn-sub" onclick="downloadWorkpaperExport('servicenow')">Export ServiceNow GRC JSON</button>
+        <button class="btn-sub" onclick="downloadWorkpaperExport('xml')">Export Generic XML</button>
+      </div>
+      <p class="sub" style="margin-top:8px;">External Auditor Read-Only Package: <button class="btn-sub" onclick="downloadExternalReviewPackage()">Download</button></p>
+    </section>
   </main>
 
   <footer class="footer">
@@ -237,6 +255,86 @@
       alert('Generation queued: ' + name);
       modal.classList.remove('show');
     });
+
+    async function renderHeatmap() {
+      const canvas = document.getElementById('riskHeatmapCanvas');
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const cellW = 90;
+      const cellH = 52;
+      const x0 = 40;
+      const y0 = 20;
+
+      const colors = ['#1b3a2d', '#374f24', '#5e4f1f', '#6b351e', '#6b1e2d'];
+      for (let y = 0; y < 5; y++) {
+        for (let x = 0; x < 5; x++) {
+          ctx.fillStyle = colors[Math.max(x, 4 - y)];
+          ctx.globalAlpha = 0.38;
+          ctx.fillRect(x0 + x * cellW, y0 + y * cellH, cellW - 2, cellH - 2);
+          ctx.globalAlpha = 1;
+        }
+      }
+
+      ctx.fillStyle = '#8895AD';
+      ctx.font = '11px JetBrains Mono';
+      for (let i = 1; i <= 5; i++) {
+        ctx.fillText(String(i), x0 + (i - 1) * cellW + 40, y0 + 5 * cellH + 14);
+        ctx.fillText(String(6 - i), 14, y0 + (i - 1) * cellH + 30);
+      }
+      ctx.fillText('Likelihood', x0 + 200, y0 + 5 * cellH + 28);
+      ctx.save();
+      ctx.translate(8, y0 + 150);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText('Impact', 0, 0);
+      ctx.restore();
+
+      try {
+        const r = await fetch('/api/v1/governance/risk-heatmap');
+        if (!r.ok) return;
+        const data = await r.json();
+        (data.points || []).forEach((p) => {
+          const x = x0 + (p.likelihood - 1) * cellW + cellW / 2;
+          const y = y0 + (5 - p.impact) * cellH + cellH / 2;
+          ctx.beginPath();
+          ctx.fillStyle = '#2878FF';
+          ctx.arc(x, y, 6, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      } catch (err) {
+        // Keep static grid if API unavailable.
+      }
+    }
+
+    async function downloadWorkpaperExport(target) {
+      const res = await fetch('/api/v1/reports/exports/workpaper?target=' + encodeURIComponent(target));
+      if (!res.ok) {
+        alert('Export failed.');
+        return;
+      }
+      const blob = await res.blob();
+      const ext = target === 'xml' ? 'xml' : 'json';
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'workpaper_export_' + target + '.' + ext;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    async function downloadExternalReviewPackage() {
+      const res = await fetch('/api/v1/reports/external/review-package');
+      if (!res.ok) {
+        alert('Unable to generate external package.');
+        return;
+      }
+      const blob = new Blob([JSON.stringify(await res.json(), null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'external_auditor_read_only_package.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    renderHeatmap();
   </script>
 <script>
 (function(){

@@ -128,3 +128,17 @@ class RiskRegisterResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
     model_config = ConfigDict(from_attributes=True)
+
+
+class GovernanceAuditLogResponse(BaseModel):
+    id: uuid.UUID
+    org_id: str
+    actor: str
+    event_type: str
+    event_payload: Dict[str, Any]
+    previous_hash: Optional[str] = None
+    entry_hash: str
+    signature: str
+    immutable: bool
+    created_at: datetime
+    model_config = ConfigDict(from_attributes=True)

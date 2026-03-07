@@ -8,7 +8,7 @@ from models.finding import Finding, ManagementResponse, Retest  # noqa
 from models.evaluation import ControlEvaluation, SODConflict  # noqa
 from models.exceptions import AuditException  # noqa
 # Phase 5 — Continuous Assurance & Governance
-from models.governance import GovernancePolicy, ComplianceFramework, ComplianceMapping, RiskRegisterEntry  # noqa
+from models.governance import GovernancePolicy, ComplianceFramework, ComplianceMapping, RiskRegisterEntry, GovernanceAuditLog  # noqa
 from models.alerts import AlertRule, ComplianceAlert  # noqa
 # Phase 6 — Enterprise Reporting
 from models.reports import ReportDefinition, ReportRun, ReportSchedule  # noqa

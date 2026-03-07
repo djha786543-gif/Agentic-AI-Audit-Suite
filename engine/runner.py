@@ -18,6 +18,7 @@ from .change import test_change_management, summarize_change_results
 from .operations import test_operations_controls, summarize_operations_results
 from .itac import run_all_itac_tests
 from .parser import extract_user_roles
+from .universal_erp import attach_lineage_to_findings, build_lineage_index, referential_integrity_check
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +61,7 @@ def run_audit_engine(
     # ── Gather all records across sheets ─────────────────────────────────────
     all_records_by_type: Dict[str, List[Dict]] = {
         "users": [], "changes": [], "transactions": [],
-        "backup": [], "incident": [], "interfaces": [], "dr": [],
+        "backup": [], "incident": [], "interfaces": [], "dr": [], "hr_master": [],
     }
 
     for sheet_name, sheet_data in parsed_data.get("sheets", {}).items():
@@ -70,18 +71,42 @@ def run_audit_engine(
             all_records_by_type[data_type].extend(records)
             logger.info("Sheet '%s': %d records routed to '%s' engine", sheet_name, len(records), data_type)
 
-    # ── SoD Engine ───────────────────────────────────────────────────────────
+    # ── Referential Integrity Precheck (Active Users ↔ HR Master) ──────────
     user_records = all_records_by_type["users"]
+    hr_master_records = all_records_by_type["hr_master"]
+    integrity_passed = True
+    if user_records and hr_master_records:
+        integrity_passed, integrity_issues = referential_integrity_check(user_records, hr_master_records)
+        domain_results["referential_integrity"] = {
+            "summary": {
+                "pass": integrity_passed,
+                "issues": len(integrity_issues),
+                "standard_ref": "PCAOB AS 1105 - Audit Evidence Reliability",
+            },
+            "issues": integrity_issues,
+        }
+
+    # ── SoD Engine ───────────────────────────────────────────────────────────
     if user_records:
         engines_run.append("Segregation of Duties")
-        user_roles = extract_user_roles(user_records)
-        sod_findings = detect_sod_conflicts(user_roles, source_system=source_system)
-        sod_dicts = [f.to_dict() for f in sod_findings]
-        all_findings.extend(sod_dicts)
-        domain_results["sod"] = {
-            "summary": summarize_sod_results(sod_findings),
-            "findings": sod_dicts,
-        }
+        if integrity_passed or not hr_master_records:
+            user_roles = extract_user_roles(user_records)
+            sod_findings = detect_sod_conflicts(user_roles, source_system=source_system)
+            sod_dicts = [f.to_dict() for f in sod_findings]
+            all_findings.extend(sod_dicts)
+            domain_results["sod"] = {
+                "summary": summarize_sod_results(sod_findings),
+                "findings": sod_dicts,
+            }
+        else:
+            domain_results["sod"] = {
+                "summary": {
+                    "pass": False,
+                    "blocked": True,
+                    "reason": "SOD execution blocked because referential integrity checks failed.",
+                },
+                "findings": [],
+            }
 
     # ── Access Control Engine ─────────────────────────────────────────────────
     if user_records:
@@ -191,6 +216,52 @@ def run_audit_engine(
                         itac["recommendation"] = str(itac.get("recommendation", "")) + " CORROBORATED: Originating user has ITGC control exceptions (SOD/Access)!"
 
     # ── Aggregate Risk Score ──────────────────────────────────────────────────
+    lineage_index = build_lineage_index(parsed_data)
+    attach_lineage_to_findings(all_findings, lineage_index)
+
+    entity_lineage: Dict[str, Dict[str, Any]] = {}
+    for sheet_data in parsed_data.get("sheets", {}).values():
+        for rec in sheet_data.get("records", []):
+            lineage = rec.get("_lineage") or {}
+            for key in ("user_id", "invoice_id", "ticket_id", "id", "record_id"):
+                val = rec.get(key)
+                if val is not None:
+                    entity_lineage[str(val)] = lineage
+
+    for finding in all_findings:
+        evidence = dict(finding.get("evidence") or {})
+        lookup_id = str(
+            finding.get("user_id")
+            or finding.get("record_id")
+            or finding.get("entity")
+            or ""
+        )
+        if lookup_id and lookup_id in entity_lineage:
+            evidence["lineage"] = entity_lineage[lookup_id]
+            finding["evidence"] = evidence
+
+    # Explainable AI payload required for peer review/re-performance.
+    for finding in all_findings:
+        finding.setdefault(
+            "logic_breakdown",
+            (
+                f"Flagged because {finding.get('entity', 'record')} triggered rule {finding.get('rule') or finding.get('finding_type') or finding.get('control_id')} "
+                f"with severity {finding.get('risk_level', 'MEDIUM')}."
+            ),
+        )
+        finding.setdefault(
+            "reperformance",
+            {
+                "prompt_template": "Evaluate finding risk based on rule trigger, entity context, and control impact.",
+                "inputs": {
+                    "rule": finding.get("rule") or finding.get("finding_type"),
+                    "entity": finding.get("entity"),
+                    "severity": finding.get("risk_level"),
+                    "evidence": finding.get("evidence"),
+                },
+            },
+        )
+
     risk_score = _compute_risk_score(all_findings)
     overall_rating = _risk_rating(risk_score)
 

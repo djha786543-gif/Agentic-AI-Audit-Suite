@@ -14,10 +14,12 @@ from __future__ import annotations
 import logging
 from datetime import datetime, timezone
 from typing import Any, Dict, List
+import xml.etree.ElementTree as ET
 
 logger = logging.getLogger(__name__)
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import Response
 from sqlalchemy import func, select, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -261,7 +263,7 @@ async def list_report_runs(
 async def generate_report(
     req: ReportRunRequest,
     db: AsyncSession = Depends(get_async_db),
-    ctx: AuthContext = Depends(require_role(UserRole.INTERNAL_AUDITOR, UserRole.EXTERNAL_AUDITOR)),
+    ctx: AuthContext = Depends(require_role(UserRole.INTERNAL_AUDITOR)),
 ) -> ReportRunResponse:
     """
     Trigger an on-demand report.  The result_payload is generated synchronously
@@ -329,6 +331,9 @@ async def generate_report(
                         "severity": f.severity,
                         "status": f.status,
                         "description": f.description,
+                        "logic_breakdown": f.logic_breakdown,
+                        "remediation_owner": f.remediation_owner,
+                        "remediation_due_date": f.remediation_due_date.isoformat() if f.remediation_due_date else None,
                         "created_at": f.created_at.isoformat() if f.created_at else None,
                     }
                     for f in findings
@@ -421,6 +426,77 @@ async def generate_report(
     await db.commit()
     await db.refresh(run)
     return run
+
+
+@router.get("/external/review-package")
+async def external_review_package(
+    db: AsyncSession = Depends(get_async_db),
+    _: AuthContext = Depends(require_role(UserRole.EXTERNAL_AUDITOR, UserRole.INTERNAL_AUDITOR)),
+) -> Dict[str, Any]:
+    """Read-only package for external auditors to review evidence and conclusions."""
+    finding_result = await db.execute(select(Finding).order_by(desc(Finding.created_at)).limit(200))
+    findings = finding_result.scalars().all()
+    return {
+        "mode": "read_only",
+        "package_generated_at": datetime.now(timezone.utc).isoformat(),
+        "findings": [
+            {
+                "id": str(f.id),
+                "control_id": f.control_id,
+                "severity": f.severity,
+                "status": f.status,
+                "description": f.description,
+                "remediation_owner": f.remediation_owner,
+                "remediation_due_date": f.remediation_due_date.isoformat() if f.remediation_due_date else None,
+                "logic_breakdown": f.logic_breakdown,
+            }
+            for f in findings
+        ],
+    }
+
+
+@router.get("/exports/workpaper")
+async def export_workpaper(
+    target: str = "workiva",
+    db: AsyncSession = Depends(get_async_db),
+    _: AuthContext = Depends(require_role(UserRole.INTERNAL_AUDITOR, UserRole.EXTERNAL_AUDITOR)),
+):
+    """One-click export payloads for audit management tools."""
+    finding_result = await db.execute(select(Finding).order_by(desc(Finding.created_at)).limit(1000))
+    findings = finding_result.scalars().all()
+    payload = {
+        "exported_at": datetime.now(timezone.utc).isoformat(),
+        "target": target,
+        "findings": [
+            {
+                "finding_id": str(f.id),
+                "control_id": f.control_id,
+                "severity": f.severity,
+                "status": f.status,
+                "description": f.description,
+                "remediation_owner": f.remediation_owner,
+                "remediation_due_date": f.remediation_due_date.isoformat() if f.remediation_due_date else None,
+            }
+            for f in findings
+        ],
+    }
+
+    target_normalized = target.strip().lower()
+    if target_normalized in {"workiva", "teammate", "servicenow", "json"}:
+        return payload
+
+    if target_normalized == "xml":
+        root = ET.Element("workpaperExport", attrib={"target": "generic_xml"})
+        ET.SubElement(root, "exportedAt").text = payload["exported_at"]
+        findings_node = ET.SubElement(root, "findings")
+        for f in payload["findings"]:
+            node = ET.SubElement(findings_node, "finding")
+            for k, v in f.items():
+                ET.SubElement(node, k).text = "" if v is None else str(v)
+        xml_bytes = ET.tostring(root, encoding="utf-8")
+        return Response(content=xml_bytes, media_type="application/xml")
+
+    raise HTTPException(status_code=400, detail="Unsupported export target. Use workiva, teammate, servicenow, json, or xml.")
 
 
 @router.get("/runs/{run_id}", response_model=ReportRunResponse)

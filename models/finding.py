@@ -24,6 +24,10 @@ class Finding(Base):
     verdict_by = Column(String, nullable=True)
     verdict_timestamp = Column(DateTime, nullable=True)
     verdict_notes = Column(Text, nullable=True)
+    remediation_owner = Column(String, nullable=True)
+    remediation_due_date = Column(DateTime, nullable=True)
+    logic_breakdown = Column(Text, nullable=True)
+    reperformance_payload = Column(JSON, nullable=True)
 
 class ManagementResponse(Base):
     __tablename__ = "management_responses"

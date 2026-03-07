@@ -36,6 +36,7 @@ class UserRole(str, enum.Enum):
     INTERNAL_AUDITOR = "internal_auditor"
     EXTERNAL_AUDITOR = "external_auditor"
     CONNECTOR_SERVICE = "connector_service"
+    PROCESS_OWNER = "process_owner"
 
 
 # ── Permission hierarchy ─────────────────────────────────────────────────────
@@ -46,12 +47,16 @@ _ROLE_GRANTS: dict[UserRole, set[UserRole]] = {
         UserRole.INTERNAL_AUDITOR,
         UserRole.EXTERNAL_AUDITOR,
         UserRole.CONNECTOR_SERVICE,
+        UserRole.PROCESS_OWNER,
     },
     UserRole.EXTERNAL_AUDITOR: {
         UserRole.EXTERNAL_AUDITOR,
     },
     UserRole.CONNECTOR_SERVICE: {
         UserRole.CONNECTOR_SERVICE,
+    },
+    UserRole.PROCESS_OWNER: {
+        UserRole.PROCESS_OWNER,
     },
 }
 

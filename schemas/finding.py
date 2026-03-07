@@ -14,9 +14,13 @@ class FindingCreate(FindingBase):
 
 class FindingResponse(FindingBase):
     id: UUID
-    org_id: str
-    engagement_id: UUID
-    created_at: datetime
+    org_id: Optional[str] = None
+    engagement_id: Optional[UUID] = None
+    created_at: Optional[datetime] = None
+    remediation_owner: Optional[str] = None
+    remediation_due_date: Optional[datetime] = None
+    logic_breakdown: Optional[str] = None
+    reperformance_payload: Optional[dict] = None
     
     class Config:
         from_attributes = True
@@ -37,6 +41,15 @@ class ManagementResponseResponse(ManagementResponseBase):
     
     class Config:
         from_attributes = True
+
+
+class RemediationAssignment(BaseModel):
+    remediation_owner: str
+    remediation_due_date: datetime
+
+
+class ReperformanceRequest(BaseModel):
+    include_prompt: bool = True
 
 class RetestBase(BaseModel):
     retest_result: str

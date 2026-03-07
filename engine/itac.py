@@ -77,6 +77,11 @@ def test_three_way_match(transactions: List[Dict]) -> List[ITACFinding]:
         po_amt = _to_decimal(txn.get("po_amount") or txn.get("purchase_order_amount"))
         gr_amt = _to_decimal(txn.get("gr_amount") or txn.get("goods_receipt_amount") or txn.get("receipt_amount"))
         inv_amt = _to_decimal(txn.get("invoice_amount") or txn.get("amount"))
+        po_qty = _to_decimal(txn.get("po_qty") or txn.get("po_quantity") or txn.get("ordered_qty"))
+        gr_qty = _to_decimal(txn.get("gr_qty") or txn.get("received_qty") or txn.get("goods_receipt_qty"))
+        inv_qty = _to_decimal(txn.get("invoice_qty") or txn.get("quantity"))
+        po_unit_price = _to_decimal(txn.get("po_unit_price") or txn.get("ordered_unit_price"))
+        inv_unit_price = _to_decimal(txn.get("invoice_unit_price") or txn.get("unit_price"))
         three_way = _str(txn.get("three_way_match") or txn.get("match_status"))
         vendor = str(txn.get("vendor") or txn.get("vendor_name") or "Unknown")
 
@@ -110,6 +115,38 @@ def test_three_way_match(transactions: List[Dict]) -> List[ITACFinding]:
                     description=f"Invoice {tid}: variance of ${variance:.2f} between PO/GR/Invoice amounts exceeds tolerance of ${tolerance:.2f}.",
                     recommendation="Place invoice on hold. Obtain explanation from vendor and AP team. Verify goods receipt documentation. Do not pay until variance is resolved.",
                     evidence={"po_amount": str(po_amt), "gr_amount": str(gr_amt), "invoice_amount": str(inv_amt), "variance": str(variance)},
+                ))
+
+        # Quantity mismatch automation.
+        if po_qty and gr_qty and inv_qty:
+            qty_max = max(po_qty, gr_qty, inv_qty)
+            qty_min = min(po_qty, gr_qty, inv_qty)
+            qty_variance = qty_max - qty_min
+            qty_tolerance = max(qty_max * Decimal("0.02"), Decimal("1"))
+            if qty_variance > qty_tolerance:
+                findings.append(ITACFinding(
+                    control_id="ITAC-AP-001",
+                    record_id=tid,
+                    finding_type="THREE_WAY_QUANTITY_MISMATCH",
+                    risk_level="HIGH",
+                    description=f"Invoice {tid}: quantity mismatch detected (PO={po_qty}, GR={gr_qty}, Invoice={inv_qty}).",
+                    recommendation="Investigate quantity discrepancy before payment release. Validate receiving docs and partial shipment terms.",
+                    evidence={"po_qty": str(po_qty), "gr_qty": str(gr_qty), "invoice_qty": str(inv_qty), "qty_variance": str(qty_variance)},
+                ))
+
+        # Price variance automation.
+        if po_unit_price and inv_unit_price:
+            price_var = abs(inv_unit_price - po_unit_price)
+            price_tol = max(po_unit_price * Decimal("0.03"), Decimal("0.5"))
+            if price_var > price_tol:
+                findings.append(ITACFinding(
+                    control_id="ITAC-AP-001",
+                    record_id=tid,
+                    finding_type="THREE_WAY_PRICE_VARIANCE",
+                    risk_level="HIGH",
+                    description=f"Invoice {tid}: unit price variance ${price_var:.2f} exceeds tolerance ${price_tol:.2f}.",
+                    recommendation="Hold invoice and validate contract pricing, amendments, and approved change orders.",
+                    evidence={"po_unit_price": str(po_unit_price), "invoice_unit_price": str(inv_unit_price), "price_variance": str(price_var)},
                 ))
 
     return findings

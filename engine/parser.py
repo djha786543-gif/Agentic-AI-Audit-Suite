@@ -114,6 +114,8 @@ def _detect_data_type(columns: List[str]) -> str:
         return "incident"
     if any(k in cols for k in ["interface", "source_count", "target_count", "records_sent"]):
         return "interfaces"
+    if any(k in cols for k in ["hr", "employee_name", "employment_status", "legal_entity", "personnel"]):
+        return "hr_master"
     if any(k in cols for k in ["dr_test", "rto", "rpo", "disaster"]):
         return "dr"
     return "unknown"
@@ -124,7 +126,15 @@ def parse_csv(content: str) -> Tuple[List[Dict], str]:
     import csv
     delimiter = _detect_delimiter(content)
     reader = csv.DictReader(io.StringIO(content), delimiter=delimiter)
-    records = [_map_columns(row) for row in reader]
+    records = []
+    for idx, row in enumerate(reader, start=2):
+        mapped = _map_columns(row)
+        # Preserve source-to-report lineage at row granularity.
+        mapped["_lineage"] = {
+            "source_type": "csv",
+            "row_number": idx,
+        }
+        records.append(mapped)
     data_type = _detect_data_type(reader.fieldnames or [])
     logger.info("CSV parsed: %d records, type=%s, delimiter='%s'", len(records), data_type, repr(delimiter))
     return records, data_type
@@ -143,11 +153,17 @@ def parse_excel(file_bytes: bytes) -> Dict[str, Tuple[List[Dict], str]]:
                 continue
             headers = [str(h) if h is not None else f"col_{i}" for i, h in enumerate(rows[0])]
             records = []
-            for row in rows[1:]:
+            for row_idx, row in enumerate(rows[1:], start=2):
                 if all(v is None for v in row):
                     continue
                 raw = dict(zip(headers, row))
-                records.append(_map_columns(raw))
+                mapped = _map_columns(raw)
+                mapped["_lineage"] = {
+                    "source_type": "excel",
+                    "sheet": sheet_name,
+                    "row_number": row_idx,
+                }
+                records.append(mapped)
             data_type = _detect_data_type(headers)
             result[sheet_name] = (records, data_type)
             logger.info("Excel sheet '%s': %d records, type=%s", sheet_name, len(records), data_type)
@@ -174,7 +190,17 @@ def parse_json(content: str) -> Tuple[List[Dict], str]:
         # JSONL
         records = [json.loads(line) for line in content.splitlines() if line.strip()]
 
-    records = [_map_columns(r) for r in records if isinstance(r, dict)]
+    mapped_records: List[Dict] = []
+    for idx, rec in enumerate(records, start=1):
+        if not isinstance(rec, dict):
+            continue
+        mapped = _map_columns(rec)
+        mapped["_lineage"] = {
+            "source_type": "json",
+            "row_number": idx,
+        }
+        mapped_records.append(mapped)
+    records = mapped_records
     data_type = _detect_data_type(list(records[0].keys()) if records else [])
     logger.info("JSON parsed: %d records, type=%s", len(records), data_type)
     return records, data_type
@@ -204,7 +230,14 @@ def parse_sap_txt(content: str) -> Tuple[List[Dict], str]:
     delimiter = _detect_delimiter("\n".join(data_lines[:10]))
     import csv
     reader = csv.DictReader(io.StringIO("\n".join(data_lines)), delimiter=delimiter)
-    records = [_map_columns(row) for row in reader]
+    records = []
+    for idx, row in enumerate(reader, start=2):
+        mapped = _map_columns(row)
+        mapped["_lineage"] = {
+            "source_type": "sap_txt",
+            "row_number": idx,
+        }
+        records.append(mapped)
     data_type = _detect_data_type(reader.fieldnames or [])
     logger.info("SAP TXT parsed: %d records, type=%s", len(records), data_type)
     return records, data_type
