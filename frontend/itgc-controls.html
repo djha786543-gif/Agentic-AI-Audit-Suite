@@ -12,8 +12,8 @@
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{--ink:#070A10;--ink2:#0B0F1A;--ink3:#101828;--ink4:#161F32;--b1:rgba(255,255,255,.06);--b2:rgba(255,255,255,.1);--tx1:#EDF0F7;--tx2:#8895AD;--tx3:#505D75;--blue:#2878FF;--blue2:#1254CC;--red:#E03E43;--orange:#F07020;--green:#18B86A;--fd:'Sora',sans-serif;--fb:'Outfit',system-ui,sans-serif;--fm:'JetBrains Mono',monospace}
     body{background:var(--ink);color:var(--tx1);font-family:var(--fb);min-height:100vh}
-    .advisory-banner{position:sticky;top:0;z-index:2500;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 20px;background:#1a0a00;border-bottom:1px solid #f59e0b;color:#fcd34d;font-size:12px}
-    .advisory-right{margin-left:auto;white-space:nowrap;font-family:var(--fm)}
+    .advisory-banner{position:sticky;top:0;z-index:80;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:4px 10px;background:#1a0a00;border-bottom:1px solid #f59e0b;color:#fcd34d;font-size:10px;line-height:1.25}
+    .advisory-right{margin-left:auto;white-space:nowrap;font-family:var(--fm);font-size:10px;opacity:.9}
     .nav{position:sticky;top:33px;z-index:900;height:62px;background:rgba(7,10,16,.88);backdrop-filter:blur(18px);border-bottom:1px solid var(--b1);display:flex;align-items:center;padding:0 24px}
     .nav-inner{max-width:1200px;width:100%;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
     .nav-brand{display:flex;gap:10px;align-items:center}.mark{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--blue),var(--blue2));display:grid;place-items:center;font-family:var(--fm);font-size:11px}
@@ -51,7 +51,7 @@
   .sn-fab svg{width:15px;height:15px}
   .sn-menu::-webkit-scrollbar{width:6px}
   .sn-menu::-webkit-scrollbar-thumb{background:rgba(138,149,170,.45);border-radius:999px}
-   (hover: none), (pointer: coarse){
+  @media (hover: none), (pointer: coarse){
     .suite-nav-widget:hover .sn-menu{transform:scale(.95) translateY(8px) !important;opacity:0;pointer-events:none}
   }
   @media (max-width: 768px){
