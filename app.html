@@ -12104,39 +12104,39 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
       
       
       function runAudit() {
-          try {
+        try {
           var eb = document.getElementById('audit-error-boundary');
           if (eb) {
             eb.style.display = 'none';
             eb.textContent = '';
           }
-          // ACAP v4.0: Always run fully client-side validation gate (no backend calls)
-          var vgModal = document.getElementById('validationGateModal');
-          if (vgModal) {
-            var schemaEl = document.getElementById('vg-schema');
-            var nullEl = document.getElementById('vg-null');
-            var dupEl = document.getElementById('vg-dup');
-            var hashEl = document.getElementById('vg-hash');
-            if (schemaEl) schemaEl.innerHTML = '✅ Validated (Client-Side Check)';
-            if (nullEl) nullEl.innerText = '0.0% Missing';
-            if (dupEl) dupEl.innerHTML = '0 Exact Matches';
-            if (hashEl) hashEl.innerText = 'shax_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-            vgModal.style.display = 'flex';
-          } else {
-            // Validation gate modal not present — proceed directly to audit engine
-            forceRunAudit();
+
+          if (!STATE.agent || !AGENTS[STATE.agent]) {
+            showToast('Select an audit agent before running.', 'warn');
+            return;
           }
-          } catch (err) {
-            console.error('runAudit failed', err);
-            showToast('Audit failed to start. Check your file/mapping and retry.', 'error');
-            var proc = document.getElementById('procTitle');
-            if (proc) proc.textContent = 'Audit start failed';
-            var eb = document.getElementById('audit-error-boundary');
-            if (eb) {
-              eb.style.display = 'block';
-              eb.textContent = 'Error boundary: ' + (err && err.message ? err.message : 'Unknown error while starting audit.');
-            }
+          if (STATE.mode === 'single' && !STATE.file) {
+            showToast('Upload a data file before running the audit.', 'warn');
+            return;
           }
+          if (STATE.mode === 'zip' && (!STATE.batchFiles || !STATE.batchFiles.length)) {
+            showToast('Add at least one file to the ZIP queue before running.', 'warn');
+            return;
+          }
+
+          // Run directly to avoid modal interaction issues blocking execution.
+          forceRunAudit();
+        } catch (err) {
+          console.error('runAudit failed', err);
+          showToast('Audit failed to start. Check your file/mapping and retry.', 'error');
+          var proc = document.getElementById('procTitle');
+          if (proc) proc.textContent = 'Audit start failed';
+          var eb2 = document.getElementById('audit-error-boundary');
+          if (eb2) {
+            eb2.style.display = 'block';
+            eb2.textContent = 'Error boundary: ' + (err && err.message ? err.message : 'Unknown error while starting audit.');
+          }
+        }
       }
 
       function forceRunAudit() {
