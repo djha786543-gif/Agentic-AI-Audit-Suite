@@ -10112,12 +10112,18 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
 
         // ── RESOLVE FIELD: find first matching column from aliased names ──────
         resolve: function (row, canonicalField) {
+          // First honor explicit mapping selected in the UI.
+          var mappedCol = (STATE && STATE.mapping && STATE.mapping[canonicalField]) ? STATE.mapping[canonicalField] : '';
+          if (mappedCol && Object.prototype.hasOwnProperty.call(row, mappedCol)) {
+            return String(row[mappedCol] == null ? '' : row[mappedCol]).trim();
+          }
+
           var aliases = ERP.fieldAliases[canonicalField] || [canonicalField];
           var rowKeys = Object.keys(row);
           for (var i = 0; i < rowKeys.length; i++) {
             var kn = ERP.norm(rowKeys[i]);
             for (var j = 0; j < aliases.length; j++) {
-              if (kn === ERP.norm(aliases[j])) return String(row[rowKeys[i]] || '').trim();
+              if (kn === ERP.norm(aliases[j])) return String(row[rowKeys[i]] == null ? '' : row[rowKeys[i]]).trim();
             }
           }
           return '';
