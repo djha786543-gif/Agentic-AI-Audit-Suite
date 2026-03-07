@@ -547,6 +547,14 @@
                             class="bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/40 text-blue-300 w-full lg:w-auto h-[38px] px-3 flex items-center justify-center rounded-xl transition-colors shrink-0 text-[11px] font-black uppercase tracking-wide">
                             <i class="fas fa-shield-check mr-2"></i> Verify All
                         </button>
+                        <button id="artifactJsonBtn"
+                            class="bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 w-full lg:w-auto h-[38px] px-3 flex items-center justify-center rounded-xl transition-colors shrink-0 text-[11px] font-black uppercase tracking-wide">
+                            <i class="fas fa-file-code mr-2"></i> Audit Artifact JSON
+                        </button>
+                        <button id="artifactPdfBtn"
+                            class="bg-fuchsia-500/10 hover:bg-fuchsia-500/20 border border-fuchsia-500/40 text-fuchsia-300 w-full lg:w-auto h-[38px] px-3 flex items-center justify-center rounded-xl transition-colors shrink-0 text-[11px] font-black uppercase tracking-wide">
+                            <i class="fas fa-file-pdf mr-2"></i> Audit Artifact PDF
+                        </button>
                     </div>
                 </div>
 
@@ -633,6 +641,7 @@
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
         // State Management
         let allVaultData = [];
@@ -740,6 +749,8 @@
         const tbody = document.querySelector('table tbody');
         const refreshBtn = document.getElementById('refreshBtn');
         const verifyAllBtn = document.getElementById('verifyAllBtn');
+        const artifactJsonBtn = document.getElementById('artifactJsonBtn');
+        const artifactPdfBtn = document.getElementById('artifactPdfBtn');
         const demoBanner = document.getElementById('demo-mode-banner');
         const remediationLedgerTbody = document.getElementById('remediation-ledger-tbody');
         let latestIntegrityCertificate = null;
@@ -819,6 +830,105 @@
             a.download = 'forensic_integrity_certificate_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-') + '.json';
             a.click();
             URL.revokeObjectURL(a.href);
+        }
+
+        async function buildAuditArtifactPayload() {
+            let findings = [];
+            let findingsMeta = null;
+            try {
+                findings = JSON.parse(localStorage.getItem('auditai_latest_findings_v1') || '[]');
+            } catch (_) {
+                findings = [];
+            }
+            try {
+                findingsMeta = JSON.parse(localStorage.getItem('auditai_latest_findings_meta_v1') || 'null');
+            } catch (_) {
+                findingsMeta = null;
+            }
+
+            const logicTrace = (findings || []).map(function (f) {
+                const tj = f.technical_justification || {};
+                const chain = f.chain || {};
+                const trace = f.logic_trace || {};
+                return {
+                    finding_id: f.id || null,
+                    entity: f.entity || null,
+                    severity: f.severity || null,
+                    policy_rule: trace.policy_rule || tj.rule || f.rule || f.id || null,
+                    triggered_tcodes: Array.isArray(trace.tcodes) ? trace.tcodes : [],
+                    erp_data_points: {
+                        evidence_a: f.field1 || (tj.evidence_summary && tj.evidence_summary.evidence_a) || null,
+                        evidence_b: f.field2 || (tj.evidence_summary && tj.evidence_summary.evidence_b) || null
+                    },
+                    decision_path: {
+                        access: chain.access || null,
+                        control_failure: chain.controlFailure || null,
+                        audit_opinion: chain.auditOpinion || null
+                    },
+                    regulatory_control: 'PCAOB AS 2201',
+                    explanation: tj.explanation || null
+                };
+            });
+
+            const timestamp = new Date().toISOString();
+            const base = {
+                artifact_type: 'Sovereign GRC Forensic Audit Artifact',
+                generated_at_utc: timestamp,
+                tamper_proof_timestamp: timestamp,
+                environment: isDemoMode ? 'DEMO' : 'LIVE',
+                vault_summary: {
+                    total_records: allVaultData.length,
+                    latest_certificate_hash: latestIntegrityCertificate ? latestIntegrityCertificate.certificate_hash : null
+                },
+                findings_meta: findingsMeta,
+                logic_trace: logicTrace,
+                sha256_reference: logicTrace.length ? await sha256Hex(JSON.stringify(logicTrace)) : null
+            };
+
+            const artifactHash = await sha256Hex(JSON.stringify(base));
+            return Object.assign({}, base, {
+                artifact_sha256: artifactHash
+            });
+        }
+
+        async function downloadAuditArtifactJson() {
+            const artifact = await buildAuditArtifactPayload();
+            const blob = new Blob([JSON.stringify(artifact, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'sovereign_grc_audit_artifact_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-') + '.json';
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+
+        async function downloadAuditArtifactPdf() {
+            const artifact = await buildAuditArtifactPayload();
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                alert('PDF engine unavailable. Use Audit Artifact JSON export.');
+                return;
+            }
+            const doc = new window.jspdf.jsPDF({ unit: 'pt', format: 'a4' });
+            const lines = [
+                'Sovereign GRC Forensic Audit Artifact',
+                'Generated (UTC): ' + artifact.generated_at_utc,
+                'Tamper-Proof Timestamp: ' + artifact.tamper_proof_timestamp,
+                'Artifact SHA-256: ' + artifact.artifact_sha256,
+                'Regulatory Control: PCAOB AS 2201',
+                'Findings with Logic Trace: ' + String((artifact.logic_trace || []).length),
+                ''
+            ];
+            (artifact.logic_trace || []).slice(0, 12).forEach(function (f, i) {
+                lines.push((i + 1) + '. ' + (f.finding_id || 'FINDING'));
+                lines.push('   Policy Rule: ' + (f.policy_rule || 'N/A'));
+                lines.push('   T-Code(s): ' + ((f.triggered_tcodes || []).join(', ') || 'Not found'));
+                lines.push('   Evidence: ' + (f.erp_data_points && f.erp_data_points.evidence_a ? f.erp_data_points.evidence_a : 'N/A'));
+                lines.push('   Decision: ' + (f.decision_path && f.decision_path.control_failure ? f.decision_path.control_failure : 'N/A'));
+                lines.push('');
+            });
+            doc.setFont('courier', 'normal');
+            doc.setFontSize(9);
+            doc.text(lines.join('\n'), 36, 40, { maxWidth: 530 });
+            doc.save('sovereign_grc_audit_artifact_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-') + '.pdf');
         }
 
                 function loadDemoVaultData() {
@@ -1051,6 +1161,12 @@
 
         verifyAllBtn.addEventListener('click', function () {
             verifyAllVaultRecords();
+        });
+        artifactJsonBtn.addEventListener('click', function () {
+            downloadAuditArtifactJson();
+        });
+        artifactPdfBtn.addEventListener('click', function () {
+            downloadAuditArtifactPdf();
         });
 
         function renderRemediationLedger() {
