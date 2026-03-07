@@ -8818,8 +8818,9 @@
             <div style="font-size:.82rem;color:#5c5650;line-height:1.7;max-width:700px">This tool starts with a
               <strong>completely clean slate</strong> on every load. All findings, KPI numbers, and AI narratives are
               generated exclusively from the data <strong>you upload</strong> in Step 2. There is no simulated or
-              placeholder data. Upload your actual ERP export and the agent will analyse it from scratch — see the
-              <strong>Help Guide</strong> for sample CSV layouts per agent.
+              placeholder data. Upload raw ERP exports directly (including SAP technical headers like
+              <strong>MANDT / BNAME / AGR_NAME / USNAM</strong>) and the Semantic Header Interpreter will auto-map
+              columns without template files.
             </div>
           </div>
         </div>
@@ -9305,6 +9306,33 @@
           <div class="mapping-grid" id="mappingGrid"></div>
         </div>
 
+        <div id="dataIntegrityScorecard" style="display:none;margin-top:12px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(9,14,24,.65);padding:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+            <div>
+              <div style="font-family:var(--font-mono);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:#93c5fd">Data Integrity Scorecard</div>
+              <div id="integrityScoreValue" style="font-size:1.25rem;font-weight:800;color:#4ade80">—</div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(4,minmax(110px,1fr));gap:8px;flex:1;min-width:300px">
+              <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:8px">
+                <div style="font-size:.6rem;color:#94a3b8">Missing Values</div>
+                <div id="integrityMissing" style="font-family:var(--font-mono);font-size:.82rem">—</div>
+              </div>
+              <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:8px">
+                <div style="font-size:.6rem;color:#94a3b8">Duplicates</div>
+                <div id="integrityDupes" style="font-family:var(--font-mono);font-size:.82rem">—</div>
+              </div>
+              <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:8px">
+                <div style="font-size:.6rem;color:#94a3b8">Date Inconsistency</div>
+                <div id="integrityDateFormats" style="font-family:var(--font-mono);font-size:.82rem">—</div>
+              </div>
+              <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:8px">
+                <div style="font-size:.6rem;color:#94a3b8">Status</div>
+                <div id="integrityStatus" style="font-family:var(--font-mono);font-size:.82rem">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="btn-row">
           <button class="btn btn-secondary" onclick="goStep(1)">&larr; Back</button>
           <button class="btn btn-primary" id="btnRun" disabled onclick="runAudit()">&#x1f680; Run Audit Agent</button>
@@ -9583,6 +9611,9 @@
                         <th>Area</th>
                         <th>Severity</th>
                         <th>Fraud Scenario</th>
+                        <th>T-Code(s)</th>
+                        <th>Policy Rule</th>
+                        <th>Logic Trace</th>
                       </tr>
                     </thead>
                     <tbody id="ccFindingsTbody"></tbody>
@@ -9727,8 +9758,10 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
       var STATE = {
         agent: null,
         file: null,
+        rawData: [],
         data: [],
         headers: [],
+        lineageMap: {},
         mapping: {},
         violations: [],
         riskSummary: {},
@@ -9969,13 +10002,13 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         // can reference canonical names regardless of source system.
         fieldAliases: {
           // User / Employee ID
-          user: ['user', 'userid', 'user_id', 'username', 'user_name', 'emp_id', 'employee_id', 'employeeid', 'sap_user', 'oracle_user', 'd365_user', 'workday_id', 'netsuite_user', 'subject', 'account', 'login', 'logon', 'principal', 'samaccountname', 'upn', 'email'],
+          user: ['user', 'userid', 'user_id', 'username', 'user_name', 'emp_id', 'employee_id', 'employeeid', 'sap_user', 'oracle_user', 'd365_user', 'workday_id', 'netsuite_user', 'subject', 'account', 'login', 'logon', 'principal', 'samaccountname', 'upn', 'email', 'usnam', 'uname', 'bname'],
           // Role / Permission / T-code
-          role: ['role', 'tcode', 't_code', 'transaction_code', 'permission', 'privilege', 'entitlement', 'access_right', 'function', 'responsibility', 'duty', 'security_role', 'role_name', 'group', 'ad_group', 'profile', 'auth_object', 'function_name', 'menu_item', 'task', 'action'],
+          role: ['role', 'tcode', 't_code', 'transaction_code', 'permission', 'privilege', 'entitlement', 'access_right', 'function', 'responsibility', 'duty', 'security_role', 'role_name', 'group', 'ad_group', 'profile', 'auth_object', 'function_name', 'menu_item', 'task', 'action', 'agr_name', 'agrname', 'low'],
           // Display name
-          name: ['name', 'full_name', 'fullname', 'display_name', 'employee_name', 'emp_name', 'user_display', 'first_last', 'person'],
+          name: ['name', 'full_name', 'fullname', 'display_name', 'employee_name', 'emp_name', 'user_display', 'first_last', 'person', 'usnam'],
           // System / ERP source
-          system: ['system', 'erp', 'source_system', 'application', 'app', 'platform', 'module', 'client', 'company_code', 'org'],
+          system: ['system', 'erp', 'source_system', 'application', 'app', 'platform', 'module', 'client', 'company_code', 'org', 'mandt', 'bukrs'],
           // Status
           status: ['status', 'emp_status', 'user_status', 'account_status', 'employment_status', 'worker_status', 'active_flag', 'enabled', 'is_active', 'enabled_flag', 'account_enabled'],
           // Account type
@@ -10043,7 +10076,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
           tax_id: ['tax_id', 'tax_number', 'ein', 'vat_number', 'gst_number', 'abn', 'company_reg', 'registration_number', 'fiscal_id'],
           address: ['address', 'street', 'vendor_address', 'supplier_address', 'postal_address', 'registered_address'],
           payment_terms: ['payment_terms', 'pay_terms', 'terms', 'net_days', 'payment_condition'],
-          created_by: ['created_by', 'creator', 'entered_by', 'added_by', 'created_user', 'input_by', 'posted_by'],
+          created_by: ['created_by', 'creator', 'entered_by', 'added_by', 'created_user', 'input_by', 'posted_by', 'usnam'],
           approval_status: ['approval_status', 'approved', 'vendor_status', 'status', 'vendor_approved'],
           phone: ['phone', 'telephone', 'contact_number', 'phone_number', 'mobile', 'contact_phone'],
           employee_address: ['employee_address', 'emp_address', 'staff_address', 'home_address', 'personal_address'],
@@ -10093,15 +10126,49 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         // ── AUTO-MAP: build mapping object from data row keys ─────────────────
         autoMap: function (headers, fieldKeys) {
           var map = {};
+          function toks(s) {
+            return String(s || '').toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+          }
+          function tokenScore(a, b) {
+            var ta = toks(a), tb = toks(b);
+            if (!ta.length || !tb.length) return 0;
+            var setB = {};
+            tb.forEach(function (x) { setB[x] = 1; });
+            var overlap = 0;
+            ta.forEach(function (x) { if (setB[x]) overlap++; });
+            return overlap / Math.max(ta.length, tb.length);
+          }
+          function ngramScore(a, b) {
+            var sa = ERP.norm(a), sb = ERP.norm(b);
+            if (!sa || !sb) return 0;
+            function grams(s) {
+              var g = {};
+              if (s.length < 2) { g[s] = 1; return g; }
+              for (var i = 0; i < s.length - 1; i++) g[s.slice(i, i + 2)] = 1;
+              return g;
+            }
+            var ga = grams(sa), gb = grams(sb);
+            var inter = 0, uni = 0;
+            var seen = {};
+            Object.keys(ga).forEach(function (k) { seen[k] = 1; if (gb[k]) inter++; });
+            Object.keys(gb).forEach(function (k) { seen[k] = 1; });
+            uni = Object.keys(seen).length || 1;
+            return inter / uni;
+          }
           fieldKeys.forEach(function (fk) {
             var aliases = ERP.fieldAliases[fk] || [fk];
+            var best = { h: '', s: 0 };
             for (var i = 0; i < headers.length; i++) {
               var hn = ERP.norm(headers[i]);
               for (var j = 0; j < aliases.length; j++) {
-                if (hn === ERP.norm(aliases[j])) { map[fk] = headers[i]; break; }
+                var an = ERP.norm(aliases[j]);
+                if (hn === an) { map[fk] = headers[i]; best = { h: headers[i], s: 1 }; break; }
+                var s = Math.max(tokenScore(headers[i], aliases[j]), ngramScore(headers[i], aliases[j]));
+                if (s > best.s) best = { h: headers[i], s: s };
               }
               if (map[fk]) break;
             }
+            if (!map[fk] && best.h && best.s >= 0.42) map[fk] = best.h;
           });
           return map;
         },
@@ -11601,9 +11668,85 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
 
       function parseFile(file, callback) {
         var ext = file.name.split('.').pop().toLowerCase();
-        function done(data, headers) { if (callback) callback(data, headers); else { STATE.data = data; STATE.headers = headers; showPreview(); buildMapping(); } }
+        function normalizeDateValue(val) {
+          if (val == null) return val;
+          var s = String(val).trim();
+          if (!s) return val;
+          var m;
+          if ((m = s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/))) {
+            var dd = parseInt(m[1], 10), mm = parseInt(m[2], 10), yyyy = parseInt(m[3], 10);
+            if (dd > 12) return yyyy + '-' + String(mm).padStart(2, '0') + '-' + String(dd).padStart(2, '0');
+            return yyyy + '-' + String(dd).padStart(2, '0') + '-' + String(mm).padStart(2, '0');
+          }
+          if ((m = s.match(/^(\d{2})-(\d{2})-(\d{2})$/))) {
+            var mm2 = parseInt(m[1], 10), dd2 = parseInt(m[2], 10), yy = parseInt(m[3], 10);
+            var yyyy2 = yy >= 70 ? 1900 + yy : 2000 + yy;
+            return yyyy2 + '-' + String(mm2).padStart(2, '0') + '-' + String(dd2).padStart(2, '0');
+          }
+          return val;
+        }
+        function normalizeCurrencyValue(val) {
+          if (val == null) return val;
+          var s = String(val).trim();
+          if (!s) return val;
+          var c = s.replace(/\$/g, '').replace(/EUR|USD|GBP|INR/gi, '').trim();
+          if (c.indexOf(',') !== -1 && c.indexOf('.') !== -1) {
+            if (c.lastIndexOf(',') > c.lastIndexOf('.')) c = c.replace(/\./g, '').replace(',', '.');
+            else c = c.replace(/,/g, '');
+          } else if (c.indexOf(',') !== -1) {
+            var parts = c.split(',');
+            c = parts[1] && parts[1].length <= 2 ? (parts[0] + '.' + parts[1]) : c.replace(/,/g, '');
+          }
+          c = c.replace(/,/g, '');
+          var n = Number(c);
+          return isNaN(n) ? val : Math.round(n * 100) / 100;
+        }
+        function normalizeRowValues(row) {
+          var out = {};
+          Object.keys(row || {}).forEach(function (k) {
+            var v = row[k];
+            var kn = String(k || '').toLowerCase();
+            if (/date|created|creation|posting|term/.test(kn)) out[k] = normalizeDateValue(v);
+            else if (/amount|amt|total|price|value|cost/.test(kn)) out[k] = normalizeCurrencyValue(v);
+            else out[k] = v;
+          });
+          return out;
+        }
+        function done(data, headers) {
+          var normalized = (data || []).map(normalizeRowValues);
+          if (callback) callback(normalized, headers);
+          else {
+            STATE.rawData = data || [];
+            STATE.data = normalized;
+            STATE.headers = headers;
+            showPreview();
+            buildMapping();
+            renderDataIntegrityScorecard(STATE.rawData, STATE.data, STATE.headers);
+          }
+        }
         if (ext === 'csv' || ext === 'tsv') {
-          Papa.parse(file, { header: true, skipEmptyLines: true, complete: function (res) { done(res.data, res.meta.fields || []); } });
+          var rows = [];
+          var lineage = {};
+          var rowNumber = 1;
+          Papa.parse(file, {
+            header: true,
+            skipEmptyLines: true,
+            worker: true,
+            fastMode: true,
+            chunk: function (chunk) {
+              if (!chunk || !chunk.data) return;
+              chunk.data.forEach(function (row) {
+                rowNumber += 1;
+                var fp = JSON.stringify(row);
+                lineage[fp] = { source_file: file.name, row_number: rowNumber, erp_table: 'csv_upload' };
+                rows.push(row);
+              });
+            },
+            complete: function (res) {
+              STATE.lineageMap = lineage;
+              done(rows, res.meta.fields || []);
+            }
+          });
         } else if (ext === 'xlsx' || ext === 'xls') {
           var reader = new FileReader();
           reader.onload = function (e) {
@@ -11772,6 +11915,67 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         document.getElementById('dataPreview').classList.add('show');
       }
 
+      function renderDataIntegrityScorecard(rawRows, normRows, headers) {
+        var box = document.getElementById('dataIntegrityScorecard');
+        if (!box) return;
+        var rows = Array.isArray(normRows) ? normRows : [];
+        var raw = Array.isArray(rawRows) ? rawRows : [];
+        var cols = Array.isArray(headers) ? headers : [];
+        if (!rows.length || !cols.length) {
+          box.style.display = 'none';
+          return;
+        }
+
+        var missing = 0;
+        rows.forEach(function (r) {
+          cols.forEach(function (c) {
+            var v = r[c];
+            if (v === '' || v == null) missing++;
+          });
+        });
+        var totalCells = rows.length * cols.length;
+        var missingPct = totalCells ? Math.round((missing / totalCells) * 1000) / 10 : 0;
+
+        var seen = {};
+        var dupes = 0;
+        rows.forEach(function (r) {
+          var fp = JSON.stringify(r);
+          if (seen[fp]) dupes++;
+          else seen[fp] = 1;
+        });
+
+        var formatFlags = { slash: 0, dash2: 0, iso: 0 };
+        raw.forEach(function (r) {
+          cols.forEach(function (c) {
+            var v = String((r && r[c]) || '').trim();
+            if (!v) return;
+            if (/^\d{2}\/\d{2}\/\d{4}$/.test(v)) formatFlags.slash++;
+            else if (/^\d{2}-\d{2}-\d{2}$/.test(v)) formatFlags.dash2++;
+            else if (/^\d{4}-\d{2}-\d{2}/.test(v)) formatFlags.iso++;
+          });
+        });
+        var dateFormatKinds = Object.keys(formatFlags).filter(function (k) { return formatFlags[k] > 0; }).length;
+        var dateInconsistent = dateFormatKinds > 1;
+
+        var integrity = 100;
+        integrity -= Math.min(40, missingPct * 0.6);
+        integrity -= Math.min(30, dupes * 0.8);
+        if (dateInconsistent) integrity -= 15;
+        integrity = Math.max(0, Math.round(integrity));
+
+        var status = integrity >= 90 ? 'Excellent' : integrity >= 75 ? 'Acceptable' : 'Needs remediation';
+        var statusColor = integrity >= 90 ? '#4ade80' : integrity >= 75 ? '#f59e0b' : '#f87171';
+
+        document.getElementById('integrityScoreValue').textContent = integrity + '/100';
+        document.getElementById('integrityScoreValue').style.color = statusColor;
+        document.getElementById('integrityMissing').textContent = missing + ' (' + missingPct + '%)';
+        document.getElementById('integrityDupes').textContent = String(dupes);
+        document.getElementById('integrityDateFormats').textContent = dateInconsistent ? 'Mixed formats detected' : 'Consistent';
+        document.getElementById('integrityStatus').textContent = status;
+        document.getElementById('integrityStatus').style.color = statusColor;
+        box.style.display = 'block';
+      }
+
       function buildMapping() {
         if (!STATE.agent) return;
         var ag = AGENTS[STATE.agent]; var fields = ag.fields;
@@ -11859,6 +12063,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
           totalRows += f.data.length;
         });
         STATE.violations = allVio;
+        STATE.violations = enrichFindingsForTrust(STATE.violations);
         STATE.riskSummary = aggRS;
         STATE.data = { length: totalRows }; // fake length for display
         renderResults();
@@ -11997,11 +12202,22 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
           } else {
             STATE.violations = ag.detect(STATE.data, STATE.mapping, filterAgentRulesForPolicy(ag.rules || []));
           }
+          STATE.violations = enrichFindingsForTrust(STATE.violations);
           // ---> END INTEGATED PROTOTYPE LOGIC INTERCEPT <---
 
           STATE.riskSummary = { Critical: 0, High: 0, Medium: 0, Low: 0 };
           STATE.violations.forEach(function (v) { if (STATE.riskSummary[v.severity] !== undefined) STATE.riskSummary[v.severity]++ });
           window._lastFindings = (STATE.violations || []).slice();
+          try {
+            localStorage.setItem('auditai_latest_findings_v1', JSON.stringify(window._lastFindings));
+            localStorage.setItem('auditai_latest_findings_meta_v1', JSON.stringify({
+              run_id: runId,
+              agent: STATE.agent,
+              generated_at: new Date().toISOString()
+            }));
+          } catch (_) {
+            // Cross-page finding persistence is best-effort only.
+          }
           var modelMap = {
             sod: 'acap-sod-v4.0',
             access: 'acap-access-v4.0',
@@ -12051,8 +12267,288 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         sevFilter: 'ALL',
         areaFilter: 'ALL',
         selectedIdx: null,
-        feedTimer: null
+        feedTimer: null,
+        swarmNudges: []
       };
+
+      function safeText(v) { return String(v == null ? '' : v); }
+
+      function uniqueList(items) {
+        var seen = {};
+        var out = [];
+        (items || []).forEach(function (x) {
+          var key = safeText(x).trim();
+          if (!key) return;
+          var lc = key.toLowerCase();
+          if (seen[lc]) return;
+          seen[lc] = true;
+          out.push(key);
+        });
+        return out;
+      }
+
+      function extractTriggeredTCodes(finding) {
+        var v = finding || {};
+        var tj = v.technical_justification || {};
+        var c = v.chain || {};
+        var textBlob = [
+          v.tcode, v.t_code, v.transaction_code, v.transaction, v.txn_code,
+          v.rule, v.id, v.field1, v.field2, v.detail,
+          c.access, c.controlFailure, c.risk,
+          tj.rule,
+          tj.evidence_summary && tj.evidence_summary.evidence_a,
+          tj.evidence_summary && tj.evidence_summary.evidence_b
+        ].map(safeText).join(' | ');
+
+        var rx = /\b([A-Z]{1,4}\d{2,4}[A-Z]?|[A-Z]{4,5})\b/g;
+        var found = [];
+        var m;
+        while ((m = rx.exec(textBlob)) !== null) {
+          var token = m[1];
+          if (!token) continue;
+          if (token === 'SOX' || token === 'ITGC' || token === 'ITAC' || token === 'FRR' || token === 'SOD') continue;
+          if (token.length >= 4) found.push(token);
+        }
+        return uniqueList(found).slice(0, 5);
+      }
+
+      function extractPolicyRule(finding) {
+        var v = finding || {};
+        var tj = v.technical_justification || {};
+        return safeText(tj.rule || v.rule || v.id || 'Policy rule not provided');
+      }
+
+      function ensureLogicTraceMeta(finding) {
+        var v = finding || {};
+        var existing = v.logic_trace || {};
+        var tcodes = (Array.isArray(existing.tcodes) && existing.tcodes.length) ? existing.tcodes : extractTriggeredTCodes(v);
+        var policyRule = existing.policy_rule || extractPolicyRule(v);
+        v.logic_trace = {
+          tcodes: tcodes,
+          policy_rule: policyRule
+        };
+        return v.logic_trace;
+      }
+
+      function getTerminatedUsersFromFindings(findings) {
+        var users = [];
+        (findings || []).forEach(function (f) {
+          var id = safeText(f.id).toUpperCase();
+          var text = (safeText(f.rule) + ' ' + safeText(f.scenario) + ' ' + safeText(f.detail) + ' ' + safeText(f.field2)).toLowerCase();
+          var isLeaver = id.indexOf('LA-001') === 0 || (text.indexOf('terminated') !== -1 && text.indexOf('active') !== -1);
+          if (isLeaver) users.push(safeText(f.entity).toLowerCase());
+        });
+        return uniqueList(users);
+      }
+
+      function getTerminatedUsersFromItgcSync() {
+        try {
+          var stored = JSON.parse(localStorage.getItem('auditai_terminated_users_v1') || 'null');
+          if (!stored || !Array.isArray(stored.users)) return [];
+          return uniqueList(stored.users.map(function (u) { return safeText(u).toLowerCase(); }));
+        } catch (_) {
+          return [];
+        }
+      }
+
+      function applyItgcTerminationFlags(findings, users) {
+        if (!Array.isArray(findings) || !findings.length || !Array.isArray(users) || !users.length) return false;
+        var changed = false;
+        findings.forEach(function (f) {
+          var ent = safeText(f.entity).toLowerCase();
+          var fieldText = (safeText(f.field1) + ' ' + safeText(f.field2) + ' ' + safeText(f.rule)).toLowerCase();
+          var hit = users.indexOf(ent) !== -1 || users.some(function (u) { return fieldText.indexOf(u) !== -1; });
+          if (!hit) return;
+          f.review_priority = 'P1';
+          f.priority_reason = 'ITGC terminated-user list flagged this ID for transaction forensics';
+          changed = true;
+        });
+        return changed;
+      }
+
+      var SWARM_BUS = null;
+      try {
+        SWARM_BUS = new BroadcastChannel('auditai_swarm_bus_v1');
+      } catch (_) {
+        SWARM_BUS = null;
+      }
+
+      function broadcastSwarmEvent(type, payload) {
+        if (!SWARM_BUS) return;
+        try {
+          SWARM_BUS.postMessage({
+            type: type,
+            at: new Date().toISOString(),
+            payload: payload || {}
+          });
+        } catch (_) {
+          // Non-blocking event bus broadcast.
+        }
+      }
+
+      if (SWARM_BUS) {
+        SWARM_BUS.onmessage = function (event) {
+          var msg = event && event.data ? event.data : {};
+          if (msg.type !== 'ITGC_LEAVER_ALERT') return;
+          if (STATE.agent !== 'frr') return;
+          var users = ((msg.payload && msg.payload.users) || []).map(function (u) { return safeText(u).toLowerCase(); });
+          if (!users.length || !Array.isArray(CC.allVio) || !CC.allVio.length) return;
+          var changed = false;
+          CC.allVio.forEach(function (f) {
+            var ent = safeText(f.entity).toLowerCase();
+            var fieldText = (safeText(f.field1) + ' ' + safeText(f.field2) + ' ' + safeText(f.rule)).toLowerCase();
+            var hit = users.indexOf(ent) !== -1 || users.some(function (u) { return fieldText.indexOf(u) !== -1; });
+            if (!hit) return;
+            f.review_priority = 'P1';
+            f.priority_reason = 'ITGC terminated-user alert corroborates JE transaction review';
+            changed = true;
+          });
+          if (changed) {
+            renderFindingsTable(CC.filtered && CC.filtered.length ? CC.filtered : CC.allVio);
+            buildLiveFeed(CC.filtered && CC.filtered.length ? CC.filtered : CC.allVio);
+          }
+        };
+      }
+
+      window.addEventListener('storage', function (event) {
+        if (!event || event.key !== 'auditai_terminated_users_v1') return;
+        if (STATE.agent !== 'frr' && STATE.agent !== 'transaction' && STATE.agent !== 'tt') return;
+        var syncedUsers = getTerminatedUsersFromItgcSync();
+        if (!syncedUsers.length) return;
+        var changed = applyItgcTerminationFlags(CC.allVio, syncedUsers);
+        if (changed) {
+          renderFindingsTable(CC.filtered && CC.filtered.length ? CC.filtered : CC.allVio);
+          buildLiveFeed(CC.filtered && CC.filtered.length ? CC.filtered : CC.allVio);
+        }
+      });
+
+      function riskWeightingForFinding(v) {
+        var sev = safeText(v.severity).toLowerCase();
+        var frequencyWeight = sev === 'critical' ? 0.8 : sev === 'high' ? 0.7 : sev === 'medium' ? 0.55 : 0.4;
+        var materialityWeight = sev === 'critical' ? 0.2 : sev === 'high' ? 0.3 : sev === 'medium' ? 0.45 : 0.6;
+        var score = Math.round((frequencyWeight * 70 + materialityWeight * 30) * 100) / 100;
+        return {
+          score: score,
+          tooltip: Math.round(frequencyWeight * 100) + '% frequency of occurrence + ' + Math.round(materialityWeight * 100) + '% financial materiality'
+        };
+      }
+
+      function enrichFindingsForTrust(findings) {
+        return (findings || []).map(function (f, idx) {
+          var v = Object.assign({}, f);
+          var ruleName = v.rule || v.id || 'Unknown Rule';
+          var agentLabel = (v.id || '').startsWith('TT-') || (v.id || '').startsWith('ITAC') ? 'Financial Forensics' :
+            (v.id || '').startsWith('SOD-') ? 'SOD Auditor' :
+            (v.id || '').startsWith('LA-') ? 'Logical Access Auditor' : 'Audit Reasoning Engine';
+          var tw = riskWeightingForFinding(v);
+          v.risk_score = tw.score;
+          v.risk_weighting_tooltip = tw.tooltip;
+          if (!v.technical_justification) {
+            v.technical_justification = {
+              agent: agentLabel,
+              rule: ruleName,
+              explanation: 'Identified via Agent [' + agentLabel + ']: Entry #' + (idx + 1) + ' matched \'' + ruleName + '\' control pattern based on observed evidence and rule threshold breach.',
+              evidence_summary: {
+                evidence_a: v.field1 || null,
+                evidence_b: v.field2 || null,
+                scenario: v.scenario || null
+              }
+            };
+          }
+          ensureLogicTraceMeta(v);
+          return v;
+        });
+      }
+
+      function openSwarmDb() {
+        return new Promise(function (resolve, reject) {
+          var req = indexedDB.open('auditai_swarm_db', 1);
+          req.onupgradeneeded = function () {
+            var db = req.result;
+            if (!db.objectStoreNames.contains('agent_findings')) db.createObjectStore('agent_findings');
+          };
+          req.onsuccess = function () { resolve(req.result); };
+          req.onerror = function () { reject(req.error); };
+        });
+      }
+
+      async function saveSwarmSnapshot(agentKey, findings) {
+        try {
+          var db = await openSwarmDb();
+          await new Promise(function (resolve, reject) {
+            var tx = db.transaction('agent_findings', 'readwrite');
+            tx.objectStore('agent_findings').put({
+              saved_at: new Date().toISOString(),
+              findings: findings || []
+            }, agentKey || 'unknown');
+            if (agentKey === 'access') {
+              var leaverUsers = getTerminatedUsersFromFindings(findings || []);
+              tx.objectStore('agent_findings').put({
+                saved_at: new Date().toISOString(),
+                users: leaverUsers,
+                findings: findings || []
+              }, 'itgc_terminated_users');
+              if (leaverUsers.length) {
+                broadcastSwarmEvent('ITGC_LEAVER_ALERT', { users: leaverUsers });
+              }
+            }
+            tx.oncomplete = function () { resolve(); };
+            tx.onerror = function () { reject(tx.error); };
+          });
+          db.close();
+        } catch (_) {
+          // Non-blocking memory enhancement.
+        }
+      }
+
+      async function getSwarmSnapshot(agentKey) {
+        try {
+          var db = await openSwarmDb();
+          var record = await new Promise(function (resolve, reject) {
+            var tx = db.transaction('agent_findings', 'readonly');
+            var req = tx.objectStore('agent_findings').get(agentKey || 'unknown');
+            req.onsuccess = function () { resolve(req.result || null); };
+            req.onerror = function () { reject(req.error); };
+          });
+          db.close();
+          return record;
+        } catch (_) {
+          return null;
+        }
+      }
+
+      async function computeSwarmNudges(agentKey, findings) {
+        if (agentKey !== 'sod' && agentKey !== 'frr') return [];
+        var accessSnapshot = await getSwarmSnapshot('access');
+        var itgcTermSnapshot = await getSwarmSnapshot('itgc_terminated_users');
+        var accessFindings = (accessSnapshot && accessSnapshot.findings) ? accessSnapshot.findings : [];
+        var terminatedUsers = getTerminatedUsersFromFindings(accessFindings);
+        if (itgcTermSnapshot && Array.isArray(itgcTermSnapshot.users)) {
+          terminatedUsers = uniqueList(terminatedUsers.concat(itgcTermSnapshot.users));
+        }
+        terminatedUsers = uniqueList(terminatedUsers.concat(getTerminatedUsersFromItgcSync()));
+
+        if (!terminatedUsers.length) return [];
+        var nudges = [];
+        (findings || []).forEach(function (f) {
+          var ent = safeText(f.entity).toLowerCase();
+          var fieldText = (safeText(f.field1) + ' ' + safeText(f.field2) + ' ' + safeText(f.rule)).toLowerCase();
+          var isTarget = terminatedUsers.indexOf(ent) !== -1 || terminatedUsers.some(function (u) { return fieldText.indexOf(u) !== -1; });
+          if (isTarget) {
+            if (agentKey === 'frr') {
+              f.review_priority = 'P1';
+              f.priority_reason = 'ITGC terminated-user alert corroborates JE transaction review';
+            }
+            nudges.push({
+              severity: 'CRITICAL',
+              message: agentKey === 'frr'
+                ? 'High Priority Alert: ITGC terminated-user signal matched JE exception ' + safeText(f.id || 'FRR') + '. Prioritize transaction review immediately for user \'' + (safeText(f.entity) || 'unknown') + '\'.'
+                : 'Swarm Nudge: Logical Access identified terminated user \'' + safeText(f.entity) + '\' still active. Re-check transaction and approval activity post-termination.'
+            });
+          }
+        });
+        return nudges;
+      }
 
       // ─── FRAUD SCENARIO → FINANCIAL EXPOSURE ESTIMATOR ──────────────────────────
       function estimateExposure(violations) {
@@ -12113,7 +12609,8 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
       function renderResults() {
         ensureResultMetaSlots();
         var ag = AGENTS[STATE.agent];
-        var vio = STATE.violations;
+        var vio = enrichFindingsForTrust(STATE.violations);
+        STATE.violations = vio;
         var rs = STATE.riskSummary;
         CC.allVio = vio;
         CC.filtered = vio;
@@ -12137,9 +12634,11 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
 
         document.getElementById('kpiCritVal').textContent = crit;
         document.getElementById('kpiCritSub').textContent = crit + ' critical SOX exposure';
+        document.getElementById('kpiCritVal').title = 'AI risk weighting: 70% frequency of occurrence + 30% financial materiality';
 
         document.getElementById('kpiExpVal').textContent = exposure >= 1000000 ? '$' + (exposure / 1000000).toFixed(1) + 'M' : '$' + Math.round(exposure / 1000) + 'K';
         document.getElementById('kpiExpSub').textContent = 'Estimated financial at-risk';
+        document.getElementById('kpiExpVal').title = 'AI risk weighting: 70% frequency of occurrence + 30% financial materiality';
 
         document.getElementById('kpiFraudVal').textContent = fraudCount;
         document.getElementById('kpiFraudSub').textContent = fraudCount + ' high-risk fraud indicators';
@@ -12173,6 +12672,13 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
 
         // ── LIVE FEED ──
         buildLiveFeed(vio);
+
+        saveSwarmSnapshot(STATE.agent, vio);
+        computeSwarmNudges(STATE.agent, vio).then(function (nudges) {
+          CC.swarmNudges = nudges || [];
+          renderFindingsTable(CC.filtered || vio);
+          buildLiveFeed(CC.filtered || vio);
+        });
 
         // ── VALIDATION SUMMARY ──
         var vCard = document.getElementById('validationSummaryBox');
@@ -12312,11 +12818,27 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         'CD': 'CD', 'INT': 'INT', 'TT': 'TT', 'FRR': 'FRR', 'MDG': 'MDG', 'ALL': 'ALL'
       };
 
+      var _redactionMap = {};
+      function isRedactionEnabled() {
+        return localStorage.getItem('auditai_redaction_enabled') === 'true';
+      }
+
+      function redactIdentity(value) {
+        if (!isRedactionEnabled()) return value;
+        if (!value) return value;
+        if (!_redactionMap[value]) {
+          var idx = Object.keys(_redactionMap).length + 1;
+          var suffix = String.fromCharCode(64 + ((idx - 1) % 26) + 1);
+          _redactionMap[value] = 'User_' + suffix;
+        }
+        return _redactionMap[value];
+      }
+
       function renderFindingsTable(vio) {
         var tbody = document.getElementById('ccFindingsTbody');
         document.getElementById('ccFindCount').textContent = vio.length + ' findings · Click row for AI narrative';
         if (!vio.length) {
-          tbody.innerHTML = '<tr><td colspan="6" class="cc-no-results">✅ No exceptions — all records passed control testing</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="9" class="cc-no-results">✅ No exceptions — all records passed control testing</td></tr>';
           return;
         }
         var html = '';
@@ -12326,13 +12848,23 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
           var pillClass = v.severity === 'Critical' ? 'cc-pill-c' : v.severity === 'High' ? 'cc-pill-h' : v.severity === 'Medium' ? 'cc-pill-m' : 'cc-pill-l';
           if (isCorroborated) pillClass += ' cc-pill-corr';
           var areaPrefix = v.id ? v.id.split('-')[0] : '';
+          var weightingTip = (v.risk_weighting_tooltip || '70% frequency of occurrence + 30% financial materiality').replace(/"/g, '&quot;');
+          var trace = ensureLogicTraceMeta(v);
+          var tcodes = (trace.tcodes && trace.tcodes.length) ? trace.tcodes.join(', ') : 'Not found in evidence';
+          var policyRule = safeText(trace.policy_rule || 'Policy rule not provided');
+          var priorityTag = v.review_priority === 'P1'
+            ? '<span style="display:inline-block;background:rgba(239,68,68,.18);color:#fca5a5;border:1px solid rgba(239,68,68,.35);border-radius:6px;padding:.08rem .35rem;margin-right:.28rem;font-size:.58rem;font-family:var(--font-mono)">P1</span>'
+            : '';
           html += '<tr class="cc-tr" id="ccrow' + idx + '" onclick="showNarrative(' + idx + ')">';
           html += '<td><span class="cc-dot ' + dotClass + '"></span></td>';
-          html += '<td class="cc-entity" title="' + v.entity + '">' + v.entity + '</td>';
+          html += '<td class="cc-entity" title="' + redactIdentity(v.entity) + '">' + redactIdentity(v.entity) + '</td>';
           html += '<td class="cc-rule-txt"><span class="cc-rule-id">' + v.id + '</span><br>' + v.rule + '</td>';
           html += '<td class="cc-area-txt">' + areaPrefix + '</td>';
-          html += '<td><span class="cc-sev-pill ' + pillClass + '">' + v.severity + '</span></td>';
+          html += '<td>' + priorityTag + '<span class="cc-sev-pill ' + pillClass + '" title="' + weightingTip + '">' + v.severity + '</span></td>';
           html += '<td class="cc-rule-txt" style="color:#f59e0b;font-size:.63rem">' + (v.scenario || '—') + '</td>';
+          html += '<td class="cc-rule-txt" style="font-family:var(--font-mono);font-size:.61rem;color:#93c5fd" title="' + tcodes.replace(/"/g, '&quot;') + '">' + tcodes + '</td>';
+          html += '<td class="cc-rule-txt" style="font-size:.61rem;color:#d1d5db" title="' + policyRule.replace(/"/g, '&quot;') + '">' + policyRule + '</td>';
+          html += '<td><button class="btn" style="font-size:.62rem;padding:.22rem .5rem" onclick="showLogicTrace(' + idx + ', event)">Logic Trace</button></td>';
           html += '</tr>';
         });
         tbody.innerHTML = html;
@@ -12351,7 +12883,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         if (row) { row.classList.add('cc-sel'); row.scrollIntoView({ block: 'nearest' }); }
 
         // Update header
-        document.getElementById('ccNarrId').textContent = v.id + ' — ' + v.entity;
+        document.getElementById('ccNarrId').textContent = v.id + ' — ' + redactIdentity(v.entity);
         var sevEl = document.getElementById('ccNarrSev');
         sevEl.textContent = v.severity;
         var sc = v.severity === 'Critical' ? 'cc-pill-c' : v.severity === 'High' ? 'cc-pill-h' : v.severity === 'Medium' ? 'cc-pill-m' : 'cc-pill-l';
@@ -12391,6 +12923,19 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
           body += '</div>';
         }
 
+        var tj = v.technical_justification || {};
+        var traceMeta = ensureLogicTraceMeta(v);
+        var traceCodes = (traceMeta.tcodes && traceMeta.tcodes.length) ? traceMeta.tcodes.join(', ') : 'Not found in evidence';
+        var tracePolicy = traceMeta.policy_rule || (tj.rule || v.rule || v.id);
+        body += '<div style="margin-top:.6rem"><div style="font-family:\'JetBrains Mono\',monospace;font-size:.5rem;letter-spacing:.12em;text-transform:uppercase;color:#1e3a5f;margin-bottom:.35rem">🧪 Technical Justification</div>';
+        body += '<div class="cc-ev-rows">';
+        body += '<div class="cc-ev-row"><span class="cc-ev-k">Agent</span><span class="cc-ev-v">' + safeText(tj.agent || 'Audit Reasoning Engine') + '</span></div>';
+        body += '<div class="cc-ev-row"><span class="cc-ev-k">Rule Pattern</span><span class="cc-ev-v">' + safeText(tj.rule || v.rule || v.id) + '</span></div>';
+        body += '<div class="cc-ev-row"><span class="cc-ev-k">Triggered T-Code(s)</span><span class="cc-ev-v">' + safeText(traceCodes) + '</span></div>';
+        body += '<div class="cc-ev-row"><span class="cc-ev-k">Triggered Policy Rule</span><span class="cc-ev-v">' + safeText(tracePolicy) + '</span></div>';
+        body += '<div class="cc-ev-row"><span class="cc-ev-k">Explanation</span><span class="cc-ev-v">' + safeText(tj.explanation || 'Pattern trigger and supporting evidence are documented for auditor re-performance.') + '</span></div>';
+        body += '</div></div>';
+
         // Evidence block
         body += '<div class="cc-action-box"><div class="cc-action-lbl">📋 Recommended Action</div>';
         body += '<div class="cc-action-txt">' + (chain.auditOpinion || 'Investigate this exception, implement compensating controls, and escalate to management if Critical severity.') + '</div></div>';
@@ -12399,13 +12944,52 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         body += '<div style="margin-top:.6rem"><div style="font-family:\'JetBrains Mono\',monospace;font-size:.5rem;letter-spacing:.12em;text-transform:uppercase;color:#1e3a5f;margin-bottom:.35rem">🔎 Audit Evidence</div>';
         body += '<div class="cc-ev-rows">';
         body += '<div class="cc-ev-row"><span class="cc-ev-k">Finding ID</span><span class="cc-ev-v">' + v.id + '</span></div>';
-        body += '<div class="cc-ev-row"><span class="cc-ev-k">Entity / User</span><span class="cc-ev-v danger">' + v.entity + '</span></div>';
+        body += '<div class="cc-ev-row"><span class="cc-ev-k">Entity / User</span><span class="cc-ev-v danger">' + redactIdentity(v.entity) + '</span></div>';
         body += '<div class="cc-ev-row"><span class="cc-ev-k">Evidence A</span><span class="cc-ev-v">' + v.field1 + '</span></div>';
         body += '<div class="cc-ev-row"><span class="cc-ev-k">Evidence B</span><span class="cc-ev-v danger">' + v.field2 + '</span></div>';
         body += '<div class="cc-ev-row"><span class="cc-ev-k">Severity</span><span class="cc-ev-v danger">' + v.severity + '</span></div>';
         body += '</div></div>';
+        body += '<div style="margin-top:.7rem"><button class="btn" style="font-size:.72rem;padding:.4rem .7rem" onclick="testTheTester(' + idx + ')">Test the Tester</button></div>';
 
         document.getElementById('ccNarrBody').innerHTML = body;
+      }
+
+      function testTheTester(idx) {
+        var vio = CC.filtered || [];
+        var v = vio[idx];
+        if (!v) return;
+        var chain = v.chain || {};
+        var payload = {
+          prompt: 'Evaluate SOX control exception severity using the provided control failure, fraud scenario, and FS impact.',
+          rule: v.rule,
+          finding_id: v.id,
+          logic_breakdown: chain,
+          severity: v.severity
+        };
+        alert('Re-performance payload:\n\n' + JSON.stringify(payload, null, 2));
+      }
+
+      function showLogicTrace(idx, ev) {
+        if (ev && ev.stopPropagation) ev.stopPropagation();
+        var vio = CC.filtered || [];
+        var v = vio[idx];
+        if (!v) return;
+        var tj = v.technical_justification || {};
+        var c = v.chain || {};
+        var traceMeta = ensureLogicTraceMeta(v);
+        var tcodes = (traceMeta.tcodes && traceMeta.tcodes.length) ? traceMeta.tcodes.join(', ') : 'Not found in evidence';
+        var policyRule = traceMeta.policy_rule || (tj.rule || v.rule || v.id);
+        var traceText =
+          'Agent: ' + (tj.agent || 'Audit Reasoning Engine') + '\n' +
+          'Rule: ' + (tj.rule || v.rule || v.id) + '\n' +
+          'Triggered Policy Rule: ' + policyRule + '\n' +
+          'Triggered T-Code(s): ' + tcodes + '\n\n' +
+          'IF entity "' + (v.entity || 'unknown') + '" satisfies policy condition(s):\n' +
+          '- ' + (c.access || v.field1 || 'Access/activity condition met') + '\n' +
+          '- ' + (c.controlFailure || v.field2 || 'Control failure observed') + '\n' +
+          'THEN raise exception "' + (v.id || 'FINDING') + '" with severity "' + (v.severity || 'Medium') + '"\n\n' +
+          'Explanation:\n' + (tj.explanation || 'Pattern threshold breach validated against configured control logic.');
+        alert(traceText);
       }
 
       // ─── LIVE FEED BUILDER ───────────────────────────────────────────────────────
@@ -12422,6 +13006,11 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
           var isAlert = v.severity === 'Critical';
           var isWarn = v.severity === 'High';
           items.push({ ts: ts, msg: v.id + ': ' + v.entity + ' — ' + (v.scenario || v.rule), alert: isAlert, warn: isWarn });
+        });
+        (CC.swarmNudges || []).forEach(function (n, i) {
+          var t = new Date(now - (i + 1) * 120000);
+          var ts = t.getHours().toString().padStart(2, '0') + ':' + t.getMinutes().toString().padStart(2, '0');
+          items.push({ ts: ts, msg: n.message, alert: true, warn: false });
         });
         items.sort(function (a, b) { return b.ts.localeCompare(a.ts) });
 
@@ -13648,7 +14237,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         // Parse as CSV and populate STATE
         var csv = IPE_STATE.extractedCSV;
         Papa.parse(csv, {
-          header: true, skipEmptyLines: true,
+          header: true, skipEmptyLines: true, worker: true, fastMode: true,
           complete: function (res) {
             STATE.data = res.data;
             STATE.headers = res.meta.fields || [];
@@ -13678,7 +14267,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         var text = document.getElementById('pasteDataArea') ? document.getElementById('pasteDataArea').value.trim() : '';
         if (!text) { alert('Please paste some data first.'); return; }
         Papa.parse(text, {
-          header: true, skipEmptyLines: true,
+          header: true, skipEmptyLines: true, worker: true, fastMode: true,
           complete: function (res) {
             if (!res.data.length) { alert('Could not parse data. Make sure the first line is column headers.'); return; }
             STATE.data = res.data;

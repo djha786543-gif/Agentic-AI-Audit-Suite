@@ -165,6 +165,43 @@
         </div>
       </article>
     </section>
+
+    <section class="card" style="margin-top:16px;">
+      <h3>Sovereign GRC Findings Traceability</h3>
+      <p class="sub" style="margin-bottom:10px;">Every finding includes a human-readable logic trace with cited ERP evidence and regulatory control references.</p>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;min-width:860px;">
+          <thead>
+            <tr style="text-align:left;border-bottom:1px solid var(--b1);font-family:var(--fm);font-size:11px;color:var(--tx2);text-transform:uppercase;">
+              <th style="padding:8px;">Finding</th>
+              <th style="padding:8px;">Severity</th>
+              <th style="padding:8px;">Entity</th>
+              <th style="padding:8px;">Rule</th>
+              <th style="padding:8px;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="reportFindingsTbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:18px;">
+      <h3>Residual Risk Heatmap (ERM 5x5)</h3>
+      <p class="sub" style="margin-bottom:10px;">Auto-generated from Governance risk register residual likelihood vs impact.</p>
+      <canvas id="riskHeatmapCanvas" width="520" height="320" style="max-width:100%;background:var(--ink2);border:1px solid var(--b1);border-radius:10px;"></canvas>
+    </section>
+
+    <section class="card" style="margin-top:16px;">
+      <h3>One-Click Workpaper Export</h3>
+      <p class="sub" style="margin-bottom:10px;">Export packages aligned to Workiva, Teammate+, and ServiceNow GRC formats.</p>
+      <div class="card-actions">
+        <button class="btn-sub" onclick="downloadWorkpaperExport('workiva')">Export Workiva JSON</button>
+        <button class="btn-sub" onclick="downloadWorkpaperExport('teammate')">Export Teammate+ JSON</button>
+        <button class="btn-sub" onclick="downloadWorkpaperExport('servicenow')">Export ServiceNow GRC JSON</button>
+        <button class="btn-sub" onclick="downloadWorkpaperExport('xml')">Export Generic XML</button>
+      </div>
+      <p class="sub" style="margin-top:8px;">External Auditor Read-Only Package: <button class="btn-sub" onclick="downloadExternalReviewPackage()">Download</button></p>
+    </section>
   </main>
 
   <footer class="footer">
@@ -199,6 +236,16 @@
           <button class="btn btn-primary" id="generateNow">Generate</button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="logicTraceModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="logicTraceTitle">
+      <div class="modal-head">
+        <h2 id="logicTraceTitle">Logic Trace</h2>
+        <button class="close" id="closeLogicTrace" aria-label="Close">✕</button>
+      </div>
+      <pre id="logicTraceBody" style="white-space:pre-wrap;background:var(--ink2);border:1px solid var(--b2);border-radius:10px;padding:12px;font-family:var(--fm);font-size:11px;color:var(--tx1);max-height:52vh;overflow:auto;"></pre>
     </div>
   </div>
 
@@ -237,6 +284,165 @@
       alert('Generation queued: ' + name);
       modal.classList.remove('show');
     });
+
+    async function renderHeatmap() {
+      const canvas = document.getElementById('riskHeatmapCanvas');
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const cellW = 90;
+      const cellH = 52;
+      const x0 = 40;
+      const y0 = 20;
+
+      const colors = ['#1b3a2d', '#374f24', '#5e4f1f', '#6b351e', '#6b1e2d'];
+      for (let y = 0; y < 5; y++) {
+        for (let x = 0; x < 5; x++) {
+          ctx.fillStyle = colors[Math.max(x, 4 - y)];
+          ctx.globalAlpha = 0.38;
+          ctx.fillRect(x0 + x * cellW, y0 + y * cellH, cellW - 2, cellH - 2);
+          ctx.globalAlpha = 1;
+        }
+      }
+
+      ctx.fillStyle = '#8895AD';
+      ctx.font = '11px JetBrains Mono';
+      for (let i = 1; i <= 5; i++) {
+        ctx.fillText(String(i), x0 + (i - 1) * cellW + 40, y0 + 5 * cellH + 14);
+        ctx.fillText(String(6 - i), 14, y0 + (i - 1) * cellH + 30);
+      }
+      ctx.fillText('Likelihood', x0 + 200, y0 + 5 * cellH + 28);
+      ctx.save();
+      ctx.translate(8, y0 + 150);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText('Impact', 0, 0);
+      ctx.restore();
+
+      try {
+        const r = await fetch('/api/v1/governance/risk-heatmap');
+        if (!r.ok) return;
+        const data = await r.json();
+        (data.points || []).forEach((p) => {
+          const x = x0 + (p.likelihood - 1) * cellW + cellW / 2;
+          const y = y0 + (5 - p.impact) * cellH + cellH / 2;
+          ctx.beginPath();
+          ctx.fillStyle = '#2878FF';
+          ctx.arc(x, y, 6, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      } catch (err) {
+        // Keep static grid if API unavailable.
+      }
+    }
+
+    async function downloadWorkpaperExport(target) {
+      const res = await fetch('/api/v1/reports/exports/workpaper?target=' + encodeURIComponent(target));
+      if (!res.ok) {
+        alert('Export failed.');
+        return;
+      }
+      const blob = await res.blob();
+      const ext = target === 'xml' ? 'xml' : 'json';
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'workpaper_export_' + target + '.' + ext;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    async function downloadExternalReviewPackage() {
+      const res = await fetch('/api/v1/reports/external/review-package');
+      if (!res.ok) {
+        alert('Unable to generate external package.');
+        return;
+      }
+      const blob = new Blob([JSON.stringify(await res.json(), null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'external_auditor_read_only_package.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    function regulatoryControlForFinding(finding) {
+      const id = String((finding && finding.id) || '').toUpperCase();
+      if (id.startsWith('LA-') || id.startsWith('SOD-') || id.startsWith('CM-') || id.startsWith('ITGC')) return 'PCAOB AS 2201 (ITGC)';
+      if (id.startsWith('FRR-') || id.startsWith('TT-') || id.startsWith('INT-') || id.startsWith('ITAC')) return 'PCAOB AS 2201 + ISA 315';
+      return 'PCAOB AS 2201';
+    }
+
+    function loadLatestFindingsForReports() {
+      const tbody = document.getElementById('reportFindingsTbody');
+      let findings = [];
+      try {
+        findings = JSON.parse(localStorage.getItem('auditai_latest_findings_v1') || '[]');
+      } catch (_) {
+        findings = [];
+      }
+      if (!Array.isArray(findings) || !findings.length) {
+        tbody.innerHTML = '<tr><td colspan="5" style="padding:12px;color:var(--tx2)">No recent findings found. Run an audit in Master Audit Suite to populate Logic Trace evidence.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = findings.slice(0, 20).map((f, idx) => {
+        return '<tr style="border-bottom:1px solid var(--b1)">' +
+          '<td style="padding:8px;font-family:var(--fm);font-size:11px">' + (f.id || 'FINDING') + '</td>' +
+          '<td style="padding:8px">' + (f.severity || 'Medium') + '</td>' +
+          '<td style="padding:8px">' + (f.entity || 'N/A') + '</td>' +
+          '<td style="padding:8px">' + (f.rule || 'N/A') + '</td>' +
+          '<td style="padding:8px"><button class="btn-sub" onclick="showReportLogicTrace(' + idx + ')">Traceability</button></td>' +
+          '</tr>';
+      }).join('');
+      window.__reportFindings = findings;
+    }
+
+    function showReportLogicTrace(index) {
+      const findings = window.__reportFindings || [];
+      const f = findings[index];
+      if (!f) return;
+      const tj = f.technical_justification || {};
+      const c = f.chain || {};
+      const trace = f.logic_trace || {};
+      const evidenceA = f.field1 || (tj.evidence_summary && tj.evidence_summary.evidence_a) || 'N/A';
+      const evidenceB = f.field2 || (tj.evidence_summary && tj.evidence_summary.evidence_b) || 'N/A';
+      const tcodeList = Array.isArray(trace.tcodes) && trace.tcodes.length ? trace.tcodes : [];
+      const tcodes = tcodeList.length ? tcodeList.join(', ') : 'Not found in evidence';
+      const policyRule = trace.policy_rule || tj.rule || f.rule || f.id || 'Policy rule not provided';
+      const regulatory = regulatoryControlForFinding(f);
+      const conflictPhrase = tcodeList.length >= 2
+        ? 'Conflict between ' + tcodeList[0] + ' and ' + tcodeList[1]
+        : 'Exception triggered by control logic evidence';
+      const flaggedSummary = 'Flagged by Rule ' + policyRule + ': ' + conflictPhrase + '.';
+      const humanReadable = [
+        'Finding ID: ' + (f.id || 'N/A'),
+        'Severity: ' + (f.severity || 'N/A'),
+        'Entity: ' + (f.entity || 'N/A'),
+        'Rule Triggered: ' + (f.rule || 'N/A'),
+        flaggedSummary,
+        'Policy Rule: ' + policyRule,
+        'ERP Data Point A: ' + evidenceA,
+        'ERP Data Point B: ' + evidenceB,
+        'T-Code(s): ' + tcodes,
+        'Regulatory Control: ' + regulatory,
+        '',
+        'Decision Path:',
+        'IF ' + (c.access || evidenceA),
+        'AND ' + (c.controlFailure || evidenceB),
+        'THEN raise exception ' + (f.id || 'FINDING') + ' with severity ' + (f.severity || 'Medium'),
+        '',
+        'Explanation: ' + (tj.explanation || c.auditOpinion || 'No additional explanation provided.')
+      ].join('\n');
+      document.getElementById('logicTraceBody').textContent = humanReadable;
+      document.getElementById('logicTraceModal').classList.add('show');
+    }
+
+    document.getElementById('closeLogicTrace').addEventListener('click', () => {
+      document.getElementById('logicTraceModal').classList.remove('show');
+    });
+    document.getElementById('logicTraceModal').addEventListener('click', (event) => {
+      if (event.target.id === 'logicTraceModal') document.getElementById('logicTraceModal').classList.remove('show');
+    });
+
+    renderHeatmap();
+    loadLatestFindingsForReports();
   </script>
 <script>
 (function(){

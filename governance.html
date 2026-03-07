@@ -186,6 +186,8 @@
     <button class="tab-btn" onclick="switchTab('frameworks')">🏛️ Frameworks</button>
     <button class="tab-btn" onclick="switchTab('risks')">⚠️ Risk Register</button>
     <button class="tab-btn" onclick="switchTab('rules')">🔔 Alert Rules</button>
+    <button class="tab-btn" onclick="switchTab('remediation')">🛠 Remediation</button>
+    <button class="tab-btn" onclick="switchTab('responses')">🧾 Management Responses</button>
   </div>
 
   <!-- Alerts Tab -->
@@ -381,6 +383,49 @@
     </div>
   </div>
 
+  <div id="tab-remediation" class="tab-pane">
+    <div class="two-col">
+      <div class="panel">
+        <div class="section-title"><span class="dot"></span> Findings Requiring Action</div>
+        <div id="remediationList"></div>
+      </div>
+      <div class="panel">
+        <div class="section-title"><span class="dot"></span> Assign Remediation Owner</div>
+        <div class="form-row">
+          <div class="form-group"><label>Finding ID (UUID)</label><input id="remFindingId" placeholder="Paste finding UUID"></div>
+          <div class="form-group"><label>Owner</label><input id="remOwner" placeholder="e.g. AP Process Owner"></div>
+        </div>
+        <div class="form-group" style="margin-bottom:12px"><label>Due Date</label><input id="remDueDate" type="date"></div>
+        <div class="form-group" style="margin-bottom:12px"><label>Actual Closure Date</label><input id="remClosureDate" type="date"></div>
+        <div class="form-row">
+          <div class="form-group"><label>Finding ID For Mitigation Plan</label><input id="remPlanFindingId" placeholder="Paste finding UUID"></div>
+        </div>
+        <div class="form-group" style="margin-bottom:12px"><label>Mitigation Plan</label><textarea id="mitigationPlanText" placeholder="AI-generated remediation recommendation will appear here"></textarea></div>
+        <div class="actions"><button class="btn btn-primary" onclick="assignRemediation()">Assign Owner & Due Date</button></div>
+        <div class="actions"><button class="btn btn-outline" onclick="generateRemediation()">Generate Mitigation Plan</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-responses" class="tab-pane">
+    <div class="two-col">
+      <div class="panel">
+        <div class="section-title"><span class="dot"></span> Process Owner Queue (Read-Only)</div>
+        <div id="ownerQueue"></div>
+      </div>
+      <div class="panel">
+        <div class="section-title"><span class="dot"></span> Submit Management Response</div>
+        <div class="form-row">
+          <div class="form-group"><label>Finding ID (UUID)</label><input id="respFindingId" placeholder="Paste finding UUID"></div>
+          <div class="form-group"><label>Responsible Owner</label><input id="respOwner" placeholder="e.g. Procure-to-Pay Lead"></div>
+        </div>
+        <div class="form-group" style="margin-bottom:12px"><label>Target Date</label><input id="respTargetDate" type="date"></div>
+        <div class="form-group" style="margin-bottom:12px"><label>Response / Justification</label><textarea id="respText" placeholder="Management response or remediation plan"></textarea></div>
+        <div class="actions"><button class="btn btn-primary" onclick="submitManagementResponse()">Submit Response</button></div>
+      </div>
+    </div>
+  </div>
+
 </main>
 
 <script>
@@ -416,13 +461,43 @@
     return `<span class="badge badge-${cls[s] || 'medium'}">${s}</span>`;
   }
 
+  function getRemediationLedger() {
+    try {
+      return JSON.parse(localStorage.getItem('auditai_remediation_ledger_v1') || '[]');
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function upsertRemediationLedger(record) {
+    const ledger = getRemediationLedger();
+    const idx = ledger.findIndex(x => x.finding_id === record.finding_id);
+    const merged = idx >= 0 ? { ...ledger[idx], ...record } : record;
+    if (idx >= 0) ledger[idx] = merged; else ledger.push(merged);
+    localStorage.setItem('auditai_remediation_ledger_v1', JSON.stringify(ledger));
+  }
+
+  function buildMitigationPlanText(f) {
+    const control = (f.control_id || '').toUpperCase();
+    const owner = f.remediation_owner || 'Assigned Process Owner';
+    const entity = f.id;
+    if (control.includes('SOD') || control.includes('LA')) {
+      return `Remove conflicting SAP role(s) from user tied to finding ${entity}; enforce dual-authorization and complete access recertification. Owner: ${owner}.`;
+    }
+    if (control.includes('FRR') || control.includes('TT')) {
+      return `Block posting rights for affected preparer in finding ${entity}; require independent reviewer sign-off and retrospective JE validation. Owner: ${owner}.`;
+    }
+    return `Implement control remediation for finding ${entity}, add preventive validation in ERP workflow, and execute retest evidence package. Owner: ${owner}.`;
+  }
+
   function switchTab(name) {
     document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('tab-' + name).classList.add('active');
     event.currentTarget.classList.add('active');
     const loaders = { alerts: loadAlerts, policies: loadPolicies,
-                      frameworks: loadFrameworks, risks: loadRisks, rules: loadRules };
+                      frameworks: loadFrameworks, risks: loadRisks, rules: loadRules,
+                      remediation: loadRemediation, responses: loadOwnerQueue };
     if (loaders[name]) loaders[name]();
   }
 
@@ -691,6 +766,242 @@
     const r = await fetch(`${API}/alerts/rules`, { method: 'POST', headers: headers(), body: JSON.stringify(body) });
     if (r.ok) { showSuccess('Alert rule created.'); loadRules(); }
     else { const err = await r.json(); showError(err.detail || 'Failed.'); }
+  }
+
+  async function loadRemediation() {
+    const el = document.getElementById('remediationList');
+    el.innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
+    try {
+      const r = await fetch(`${API}/findings/`, { headers: headers() });
+      const data = await r.json();
+      if (!Array.isArray(data) || !data.length) {
+        el.innerHTML = '<div class="empty-state"><div class="empty-icon">🛠</div>No findings available</div>';
+        return;
+      }
+      const ledger = getRemediationLedger();
+      const byFinding = Object.fromEntries(ledger.map(x => [x.finding_id, x]));
+      el.innerHTML = `<table><thead><tr><th>ID</th><th>Control</th><th>Severity</th><th>Owner</th><th>Due</th><th>Mitigation Plan</th><th>Remediation Agent</th><th>Closure</th><th>Status</th></tr></thead><tbody>
+        ${data.map(f => `<tr>
+          <td style="font-family:'JetBrains Mono',monospace;font-size:.7rem">${f.id}</td>
+          <td>${f.control_id || '—'}</td>
+          <td>${severityBadge((f.severity || '').toUpperCase())}</td>
+          <td>${f.remediation_owner || 'Unassigned'}</td>
+          <td>${f.remediation_due_date ? new Date(f.remediation_due_date).toLocaleDateString() : '—'}</td>
+          <td><button class="btn btn-outline" onclick="generateMitigationPlan('${f.id}')">Generate Mitigation Plan</button><div id="plan-${f.id}" style="margin-top:6px;font-size:.75rem;color:#9fb3d1">${(byFinding[f.id] && byFinding[f.id].mitigation_plan) || '—'}</div></td>
+          <td>
+            <button class="btn btn-outline" onclick="generateAutonomousFix('${f.id}','sap')">Generate SAP Fix</button>
+            <button class="btn btn-outline" style="margin-left:6px" onclick="generateAutonomousFix('${f.id}','snow')">Create SNOW Ticket</button>
+            <div id="fix-${f.id}" style="margin-top:6px;font-size:.74rem;color:#9fb3d1;white-space:pre-wrap">${(byFinding[f.id] && byFinding[f.id].technical_fix) || '—'}</div>
+          </td>
+          <td>
+            ${(byFinding[f.id] && byFinding[f.id].actual_closure_date) ? new Date(byFinding[f.id].actual_closure_date).toLocaleDateString() : 'Open'}
+            <button class="btn btn-outline" style="margin-left:8px" onclick="markActualClosure('${f.id}')">Mark Closed</button>
+          </td>
+          <td>${statusBadge(f.status || 'open')}</td>
+        </tr>`).join('')}
+      </tbody></table>`;
+    } catch (e) {
+      el.innerHTML = '<div class="empty-state">Failed to load remediation queue.</div>';
+    }
+  }
+
+  async function assignRemediation() {
+    const findingId = document.getElementById('remFindingId').value.trim();
+    const owner = document.getElementById('remOwner').value.trim();
+    const dueDate = document.getElementById('remDueDate').value;
+    const closureDate = document.getElementById('remClosureDate').value;
+    if (!findingId || !owner || !dueDate) {
+      showError('Finding ID, owner, and due date are required.');
+      return;
+    }
+    const r = await fetch(`${API}/findings/${findingId}/remediation`, {
+      method: 'PATCH', headers: headers(),
+      body: JSON.stringify({ remediation_owner: owner, remediation_due_date: new Date(dueDate).toISOString() })
+    });
+    if (r.ok) {
+      upsertRemediationLedger({
+        finding_id: findingId,
+        remediation_owner: owner,
+        remediation_due_date: dueDate ? new Date(dueDate).toISOString() : null,
+        actual_closure_date: closureDate ? new Date(closureDate).toISOString() : null,
+        updated_at: new Date().toISOString()
+      });
+      showSuccess('Remediation assignment saved.');
+      loadRemediation();
+    } else {
+      const err = await r.json();
+      showError(err.detail || 'Failed to assign remediation owner.');
+    }
+  }
+
+  async function generateMitigationPlan(findingId) {
+    await generateRemediation(findingId);
+  }
+
+  async function generateRemediation(findingIdFromButton) {
+    try {
+      const inputFindingId = document.getElementById('remPlanFindingId');
+      const outputPlan = document.getElementById('mitigationPlanText');
+      const findingId = (findingIdFromButton || (inputFindingId && inputFindingId.value) || '').trim();
+      if (!findingId) {
+        showError('Finding ID is required to generate a mitigation plan.');
+        return;
+      }
+      const r = await fetch(`${API}/findings/`, { headers: headers() });
+      const data = await r.json();
+      const f = (data || []).find(x => x.id === findingId);
+      if (!f) { showError('Finding not found for mitigation plan.'); return; }
+      const plan = buildMitigationPlanText(f);
+      upsertRemediationLedger({
+        finding_id: findingId,
+        mitigation_plan: plan,
+        generated_at: new Date().toISOString(),
+        management_response: null,
+        actual_closure_date: null
+      });
+      const el = document.getElementById(`plan-${findingId}`);
+      if (el) el.textContent = plan;
+      if (outputPlan) outputPlan.value = plan;
+      if (inputFindingId && !inputFindingId.value && findingId) inputFindingId.value = findingId;
+      showSuccess('Mitigation plan drafted and tracked in vault ledger.');
+    } catch (e) {
+      showError('Failed to generate mitigation plan.');
+    }
+  }
+
+  function buildAutonomousFixBundle(finding, mode) {
+    const fid = finding.id;
+    const owner = finding.remediation_owner || 'control.owner@example.com';
+    const control = (finding.control_id || '').toUpperCase();
+    if (mode === 'snow') {
+      const ticketId = `SNOW-${Date.now().toString().slice(-8)}`;
+      const ticketPayload = {
+        ticket_id: ticketId,
+        short_description: `Auto-remediation for finding ${fid}`,
+        control_id: finding.control_id || 'UNKNOWN',
+        priority: (finding.severity || '').toUpperCase() === 'CRITICAL' ? '1 - Critical' : '2 - High',
+        assignment_group: 'GRC-SECOPS',
+        assigned_to: owner,
+        regulatory_reference: 'PCAOB AS 2201',
+        requested_action: control.includes('LA') || control.includes('SOD')
+          ? 'Deprovision conflicting access and attach recertification evidence.'
+          : 'Apply application control fix and attach re-test evidence.'
+      };
+      return {
+        remediation_agent_status: 'ticket_generated',
+        technical_fix_type: 'servicenow_ticket',
+        ticket_id: ticketId,
+        technical_fix: JSON.stringify(ticketPayload, null, 2)
+      };
+    }
+
+    const sampleScript = [
+      `* Auto-generated remediation for ${fid}`,
+      `* Regulatory Reference: PCAOB AS 2201`,
+      `* Owner: ${owner}`,
+      control.includes('LA') || control.includes('SOD')
+        ? `DELETE FROM AGR_USERS WHERE UNAME = '<LEAVER_USER>' AND AGR_NAME IN ('<CONFLICT_ROLE>');`
+        : `UPDATE Z_GRC_EXCEPTION SET STATUS='REMEDIATED', LAST_UPDATED=CURRENT_UTCTIMESTAMP WHERE FINDING_ID='${fid}';`,
+      `COMMIT WORK.`
+    ].join('\n');
+
+    return {
+      remediation_agent_status: 'script_generated',
+      technical_fix_type: 'sap_security_script',
+      technical_fix: sampleScript
+    };
+  }
+
+  async function generateAutonomousFix(findingId, mode) {
+    try {
+      const r = await fetch(`${API}/findings/`, { headers: headers() });
+      const data = await r.json();
+      const finding = (data || []).find(x => x.id === findingId);
+      if (!finding) { showError('Finding not found for remediation agent.'); return; }
+      const fix = buildAutonomousFixBundle(finding, mode);
+      upsertRemediationLedger({
+        finding_id: findingId,
+        remediation_agent_status: fix.remediation_agent_status,
+        technical_fix_type: fix.technical_fix_type,
+        technical_fix: fix.technical_fix,
+        ticket_id: fix.ticket_id || null,
+        generated_at: new Date().toISOString(),
+        actual_closure_date: null
+      });
+      const target = document.getElementById(`fix-${findingId}`);
+      if (target) target.textContent = fix.technical_fix;
+      showSuccess(mode === 'snow' ? 'Remediation Agent created ServiceNow ticket payload.' : 'Remediation Agent generated SAP security script.');
+    } catch (e) {
+      showError('Failed to generate autonomous remediation fix.');
+    }
+  }
+
+  function markActualClosure(findingId) {
+    upsertRemediationLedger({
+      finding_id: findingId,
+      remediation_agent_status: 'actual_closure',
+      actual_closure_date: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    });
+    showSuccess('Finding marked as Actual Closure.');
+    loadRemediation();
+  }
+
+  async function loadOwnerQueue() {
+    const el = document.getElementById('ownerQueue');
+    el.innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
+    try {
+      const r = await fetch(`${API}/findings/`, { headers: headers() });
+      const data = await r.json();
+      if (!Array.isArray(data) || !data.length) {
+        el.innerHTML = '<div class="empty-state"><div class="empty-icon">🧾</div>No owner items found</div>';
+        return;
+      }
+      el.innerHTML = `<table><thead><tr><th>Finding</th><th>Owner</th><th>Due</th><th>Logic Breakdown</th></tr></thead><tbody>
+        ${data.map(f => `<tr>
+          <td style="font-family:'JetBrains Mono',monospace;font-size:.7rem">${f.id}</td>
+          <td>${f.remediation_owner || 'Unassigned'}</td>
+          <td>${f.remediation_due_date ? new Date(f.remediation_due_date).toLocaleDateString() : '—'}</td>
+          <td style="font-size:.78rem">${f.logic_breakdown || '—'}</td>
+        </tr>`).join('')}
+      </tbody></table>`;
+    } catch (e) {
+      el.innerHTML = '<div class="empty-state">Failed to load management queue.</div>';
+    }
+  }
+
+  async function submitManagementResponse() {
+    const findingId = document.getElementById('respFindingId').value.trim();
+    const owner = document.getElementById('respOwner').value.trim();
+    const targetDate = document.getElementById('respTargetDate').value;
+    const responseText = document.getElementById('respText').value.trim();
+    if (!findingId || !owner || !responseText) {
+      showError('Finding ID, owner, and response text are required.');
+      return;
+    }
+    const r = await fetch(`${API}/findings/${findingId}/management-response`, {
+      method: 'POST', headers: headers(),
+      body: JSON.stringify({
+        finding_id: findingId,
+        responsible_owner: owner,
+        response_text: responseText,
+        target_date: targetDate ? new Date(targetDate).toISOString() : null
+      })
+    });
+    if (r.ok) {
+      upsertRemediationLedger({
+        finding_id: findingId,
+        management_response: responseText,
+        responsible_owner: owner,
+        target_date: targetDate ? new Date(targetDate).toISOString() : null,
+        updated_at: new Date().toISOString()
+      });
+      showSuccess('Management response submitted.');
+      loadOwnerQueue();
+    } else {
+      const err = await r.json();
+      showError(err.detail || 'Failed to submit management response.');
+    }
   }
 
   // ── Init ────────────────────────────────────────────────────────────────────

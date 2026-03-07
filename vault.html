@@ -543,6 +543,26 @@
                             class="bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 w-full lg:w-12 h-[38px] flex items-center justify-center rounded-xl transition-colors shrink-0">
                             <i class="fas fa-sync-alt"></i>
                         </button>
+                        <button id="verifyAllBtn"
+                            class="bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/40 text-blue-300 w-full lg:w-auto h-[38px] px-3 flex items-center justify-center rounded-xl transition-colors shrink-0 text-[11px] font-black uppercase tracking-wide">
+                            <i class="fas fa-shield-check mr-2"></i> Verify All
+                        </button>
+                        <button id="artifactJsonBtn"
+                            class="bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 w-full lg:w-auto h-[38px] px-3 flex items-center justify-center rounded-xl transition-colors shrink-0 text-[11px] font-black uppercase tracking-wide">
+                            <i class="fas fa-file-code mr-2"></i> Audit Artifact JSON
+                        </button>
+                        <button id="artifactPdfBtn"
+                            class="bg-fuchsia-500/10 hover:bg-fuchsia-500/20 border border-fuchsia-500/40 text-fuchsia-300 w-full lg:w-auto h-[38px] px-3 flex items-center justify-center rounded-xl transition-colors shrink-0 text-[11px] font-black uppercase tracking-wide">
+                            <i class="fas fa-file-pdf mr-2"></i> Audit Artifact PDF
+                        </button>
+                        <button id="integritySummaryJsonBtn"
+                            class="bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 w-full lg:w-auto h-[38px] px-3 flex items-center justify-center rounded-xl transition-colors shrink-0 text-[11px] font-black uppercase tracking-wide">
+                            <i class="fas fa-certificate mr-2"></i> Integrity Cert JSON
+                        </button>
+                        <button id="integritySummaryPdfBtn"
+                            class="bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/40 text-amber-300 w-full lg:w-auto h-[38px] px-3 flex items-center justify-center rounded-xl transition-colors shrink-0 text-[11px] font-black uppercase tracking-wide">
+                            <i class="fas fa-file-shield mr-2"></i> Integrity Cert PDF
+                        </button>
                     </div>
                 </div>
 
@@ -603,10 +623,33 @@
                     <div id="reasoning-content" class="p-6 text-[11px] text-slate-300 leading-relaxed"></div>
                 </div>
 
+                <div class="glass overflow-hidden flex flex-col border border-white/5 mt-4">
+                    <div class="bg-black/40 border-b border-white/5 px-6 py-4 flex justify-between items-center">
+                        <h2 class="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] flex items-center gap-2">
+                            <i class="fas fa-clipboard-check text-emerald-400"></i> Remediation Lifecycle Ledger
+                        </h2>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left whitespace-nowrap min-w-[900px]">
+                            <thead class="bg-black/20 text-[9px] font-black uppercase text-slate-500 tracking-[0.15em]">
+                                <tr>
+                                    <th class="py-3 px-6 border-b border-white/5">Finding ID</th>
+                                    <th class="py-3 px-6 border-b border-white/5">Owner</th>
+                                    <th class="py-3 px-6 border-b border-white/5">Mitigation Plan</th>
+                                    <th class="py-3 px-6 border-b border-white/5">Management Response</th>
+                                    <th class="py-3 px-6 border-b border-white/5">Closure Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="remediation-ledger-tbody" class="divide-y divide-white/5 text-sm"></tbody>
+                        </table>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
         // State Management
         let allVaultData = [];
@@ -621,6 +664,91 @@
         const API_LOCAL = 'http://127.0.0.1:8005';
         const API_HEADERS = { 'Bypass-Tunnel-Reminder': 'true' };
 
+        async function deriveVaultKey(sessionKey, salt) {
+            const enc = new TextEncoder();
+            const keyMaterial = await crypto.subtle.importKey(
+                'raw',
+                enc.encode(sessionKey),
+                { name: 'PBKDF2' },
+                false,
+                ['deriveKey']
+            );
+            return crypto.subtle.deriveKey(
+                {
+                    name: 'PBKDF2',
+                    salt,
+                    iterations: 120000,
+                    hash: 'SHA-256'
+                },
+                keyMaterial,
+                { name: 'AES-GCM', length: 256 },
+                false,
+                ['encrypt', 'decrypt']
+            );
+        }
+
+        function openVaultDb() {
+            return new Promise(function (resolve, reject) {
+                const req = indexedDB.open('auditai_vault_db', 1);
+                req.onupgradeneeded = function () {
+                    const db = req.result;
+                    if (!db.objectStoreNames.contains('secure_cache')) {
+                        db.createObjectStore('secure_cache');
+                    }
+                };
+                req.onsuccess = function () { resolve(req.result); };
+                req.onerror = function () { reject(req.error); };
+            });
+        }
+
+        async function cacheVaultEncrypted(records) {
+            const sessionKey = sessionStorage.getItem('auditai_vault_session_key');
+            if (!sessionKey || !records || !records.length) return;
+            const salt = crypto.getRandomValues(new Uint8Array(16));
+            const iv = crypto.getRandomValues(new Uint8Array(12));
+            const key = await deriveVaultKey(sessionKey, salt);
+            const plain = new TextEncoder().encode(JSON.stringify(records));
+            const cipher = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, plain);
+
+            const db = await openVaultDb();
+            await new Promise(function (resolve, reject) {
+                const tx = db.transaction('secure_cache', 'readwrite');
+                const store = tx.objectStore('secure_cache');
+                store.put({
+                    salt: Array.from(salt),
+                    iv: Array.from(iv),
+                    cipher: Array.from(new Uint8Array(cipher)),
+                    saved_at: new Date().toISOString(),
+                }, 'vault_records_v1');
+                tx.oncomplete = function () { resolve(); };
+                tx.onerror = function () { reject(tx.error); };
+            });
+            db.close();
+        }
+
+        async function loadVaultEncryptedCache() {
+            const sessionKey = sessionStorage.getItem('auditai_vault_session_key');
+            if (!sessionKey) return null;
+            const db = await openVaultDb();
+            const cached = await new Promise(function (resolve, reject) {
+                const tx = db.transaction('secure_cache', 'readonly');
+                const store = tx.objectStore('secure_cache');
+                const req = store.get('vault_records_v1');
+                req.onsuccess = function () { resolve(req.result || null); };
+                req.onerror = function () { reject(req.error); };
+            });
+            db.close();
+            if (!cached) return null;
+
+            const salt = new Uint8Array(cached.salt || []);
+            const iv = new Uint8Array(cached.iv || []);
+            const cipher = new Uint8Array(cached.cipher || []);
+            const key = await deriveVaultKey(sessionKey, salt);
+            const plainBuffer = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, cipher);
+            const plainText = new TextDecoder().decode(plainBuffer);
+            return JSON.parse(plainText);
+        }
+
         // DOM Elements
         const searchInput = document.getElementById('searchInput');
         const originFilter = document.getElementById('originFilter');
@@ -628,7 +756,264 @@
         const dateFilter = document.getElementById('dateFilter');
         const tbody = document.querySelector('table tbody');
         const refreshBtn = document.getElementById('refreshBtn');
+        const verifyAllBtn = document.getElementById('verifyAllBtn');
+        const artifactJsonBtn = document.getElementById('artifactJsonBtn');
+        const artifactPdfBtn = document.getElementById('artifactPdfBtn');
+        const integritySummaryJsonBtn = document.getElementById('integritySummaryJsonBtn');
+        const integritySummaryPdfBtn = document.getElementById('integritySummaryPdfBtn');
         const demoBanner = document.getElementById('demo-mode-banner');
+        const remediationLedgerTbody = document.getElementById('remediation-ledger-tbody');
+        let latestIntegrityCertificate = null;
+
+        function toHex(buffer) {
+            return Array.from(new Uint8Array(buffer)).map(function (b) { return b.toString(16).padStart(2, '0'); }).join('');
+        }
+
+        async function sha256Hex(text) {
+            const bytes = new TextEncoder().encode(text);
+            const digest = await crypto.subtle.digest('SHA-256', bytes);
+            return toHex(digest);
+        }
+
+        function deriveVerificationStatus(log, recomputed) {
+            const provided = String(log.hash_sequence || log.content_hash || '').toLowerCase().replace(/[^a-f0-9]/g, '');
+            const explicit = String(log.verification_status || '').toLowerCase();
+            if (explicit === 'tampered' || log.hash_verified === false) return 'TAMPERED';
+            if (!provided) return 'PENDING';
+            if (recomputed && provided && recomputed.indexOf(provided.slice(0, 10)) === -1) return 'TAMPERED';
+            if (explicit === 'pending') return 'PENDING';
+            return 'VERIFIED';
+        }
+
+        async function verifyAllVaultRecords() {
+            if (!Array.isArray(allVaultData) || !allVaultData.length) {
+                alert('No vault records available to verify.');
+                return;
+            }
+
+            let verified = 0;
+            let tampered = 0;
+            let pending = 0;
+            const details = [];
+
+            for (const log of allVaultData) {
+                const canonical = [
+                    log.id || '',
+                    log.recorded_at || log.timestamp || '',
+                    log.source_system || '',
+                    String(log.ai_confidence_score == null ? '' : log.ai_confidence_score)
+                ].join('|');
+                const recomputed = await sha256Hex(canonical);
+                let status = deriveVerificationStatus(log, recomputed);
+
+                if (status === 'VERIFIED') verified++;
+                else if (status === 'TAMPERED') tampered++;
+                else pending++;
+
+                details.push({
+                    id: log.id || null,
+                    status: status,
+                    recomputed_hash: recomputed,
+                    provided_hash: log.hash_sequence || log.content_hash || null
+                });
+            }
+
+            const certificateBody = {
+                certificate_type: 'Forensic Integrity Certificate',
+                generated_at: new Date().toISOString(),
+                total_records: allVaultData.length,
+                verified_records: verified,
+                tampered_records: tampered,
+                pending_records: pending,
+                environment: isDemoMode ? 'DEMO' : 'LIVE',
+                details: details
+            };
+            const certHash = await sha256Hex(JSON.stringify(certificateBody));
+            latestIntegrityCertificate = Object.assign({}, certificateBody, { certificate_hash: certHash });
+
+            renderTable();
+            alert('Verification completed. Verified=' + verified + ', Tampered=' + tampered + ', Pending=' + pending + '.\nForensic Integrity Certificate generated.');
+            downloadIntegrityCertificate();
+        }
+
+        function downloadIntegrityCertificate() {
+            if (!latestIntegrityCertificate) return;
+            const blob = new Blob([JSON.stringify(latestIntegrityCertificate, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'forensic_integrity_certificate_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-') + '.json';
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+
+        async function buildIntegritySummaryPayload() {
+            const records = [];
+            for (const log of (allVaultData || [])) {
+                const canonical = [
+                    log.id || '',
+                    log.recorded_at || log.timestamp || '',
+                    log.source_system || '',
+                    String(log.ai_confidence_score == null ? '' : log.ai_confidence_score)
+                ].join('|');
+                const recomputed = await sha256Hex(canonical);
+                records.push({
+                    record_id: log.id || null,
+                    source_system: log.source_system || null,
+                    recorded_at: log.recorded_at || log.timestamp || null,
+                    sha256_hash: log.hash_sequence || log.content_hash || recomputed,
+                    verification_status: deriveVerificationStatus(log, recomputed)
+                });
+            }
+            const verifiedCount = records.filter(function (r) { return r.verification_status === 'VERIFIED'; }).length;
+            const tamperedCount = records.filter(function (r) { return r.verification_status === 'TAMPERED'; }).length;
+            const pendingCount = records.filter(function (r) { return r.verification_status === 'PENDING'; }).length;
+            return {
+                certificate_type: 'External Auditor Hash Integrity Summary',
+                generated_at: new Date().toISOString(),
+                environment: isDemoMode ? 'DEMO' : 'LIVE',
+                total_records: records.length,
+                verified_records: verifiedCount,
+                tampered_records: tamperedCount,
+                pending_records: pendingCount,
+                latest_forensic_certificate_hash: latestIntegrityCertificate ? latestIntegrityCertificate.certificate_hash : null,
+                records: records
+            };
+        }
+
+        async function downloadIntegritySummaryJson() {
+            const payload = await buildIntegritySummaryPayload();
+            const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'external_auditor_hash_integrity_summary_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-') + '.json';
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+
+        async function downloadIntegritySummaryPdf() {
+            const payload = await buildIntegritySummaryPayload();
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                alert('PDF engine unavailable. Use Integrity Cert JSON export.');
+                return;
+            }
+            const doc = new window.jspdf.jsPDF({ unit: 'pt', format: 'a4' });
+            const lines = [
+                'External Auditor Hash Integrity Summary',
+                'Generated (UTC): ' + payload.generated_at,
+                'Environment: ' + payload.environment,
+                'Total Records: ' + payload.total_records,
+                'Verified: ' + payload.verified_records + ' | Tampered: ' + payload.tampered_records + ' | Pending: ' + payload.pending_records,
+                'Forensic Certificate Hash: ' + (payload.latest_forensic_certificate_hash || 'N/A'),
+                ''
+            ];
+            (payload.records || []).slice(0, 40).forEach(function (r, i) {
+                lines.push((i + 1) + '. ' + (r.record_id || 'RECORD') + ' [' + r.verification_status + ']');
+                lines.push('   Source: ' + (r.source_system || 'N/A') + ' | Hash: ' + (r.sha256_hash || 'N/A'));
+            });
+            doc.setFont('courier', 'normal');
+            doc.setFontSize(8);
+            doc.text(lines.join('\n'), 32, 36, { maxWidth: 540 });
+            doc.save('external_auditor_hash_integrity_summary_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-') + '.pdf');
+        }
+
+        async function buildAuditArtifactPayload() {
+            let findings = [];
+            let findingsMeta = null;
+            try {
+                findings = JSON.parse(localStorage.getItem('auditai_latest_findings_v1') || '[]');
+            } catch (_) {
+                findings = [];
+            }
+            try {
+                findingsMeta = JSON.parse(localStorage.getItem('auditai_latest_findings_meta_v1') || 'null');
+            } catch (_) {
+                findingsMeta = null;
+            }
+
+            const logicTrace = (findings || []).map(function (f) {
+                const tj = f.technical_justification || {};
+                const chain = f.chain || {};
+                const trace = f.logic_trace || {};
+                return {
+                    finding_id: f.id || null,
+                    entity: f.entity || null,
+                    severity: f.severity || null,
+                    policy_rule: trace.policy_rule || tj.rule || f.rule || f.id || null,
+                    triggered_tcodes: Array.isArray(trace.tcodes) ? trace.tcodes : [],
+                    erp_data_points: {
+                        evidence_a: f.field1 || (tj.evidence_summary && tj.evidence_summary.evidence_a) || null,
+                        evidence_b: f.field2 || (tj.evidence_summary && tj.evidence_summary.evidence_b) || null
+                    },
+                    decision_path: {
+                        access: chain.access || null,
+                        control_failure: chain.controlFailure || null,
+                        audit_opinion: chain.auditOpinion || null
+                    },
+                    regulatory_control: 'PCAOB AS 2201',
+                    explanation: tj.explanation || null
+                };
+            });
+
+            const timestamp = new Date().toISOString();
+            const base = {
+                artifact_type: 'Sovereign GRC Forensic Audit Artifact',
+                generated_at_utc: timestamp,
+                tamper_proof_timestamp: timestamp,
+                environment: isDemoMode ? 'DEMO' : 'LIVE',
+                vault_summary: {
+                    total_records: allVaultData.length,
+                    latest_certificate_hash: latestIntegrityCertificate ? latestIntegrityCertificate.certificate_hash : null
+                },
+                findings_meta: findingsMeta,
+                logic_trace: logicTrace,
+                sha256_reference: logicTrace.length ? await sha256Hex(JSON.stringify(logicTrace)) : null
+            };
+
+            const artifactHash = await sha256Hex(JSON.stringify(base));
+            return Object.assign({}, base, {
+                artifact_sha256: artifactHash
+            });
+        }
+
+        async function downloadAuditArtifactJson() {
+            const artifact = await buildAuditArtifactPayload();
+            const blob = new Blob([JSON.stringify(artifact, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'sovereign_grc_audit_artifact_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-') + '.json';
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+
+        async function downloadAuditArtifactPdf() {
+            const artifact = await buildAuditArtifactPayload();
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                alert('PDF engine unavailable. Use Audit Artifact JSON export.');
+                return;
+            }
+            const doc = new window.jspdf.jsPDF({ unit: 'pt', format: 'a4' });
+            const lines = [
+                'Sovereign GRC Forensic Audit Artifact',
+                'Generated (UTC): ' + artifact.generated_at_utc,
+                'Tamper-Proof Timestamp: ' + artifact.tamper_proof_timestamp,
+                'Artifact SHA-256: ' + artifact.artifact_sha256,
+                'Regulatory Control: PCAOB AS 2201',
+                'Findings with Logic Trace: ' + String((artifact.logic_trace || []).length),
+                ''
+            ];
+            (artifact.logic_trace || []).slice(0, 12).forEach(function (f, i) {
+                lines.push((i + 1) + '. ' + (f.finding_id || 'FINDING'));
+                lines.push('   Policy Rule: ' + (f.policy_rule || 'N/A'));
+                lines.push('   T-Code(s): ' + ((f.triggered_tcodes || []).join(', ') || 'Not found'));
+                lines.push('   Evidence: ' + (f.erp_data_points && f.erp_data_points.evidence_a ? f.erp_data_points.evidence_a : 'N/A'));
+                lines.push('   Decision: ' + (f.decision_path && f.decision_path.control_failure ? f.decision_path.control_failure : 'N/A'));
+                lines.push('');
+            });
+            doc.setFont('courier', 'normal');
+            doc.setFontSize(9);
+            doc.text(lines.join('\n'), 36, 40, { maxWidth: 530 });
+            doc.save('sovereign_grc_audit_artifact_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-') + '.pdf');
+        }
 
                 function loadDemoVaultData() {
                       var tbodyEl = document.querySelector('table tbody');
@@ -829,6 +1214,7 @@
                 const vaultRes = await fetch(API_BASE + '/api/v1/audit/vault', { headers: API_HEADERS });
                 if (!vaultRes.ok) throw new Error('Vault fetch failed');
                 allVaultData = await vaultRes.json();
+                await cacheVaultEncrypted(allVaultData);
                 if (!Array.isArray(allVaultData) || allVaultData.length === 0) {
                     throw new Error('Vault returned no records');
                 }
@@ -839,11 +1225,61 @@
                 updateDashboardState(true);
             } catch (e) {
                 console.error('Engine disconnected', e);
+                try {
+                    const cached = await loadVaultEncryptedCache();
+                    if (Array.isArray(cached) && cached.length) {
+                        allVaultData = cached;
+                        isDemoMode = false;
+                        updateDashboardState(true);
+                        return;
+                    }
+                } catch (cacheErr) {
+                    console.warn('Encrypted cache unavailable:', cacheErr);
+                }
                 isDemoMode = true;
                 loadDemoVaultData();
                 demoBanner.classList.remove('hidden');
                 updateDashboardState(false);
             }
+        }
+
+        verifyAllBtn.addEventListener('click', function () {
+            verifyAllVaultRecords();
+        });
+        artifactJsonBtn.addEventListener('click', function () {
+            downloadAuditArtifactJson();
+        });
+        artifactPdfBtn.addEventListener('click', function () {
+            downloadAuditArtifactPdf();
+        });
+        integritySummaryJsonBtn.addEventListener('click', function () {
+            downloadIntegritySummaryJson();
+        });
+        integritySummaryPdfBtn.addEventListener('click', function () {
+            downloadIntegritySummaryPdf();
+        });
+
+        function renderRemediationLedger() {
+            if (!remediationLedgerTbody) return;
+            let ledger = [];
+            try {
+                ledger = JSON.parse(localStorage.getItem('auditai_remediation_ledger_v1') || '[]');
+            } catch (_) {
+                ledger = [];
+            }
+            if (!ledger.length) {
+                remediationLedgerTbody.innerHTML = '<tr><td colspan="5" class="py-6 px-6 text-slate-500 text-xs">No remediation lifecycle records yet. Generate mitigation plans in Governance.</td></tr>';
+                return;
+            }
+            remediationLedgerTbody.innerHTML = ledger.map(function (r) {
+                return '<tr>' +
+                    '<td class="py-3 px-6 font-mono text-[10px] text-blue-300">' + (r.finding_id || '—') + '</td>' +
+                    '<td class="py-3 px-6 text-[11px] text-slate-200">' + (r.remediation_owner || r.responsible_owner || 'Unassigned') + '</td>' +
+                    '<td class="py-3 px-6 text-[11px] text-slate-300" style="max-width:300px;white-space:normal">' + (r.mitigation_plan || '—') + '</td>' +
+                    '<td class="py-3 px-6 text-[11px] text-slate-300" style="max-width:260px;white-space:normal">' + (r.management_response || '—') + '</td>' +
+                    '<td class="py-3 px-6 text-[11px] text-slate-200">' + (r.actual_closure_date ? new Date(r.actual_closure_date).toLocaleDateString() : 'Open') + '</td>' +
+                '</tr>';
+            }).join('');
         }
 
         function updateDashboardState(isConnected) {
@@ -857,6 +1293,7 @@
                 scoreText.innerText = '100%'; scoreBar.style.width = '100%';
                 countText.innerText = totalRunsCount;
                 renderTable();
+                renderRemediationLedger();
             } else {
                 if (isDemoMode) {
                     pill.innerHTML = '<i class="fas fa-flask-vial text-amber-400"></i> DEMO MODE';
@@ -865,11 +1302,13 @@
                     scoreBar.style.width = '93%';
                     countText.innerText = totalRunsCount;
                     renderTable();
+                    renderRemediationLedger();
                 } else {
                     pill.innerHTML = '<i class="fas fa-circle text-red-500"></i> Engine Offline';
                     pill.className = 'glass px-6 py-2.5 rounded-full text-[10px] font-black uppercase flex items-center gap-2 border border-red-500/40 text-red-500 shadow-[0_0_15px_rgba(239,68,68,0.15)] transition-all';
                     scoreText.innerText = '--%';
                     scoreBar.style.width = '0%';
+                    renderRemediationLedger();
                 }
             }
         }
