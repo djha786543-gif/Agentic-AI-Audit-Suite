@@ -538,6 +538,27 @@
   }
 
   // ── Alerts ──────────────────────────────────────────────────────────────────
+  let localRaisedAlerts = [];
+  let cachedServerAlerts = [];
+
+  function renderAlertsTable(alerts) {
+    const el = document.getElementById('alertsList');
+    el.innerHTML = `<table><thead><tr><th>Title</th><th>Severity</th><th>Status</th><th>Raised</th></tr></thead><tbody>
+      ${alerts.map(a => `<tr>
+        <td><div>${a.title}</div><div style="font-size:.75rem;color:#8A95AA;margin-top:3px;">${a.description || ''}</div></td>
+        <td>${severityBadge(a.severity)}</td>
+        <td>${statusBadge(a.status || 'open')}</td>
+        <td style="font-family:'JetBrains Mono',monospace;font-size:.75rem">${new Date(a.created_at || Date.now()).toLocaleString()}</td>
+      </tr>`).join('')}
+    </tbody></table>`;
+  }
+
+  function resetRaiseAlertForm() {
+    document.getElementById('alertTitle').value = '';
+    document.getElementById('alertSeverity').value = 'HIGH';
+    document.getElementById('alertDesc').value = '';
+  }
+
   async function loadAlerts() {
     const el = document.getElementById('alertsList');
     el.innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
@@ -560,24 +581,11 @@
     try {
       const r = await fetch(`${API}/alerts/?limit=20`, { headers: headers() });
       const data = r.ok ? await r.json() : demoAlerts;
-      const useData = Array.isArray(data) && data.length ? data : demoAlerts;
-      el.innerHTML = `<table><thead><tr><th>Title</th><th>Severity</th><th>Status</th><th>Raised</th></tr></thead><tbody>
-        ${useData.map(a => `<tr>
-          <td><div>${a.title}</div><div style="font-size:.75rem;color:#8A95AA;margin-top:3px;">${a.description || ''}</div></td>
-          <td>${severityBadge(a.severity)}</td>
-          <td>${statusBadge(a.status)}</td>
-          <td style="font-family:'JetBrains Mono',monospace;font-size:.75rem">${new Date(a.created_at).toLocaleString()}</td>
-        </tr>`).join('')}
-      </tbody></table>`;
+      cachedServerAlerts = Array.isArray(data) && data.length ? data : demoAlerts;
+      renderAlertsTable(localRaisedAlerts.concat(cachedServerAlerts));
     } catch (e) {
-      el.innerHTML = `<table><thead><tr><th>Title</th><th>Severity</th><th>Status</th><th>Raised</th></tr></thead><tbody>
-        ${demoAlerts.map(a => `<tr>
-          <td><div>${a.title}</div><div style="font-size:.75rem;color:#8A95AA;margin-top:3px;">${a.description}</div></td>
-          <td>${severityBadge(a.severity)}</td>
-          <td>${statusBadge(a.status)}</td>
-          <td style="font-family:'JetBrains Mono',monospace;font-size:.75rem">${new Date(a.created_at).toLocaleString()}</td>
-        </tr>`).join('')}
-      </tbody></table>`;
+      cachedServerAlerts = demoAlerts;
+      renderAlertsTable(localRaisedAlerts.concat(cachedServerAlerts));
     }
   }
 
@@ -588,9 +596,30 @@
       description: document.getElementById('alertDesc').value.trim()
     };
     if (!body.title) { showError('Alert title is required.'); return; }
-    const r = await fetch(`${API}/alerts/`, { method: 'POST', headers: headers(), body: JSON.stringify(body) });
-    if (r.ok) { showSuccess('Alert raised.'); loadAlerts(); loadKPIs(); }
-    else { const err = await r.json(); showError(err.detail || 'Failed to raise alert. Ensure you are logged in.'); }
+    const newAlert = {
+      title: body.title,
+      severity: body.severity,
+      status: 'open',
+      description: body.description,
+      created_at: new Date().toISOString()
+    };
+
+    localRaisedAlerts.unshift(newAlert);
+    renderAlertsTable(localRaisedAlerts.concat(cachedServerAlerts));
+    resetRaiseAlertForm();
+
+    try {
+      const r = await fetch(`${API}/alerts/`, { method: 'POST', headers: headers(), body: JSON.stringify(body) });
+      if (r.ok) {
+        showSuccess('Alert raised.');
+        loadKPIs();
+      } else {
+        const err = await r.json();
+        showError(err.detail || 'Alert added locally. API sync failed.');
+      }
+    } catch (_) {
+      showSuccess('Alert raised locally.');
+    }
   }
 
   // ── Policies ────────────────────────────────────────────────────────────────
