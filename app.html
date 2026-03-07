@@ -9334,9 +9334,9 @@
         </div>
 
         <div class="btn-row">
-          <button class="btn btn-secondary" onclick="goStep(1)">&larr; Back</button>
-          <button class="btn btn-primary" id="btnRun" disabled onclick="processData()">&#x1f680; Run Audit Agent</button>
-          <button class="btn btn-primary" id="btnRunBatch" style="display:none" disabled
+          <button type="button" class="btn btn-secondary" onclick="goStep(1)">&larr; Back</button>
+          <button type="button" class="btn btn-primary" id="runAuditBtn" data-legacy-id="btnRun" disabled onclick="startAuditScan(event)">&#x1f680; Run Audit Agent</button>
+          <button type="button" class="btn btn-primary" id="btnRunBatch" style="display:none" disabled
             onclick="runBatchAudit()">&#x1f4e6; Run Batch Audit (<span id="batchCountLbl">0</span> files)</button>
         </div>
         <div style="margin-top:.55rem;font-size:.7rem;color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.01em;">
@@ -9350,6 +9350,9 @@
           <div class="spinner"></div>
           <h3 id="procTitle">Processing Audit...</h3>
           <p id="procAgent"></p>
+          <div id="scanProgressWrap" style="max-width:720px;margin:12px auto 10px;height:8px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;border:1px solid rgba(255,255,255,.12);">
+            <div id="scanProgressBar" style="width:0%;height:100%;background:linear-gradient(90deg,#00d4aa,#60a5fa);transition:width .25s ease;"></div>
+          </div>
           <div id="audit-error-boundary" style="display:none;margin:.75rem auto 0;max-width:820px;padding:.65rem .85rem;border-radius:8px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);color:#fecaca;font-size:.75rem;"></div>
           <div class="proc-steps" id="procSteps">
             <div class="proc-step active" id="ps1">
@@ -9377,7 +9380,7 @@
 
       <!-- VIEW 4: AI Internal Audit Command Center -->
       <div class="view" id="v4">
-        <div class="cc-root" id="ccRoot">
+        <div class="cc-root" id="ccRoot" data-results-container="results-container">
 
           <!-- ══ TOP KPI BAR ══ -->
           <div class="cc-topbar">
@@ -9766,16 +9769,51 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         headers: [],
         lineageMap: {},
         mapping: {},
+        mappedData: null,
         violations: [],
         riskSummary: {},
         mode: 'single', // 'single' or 'zip'
         batchFiles: [],   // [{name, size, data, headers, violations, riskSummary}]
         batchViolations: []
       };
+      window.MappedData = null;
       window._activeRules = [];
       window._lastFindings = [];
       window._lastRunId = null;
       window._lastModelVersion = MODEL_VERSION;
+
+      function getRunAuditButton() {
+        return document.getElementById('runAuditBtn') || document.getElementById('btnRun');
+      }
+
+      function getResultsContainer() {
+        return document.querySelector('[data-results-container="results-container"]') || document.getElementById('ccRoot');
+      }
+
+      function syncMappedDataReference() {
+        var snapshot = {
+          agent: STATE.agent,
+          headers: (STATE.headers || []).slice(),
+          mapping: Object.assign({}, STATE.mapping || {}),
+          data: STATE.data || [],
+          updatedAt: new Date().toISOString()
+        };
+        STATE.mappedData = snapshot;
+        window.MappedData = snapshot;
+      }
+
+      function renderAuditFindings() {
+        var target = getResultsContainer();
+        if (!target) return;
+        renderResults();
+        target.setAttribute('data-rendered-at', new Date().toISOString());
+      }
+
+      function startAuditScan(event) {
+        if (event && typeof event.preventDefault === 'function') event.preventDefault();
+        syncMappedDataReference();
+        processData();
+      }
 
       function showToast(msg, level) {
         var existing = document.getElementById('appToast');
@@ -11604,7 +11642,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         if (opts.batchMode) {
           renderBatchResults();
         } else {
-          renderResults();
+          renderAuditFindings();
         }
         if (opts.showCopilot !== false) showCopilotFab();
       }
@@ -11629,7 +11667,8 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
           buildMapping();
         }
         if (STATE.mode === 'single' && STATE.file) {
-          document.getElementById('btnRun').disabled = false;
+          var runBtn = getRunAuditButton();
+          if (runBtn) runBtn.disabled = false;
         }
       }
 
@@ -11690,7 +11729,8 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         document.getElementById('fileInfo').classList.remove('show');
         document.getElementById('dataPreview').classList.remove('show');
         document.getElementById('mappingSection').classList.remove('show');
-        document.getElementById('btnRun').style.display = mode === 'single' ? '' : 'none';
+        var runSingleBtn = getRunAuditButton();
+        if (runSingleBtn) runSingleBtn.style.display = mode === 'single' ? '' : 'none';
         document.getElementById('btnRunBatch').style.display = mode === 'zip' ? '' : 'none';
         updateBatchUI();
       }
@@ -11717,7 +11757,8 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         document.getElementById('fileInfo').classList.remove('show');
         document.getElementById('dataPreview').classList.remove('show');
         document.getElementById('mappingSection').classList.remove('show');
-        document.getElementById('btnRun').disabled = true;
+        var runBtn = getRunAuditButton();
+        if (runBtn) runBtn.disabled = true;
         document.getElementById('fileInput').value = '';
       }
 
@@ -12065,7 +12106,9 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
           var field = sel.getAttribute('data-field'); var val = sel.value;
           if (val) STATE.mapping[field] = val; else allMapped = false;
         });
-        document.getElementById('btnRun').disabled = !STATE.file;
+        var runBtn = getRunAuditButton();
+        if (runBtn) runBtn.disabled = !STATE.file;
+        syncMappedDataReference();
       }
 
       // =====================================================
@@ -12158,7 +12201,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
       
       
       function processData() {
-        var btn = document.getElementById('btnRun');
+        var btn = getRunAuditButton();
         var original = btn ? btn.innerHTML : '';
 
         if (!STATE.agent || !AGENTS[STATE.agent]) {
@@ -12206,18 +12249,17 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
 
         var stepTwo = document.getElementById('v2');
         if (!stepTwo || !stepTwo.classList.contains('active')) return;
+        event.preventDefault();
 
         var runBatch = document.getElementById('btnRunBatch');
         if (STATE.mode === 'zip' && runBatch && runBatch.style.display !== 'none' && !runBatch.disabled) {
-          event.preventDefault();
           runBatchAudit();
           return;
         }
 
-        var runSingle = document.getElementById('btnRun');
+        var runSingle = getRunAuditButton();
         if (runSingle && runSingle.style.display !== 'none' && !runSingle.disabled) {
-          event.preventDefault();
-          processData();
+          startAuditScan(event);
         }
       }
 
@@ -12230,7 +12272,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         var buttons = Array.from(document.querySelectorAll('button'));
         buttons.forEach(function (btn) {
           if (btn.dataset.globalActionBound === '1') return;
-          if (btn.id === 'btnRun' || btn.id === 'btnRunBatch') return;
+          if (btn.id === 'runAuditBtn' || btn.id === 'btnRun' || btn.id === 'btnRunBatch') return;
 
           var label = (btn.textContent || '').toLowerCase();
           if (label.indexOf('run') === -1 && label.indexOf('analyze') === -1) return;
@@ -12261,6 +12303,13 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
           if (eb) {
             eb.style.display = 'none';
             eb.textContent = '';
+          }
+
+          if (window.MappedData && window.MappedData.mapping) {
+            STATE.mapping = Object.assign({}, window.MappedData.mapping);
+            if (window.MappedData.data && window.MappedData.data.length) {
+              STATE.data = window.MappedData.data;
+            }
           }
 
           if (!STATE.agent || !AGENTS[STATE.agent]) {
@@ -12301,16 +12350,27 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         document.getElementById('procAgent').textContent = 'Running ' + ag.name + '...';
         var steps = ['ps1', 'ps2', 'ps3', 'ps4', 'ps5'];
         var i = 0;
+        var totalMs = 2400;
+        var stepDelayMs = Math.floor(totalMs / steps.length);
+        var progressBar = document.getElementById('scanProgressBar');
+        var progressWrap = document.getElementById('scanProgressWrap');
+        var procSteps = document.getElementById('procSteps');
+        if (progressWrap) progressWrap.style.display = 'block';
+        if (procSteps) procSteps.style.display = 'none';
+        if (progressBar) progressBar.style.width = '0%';
 
         function next() {
-          if (i > 0) document.getElementById(steps[i - 1]).className = 'proc-step done';
+          if (progressBar) {
+            var pct = Math.min(100, Math.round((i / steps.length) * 100));
+            progressBar.style.width = pct + '%';
+          }
 
           if (i < steps.length) {
-            document.getElementById(steps[i]).className = 'proc-step active';
             i++;
-            setTimeout(next, 600 + Math.random() * 400);
+            setTimeout(next, stepDelayMs);
           }
           else {
+            if (progressBar) progressBar.style.width = '100%';
             // ACAP v4.0: Always run fully client-side — no backend calls
             runFallbackDemo();
           }
@@ -12406,6 +12466,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
               summary: STATE.riskSummary
             }
           }));
+          if (procSteps) procSteps.style.display = '';
           setTimeout(function () { transitionToStep(4, { batchMode: false, showCopilot: true }); }, 500);
         }
 
