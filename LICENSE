@@ -1,0 +1,44 @@
+Agentic AI Audit Suite Proprietary License
+Copyright (c) 2026 djha786543-gif. All rights reserved.
+
+1. Ownership
+The software, source code, architecture, models, prompts, workflows, documentation,
+assets, and all related materials in this repository (the "Software") are proprietary
+and owned by the copyright holder.
+
+2. No License Granted
+Except where explicit written permission is granted by the copyright holder, no right,
+license, or permission is granted to use, copy, modify, merge, publish, distribute,
+sublicense, sell, train on, reverse engineer, or create derivative works from the
+Software.
+
+3. Prohibited Use
+Without prior written authorization, you may not:
+- copy or redistribute any substantial portion of this repository,
+- use this code in commercial or production systems,
+- remove or alter copyright, legal notices, or attribution,
+- claim this work as your own.
+
+4. Authorized Internal Access
+If access is granted for review, audit, or evaluation, such access is limited,
+non-transferable, revocable, and does not transfer intellectual property rights.
+
+5. Confidentiality
+Any non-public implementation details, credentials, architecture, controls, and
+security practices in this repository are confidential and must not be disclosed.
+
+6. Enforcement
+Unauthorized use may violate copyright and trade secret laws and may result in civil
+and/or criminal penalties. The copyright holder reserves all legal remedies.
+
+7. Third-Party Components
+Some files may include third-party components under their own licenses. Such components
+remain subject to their respective license terms.
+
+8. Disclaimer
+THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND
+NON-INFRINGEMENT.
+
+9. Contact
+For licensing or permission requests, contact the repository owner.

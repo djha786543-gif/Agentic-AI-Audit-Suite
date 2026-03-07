@@ -1,0 +1,10 @@
+# Enforce repository ownership and review routing.
+# Default owner for all files:
+* @djha786543-gif
+
+# Security-sensitive areas:
+core/** @djha786543-gif
+auth/** @djha786543-gif
+api/** @djha786543-gif
+backend/** @djha786543-gif
+.github/workflows/** @djha786543-gif

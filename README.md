@@ -316,3 +316,10 @@ Automated testing requires automated workpapers. Using the exporters inside the 
 ## 🛡️ License & Contributions
 This project is proprietary and intended for Enterprise IT Audit Assurance. 
 Please ensure no production secrets or real audit evidence are committed to public repositories.
+
+Repository legal controls:
+- `LICENSE` - Proprietary "All Rights Reserved" license terms.
+- `NOTICE` - Copyright and unauthorized-use notice.
+- `.github/CODEOWNERS` - Ownership enforcement for review routing.
+
+Unauthorized copying, redistribution, derivative reuse, or commercial exploitation is prohibited without prior written authorization from the repository owner.
