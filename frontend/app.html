@@ -12208,6 +12208,16 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
           STATE.riskSummary = { Critical: 0, High: 0, Medium: 0, Low: 0 };
           STATE.violations.forEach(function (v) { if (STATE.riskSummary[v.severity] !== undefined) STATE.riskSummary[v.severity]++ });
           window._lastFindings = (STATE.violations || []).slice();
+          try {
+            localStorage.setItem('auditai_latest_findings_v1', JSON.stringify(window._lastFindings));
+            localStorage.setItem('auditai_latest_findings_meta_v1', JSON.stringify({
+              run_id: runId,
+              agent: STATE.agent,
+              generated_at: new Date().toISOString()
+            }));
+          } catch (_) {
+            // Cross-page finding persistence is best-effort only.
+          }
           var modelMap = {
             sod: 'acap-sod-v4.0',
             access: 'acap-access-v4.0',
@@ -12331,6 +12341,50 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         return uniqueList(users);
       }
 
+      var SWARM_BUS = null;
+      try {
+        SWARM_BUS = new BroadcastChannel('auditai_swarm_bus_v1');
+      } catch (_) {
+        SWARM_BUS = null;
+      }
+
+      function broadcastSwarmEvent(type, payload) {
+        if (!SWARM_BUS) return;
+        try {
+          SWARM_BUS.postMessage({
+            type: type,
+            at: new Date().toISOString(),
+            payload: payload || {}
+          });
+        } catch (_) {
+          // Non-blocking event bus broadcast.
+        }
+      }
+
+      if (SWARM_BUS) {
+        SWARM_BUS.onmessage = function (event) {
+          var msg = event && event.data ? event.data : {};
+          if (msg.type !== 'ITGC_LEAVER_ALERT') return;
+          if (STATE.agent !== 'frr') return;
+          var users = ((msg.payload && msg.payload.users) || []).map(function (u) { return safeText(u).toLowerCase(); });
+          if (!users.length || !Array.isArray(CC.allVio) || !CC.allVio.length) return;
+          var changed = false;
+          CC.allVio.forEach(function (f) {
+            var ent = safeText(f.entity).toLowerCase();
+            var fieldText = (safeText(f.field1) + ' ' + safeText(f.field2) + ' ' + safeText(f.rule)).toLowerCase();
+            var hit = users.indexOf(ent) !== -1 || users.some(function (u) { return fieldText.indexOf(u) !== -1; });
+            if (!hit) return;
+            f.review_priority = 'P1';
+            f.priority_reason = 'ITGC terminated-user alert corroborates JE transaction review';
+            changed = true;
+          });
+          if (changed) {
+            renderFindingsTable(CC.filtered && CC.filtered.length ? CC.filtered : CC.allVio);
+            buildLiveFeed(CC.filtered && CC.filtered.length ? CC.filtered : CC.allVio);
+          }
+        };
+      }
+
       function riskWeightingForFinding(v) {
         var sev = safeText(v.severity).toLowerCase();
         var frequencyWeight = sev === 'critical' ? 0.8 : sev === 'high' ? 0.7 : sev === 'medium' ? 0.55 : 0.4;
@@ -12391,11 +12445,15 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
               findings: findings || []
             }, agentKey || 'unknown');
             if (agentKey === 'access') {
+              var leaverUsers = getTerminatedUsersFromFindings(findings || []);
               tx.objectStore('agent_findings').put({
                 saved_at: new Date().toISOString(),
-                users: getTerminatedUsersFromFindings(findings || []),
+                users: leaverUsers,
                 findings: findings || []
               }, 'itgc_terminated_users');
+              if (leaverUsers.length) {
+                broadcastSwarmEvent('ITGC_LEAVER_ALERT', { users: leaverUsers });
+              }
             }
             tx.oncomplete = function () { resolve(); };
             tx.onerror = function () { reject(tx.error); };

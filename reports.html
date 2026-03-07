@@ -166,6 +166,25 @@
       </article>
     </section>
 
+    <section class="card" style="margin-top:16px;">
+      <h3>Sovereign GRC Findings Traceability</h3>
+      <p class="sub" style="margin-bottom:10px;">Every finding includes a human-readable logic trace with cited ERP evidence and regulatory control references.</p>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;min-width:860px;">
+          <thead>
+            <tr style="text-align:left;border-bottom:1px solid var(--b1);font-family:var(--fm);font-size:11px;color:var(--tx2);text-transform:uppercase;">
+              <th style="padding:8px;">Finding</th>
+              <th style="padding:8px;">Severity</th>
+              <th style="padding:8px;">Entity</th>
+              <th style="padding:8px;">Rule</th>
+              <th style="padding:8px;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="reportFindingsTbody"></tbody>
+        </table>
+      </div>
+    </section>
+
     <section class="card" style="margin-top:18px;">
       <h3>Residual Risk Heatmap (ERM 5x5)</h3>
       <p class="sub" style="margin-bottom:10px;">Auto-generated from Governance risk register residual likelihood vs impact.</p>
@@ -217,6 +236,16 @@
           <button class="btn btn-primary" id="generateNow">Generate</button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="logicTraceModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="logicTraceTitle">
+      <div class="modal-head">
+        <h2 id="logicTraceTitle">Logic Trace</h2>
+        <button class="close" id="closeLogicTrace" aria-label="Close">✕</button>
+      </div>
+      <pre id="logicTraceBody" style="white-space:pre-wrap;background:var(--ink2);border:1px solid var(--b2);border-radius:10px;padding:12px;font-family:var(--fm);font-size:11px;color:var(--tx1);max-height:52vh;overflow:auto;"></pre>
     </div>
   </div>
 
@@ -334,7 +363,80 @@
       URL.revokeObjectURL(a.href);
     }
 
+    function regulatoryControlForFinding(finding) {
+      const id = String((finding && finding.id) || '').toUpperCase();
+      if (id.startsWith('LA-') || id.startsWith('SOD-') || id.startsWith('CM-') || id.startsWith('ITGC')) return 'PCAOB AS 2201 (ITGC)';
+      if (id.startsWith('FRR-') || id.startsWith('TT-') || id.startsWith('INT-') || id.startsWith('ITAC')) return 'PCAOB AS 2201 + ISA 315';
+      return 'PCAOB AS 2201';
+    }
+
+    function loadLatestFindingsForReports() {
+      const tbody = document.getElementById('reportFindingsTbody');
+      let findings = [];
+      try {
+        findings = JSON.parse(localStorage.getItem('auditai_latest_findings_v1') || '[]');
+      } catch (_) {
+        findings = [];
+      }
+      if (!Array.isArray(findings) || !findings.length) {
+        tbody.innerHTML = '<tr><td colspan="5" style="padding:12px;color:var(--tx2)">No recent findings found. Run an audit in Master Audit Suite to populate Logic Trace evidence.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = findings.slice(0, 20).map((f, idx) => {
+        return '<tr style="border-bottom:1px solid var(--b1)">' +
+          '<td style="padding:8px;font-family:var(--fm);font-size:11px">' + (f.id || 'FINDING') + '</td>' +
+          '<td style="padding:8px">' + (f.severity || 'Medium') + '</td>' +
+          '<td style="padding:8px">' + (f.entity || 'N/A') + '</td>' +
+          '<td style="padding:8px">' + (f.rule || 'N/A') + '</td>' +
+          '<td style="padding:8px"><button class="btn-sub" onclick="showReportLogicTrace(' + idx + ')">Logic Trace</button></td>' +
+          '</tr>';
+      }).join('');
+      window.__reportFindings = findings;
+    }
+
+    function showReportLogicTrace(index) {
+      const findings = window.__reportFindings || [];
+      const f = findings[index];
+      if (!f) return;
+      const tj = f.technical_justification || {};
+      const c = f.chain || {};
+      const trace = f.logic_trace || {};
+      const evidenceA = f.field1 || (tj.evidence_summary && tj.evidence_summary.evidence_a) || 'N/A';
+      const evidenceB = f.field2 || (tj.evidence_summary && tj.evidence_summary.evidence_b) || 'N/A';
+      const tcodes = Array.isArray(trace.tcodes) && trace.tcodes.length ? trace.tcodes.join(', ') : 'Not found in evidence';
+      const policyRule = trace.policy_rule || tj.rule || f.rule || f.id || 'Policy rule not provided';
+      const regulatory = regulatoryControlForFinding(f);
+      const humanReadable = [
+        'Finding ID: ' + (f.id || 'N/A'),
+        'Severity: ' + (f.severity || 'N/A'),
+        'Entity: ' + (f.entity || 'N/A'),
+        'Rule Triggered: ' + (f.rule || 'N/A'),
+        'Policy Rule: ' + policyRule,
+        'ERP Data Point A: ' + evidenceA,
+        'ERP Data Point B: ' + evidenceB,
+        'T-Code(s): ' + tcodes,
+        'Regulatory Control: ' + regulatory,
+        '',
+        'Decision Path:',
+        'IF ' + (c.access || evidenceA),
+        'AND ' + (c.controlFailure || evidenceB),
+        'THEN raise exception ' + (f.id || 'FINDING') + ' with severity ' + (f.severity || 'Medium'),
+        '',
+        'Explanation: ' + (tj.explanation || c.auditOpinion || 'No additional explanation provided.')
+      ].join('\n');
+      document.getElementById('logicTraceBody').textContent = humanReadable;
+      document.getElementById('logicTraceModal').classList.add('show');
+    }
+
+    document.getElementById('closeLogicTrace').addEventListener('click', () => {
+      document.getElementById('logicTraceModal').classList.remove('show');
+    });
+    document.getElementById('logicTraceModal').addEventListener('click', (event) => {
+      if (event.target.id === 'logicTraceModal') document.getElementById('logicTraceModal').classList.remove('show');
+    });
+
     renderHeatmap();
+    loadLatestFindingsForReports();
   </script>
 <script>
 (function(){

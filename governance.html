@@ -775,7 +775,7 @@
       }
       const ledger = getRemediationLedger();
       const byFinding = Object.fromEntries(ledger.map(x => [x.finding_id, x]));
-      el.innerHTML = `<table><thead><tr><th>ID</th><th>Control</th><th>Severity</th><th>Owner</th><th>Due</th><th>Mitigation Plan</th><th>Closure</th><th>Status</th></tr></thead><tbody>
+      el.innerHTML = `<table><thead><tr><th>ID</th><th>Control</th><th>Severity</th><th>Owner</th><th>Due</th><th>Mitigation Plan</th><th>Remediation Agent</th><th>Closure</th><th>Status</th></tr></thead><tbody>
         ${data.map(f => `<tr>
           <td style="font-family:'JetBrains Mono',monospace;font-size:.7rem">${f.id}</td>
           <td>${f.control_id || '—'}</td>
@@ -783,7 +783,15 @@
           <td>${f.remediation_owner || 'Unassigned'}</td>
           <td>${f.remediation_due_date ? new Date(f.remediation_due_date).toLocaleDateString() : '—'}</td>
           <td><button class="btn btn-outline" onclick="generateMitigationPlan('${f.id}')">Generate Mitigation Plan</button><div id="plan-${f.id}" style="margin-top:6px;font-size:.75rem;color:#9fb3d1">${(byFinding[f.id] && byFinding[f.id].mitigation_plan) || '—'}</div></td>
-          <td>${(byFinding[f.id] && byFinding[f.id].actual_closure_date) ? new Date(byFinding[f.id].actual_closure_date).toLocaleDateString() : 'Open'}</td>
+          <td>
+            <button class="btn btn-outline" onclick="generateAutonomousFix('${f.id}','sap')">Generate SAP Fix</button>
+            <button class="btn btn-outline" style="margin-left:6px" onclick="generateAutonomousFix('${f.id}','snow')">Create SNOW Ticket</button>
+            <div id="fix-${f.id}" style="margin-top:6px;font-size:.74rem;color:#9fb3d1;white-space:pre-wrap">${(byFinding[f.id] && byFinding[f.id].technical_fix) || '—'}</div>
+          </td>
+          <td>
+            ${(byFinding[f.id] && byFinding[f.id].actual_closure_date) ? new Date(byFinding[f.id].actual_closure_date).toLocaleDateString() : 'Open'}
+            <button class="btn btn-outline" style="margin-left:8px" onclick="markActualClosure('${f.id}')">Mark Closed</button>
+          </td>
           <td>${statusBadge(f.status || 'open')}</td>
         </tr>`).join('')}
       </tbody></table>`;
@@ -841,6 +849,84 @@
     } catch (e) {
       showError('Failed to generate mitigation plan.');
     }
+  }
+
+  function buildAutonomousFixBundle(finding, mode) {
+    const fid = finding.id;
+    const owner = finding.remediation_owner || 'control.owner@example.com';
+    const control = (finding.control_id || '').toUpperCase();
+    if (mode === 'snow') {
+      const ticketId = `SNOW-${Date.now().toString().slice(-8)}`;
+      const ticketPayload = {
+        ticket_id: ticketId,
+        short_description: `Auto-remediation for finding ${fid}`,
+        control_id: finding.control_id || 'UNKNOWN',
+        priority: (finding.severity || '').toUpperCase() === 'CRITICAL' ? '1 - Critical' : '2 - High',
+        assignment_group: 'GRC-SECOPS',
+        assigned_to: owner,
+        regulatory_reference: 'PCAOB AS 2201',
+        requested_action: control.includes('LA') || control.includes('SOD')
+          ? 'Deprovision conflicting access and attach recertification evidence.'
+          : 'Apply application control fix and attach re-test evidence.'
+      };
+      return {
+        remediation_agent_status: 'ticket_generated',
+        technical_fix_type: 'servicenow_ticket',
+        ticket_id: ticketId,
+        technical_fix: JSON.stringify(ticketPayload, null, 2)
+      };
+    }
+
+    const sampleScript = [
+      `* Auto-generated remediation for ${fid}`,
+      `* Regulatory Reference: PCAOB AS 2201`,
+      `* Owner: ${owner}`,
+      control.includes('LA') || control.includes('SOD')
+        ? `DELETE FROM AGR_USERS WHERE UNAME = '<LEAVER_USER>' AND AGR_NAME IN ('<CONFLICT_ROLE>');`
+        : `UPDATE Z_GRC_EXCEPTION SET STATUS='REMEDIATED', LAST_UPDATED=CURRENT_UTCTIMESTAMP WHERE FINDING_ID='${fid}';`,
+      `COMMIT WORK.`
+    ].join('\n');
+
+    return {
+      remediation_agent_status: 'script_generated',
+      technical_fix_type: 'sap_security_script',
+      technical_fix: sampleScript
+    };
+  }
+
+  async function generateAutonomousFix(findingId, mode) {
+    try {
+      const r = await fetch(`${API}/findings/`, { headers: headers() });
+      const data = await r.json();
+      const finding = (data || []).find(x => x.id === findingId);
+      if (!finding) { showError('Finding not found for remediation agent.'); return; }
+      const fix = buildAutonomousFixBundle(finding, mode);
+      upsertRemediationLedger({
+        finding_id: findingId,
+        remediation_agent_status: fix.remediation_agent_status,
+        technical_fix_type: fix.technical_fix_type,
+        technical_fix: fix.technical_fix,
+        ticket_id: fix.ticket_id || null,
+        generated_at: new Date().toISOString(),
+        actual_closure_date: null
+      });
+      const target = document.getElementById(`fix-${findingId}`);
+      if (target) target.textContent = fix.technical_fix;
+      showSuccess(mode === 'snow' ? 'Remediation Agent created ServiceNow ticket payload.' : 'Remediation Agent generated SAP security script.');
+    } catch (e) {
+      showError('Failed to generate autonomous remediation fix.');
+    }
+  }
+
+  function markActualClosure(findingId) {
+    upsertRemediationLedger({
+      finding_id: findingId,
+      remediation_agent_status: 'actual_closure',
+      actual_closure_date: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    });
+    showSuccess('Finding marked as Actual Closure.');
+    loadRemediation();
   }
 
   async function loadOwnerQueue() {
