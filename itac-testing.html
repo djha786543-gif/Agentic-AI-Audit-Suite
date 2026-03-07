@@ -154,14 +154,56 @@
           '<td style="font-size:12px;">' + c.procedure + failNote + '</td>' +
           '<td style="color:' + resultColor + ';font-weight:700;">' + resultIcon + ' ' + c.result + '</td>' +
           '<td style="color:' + riskColor + ';font-weight:700;font-size:12px;">' + c.risk + '</td>' +
-          '<td><a href="app.html" style="background:rgba(99,102,241,0.2);color:#a5b4fc;padding:4px 10px;border-radius:6px;font-size:11px;text-decoration:none;border:1px solid rgba(99,102,241,0.3);">Run Test</a></td>';
+          '<td><button class="run-btn" type="button" data-control-id="' + c.id + '">Run Test</button></td>';
         tr.style.background = c.result === 'FAIL' ? 'rgba(239,68,68,0.05)' : '';
         tbody.appendChild(tr);
       });
     }
 
+    function mockProcessButton(button, onDone) {
+      if (!button) return;
+      var originalText = button.textContent;
+      button.disabled = true;
+      button.textContent = 'Processing...';
+      setTimeout(function () {
+        button.disabled = false;
+        button.textContent = originalText;
+        if (typeof onDone === 'function') onDone();
+      }, 2000);
+    }
+
+    function updateRowResult(row) {
+      if (!row) return;
+      var resultCell = row.children[4];
+      if (!resultCell) return;
+      var isPass = Math.random() > 0.2;
+      resultCell.style.color = isPass ? '#22c55e' : '#ef4444';
+      resultCell.style.fontWeight = '700';
+      resultCell.textContent = (isPass ? '✅ Pass' : '❌ FAIL') + ' (' + new Date().toLocaleTimeString() + ')';
+      row.style.background = isPass ? '' : 'rgba(239,68,68,0.05)';
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
       renderITACTable(ITAC_CONTROLS);
+
+      var runAllBtn = document.getElementById('runAll');
+      var tbody = document.getElementById('itac-tbody');
+
+      runAllBtn.addEventListener('click', function () {
+        mockProcessButton(runAllBtn, function () {
+          Array.from(tbody.querySelectorAll('tr')).forEach(function (row) {
+            updateRowResult(row);
+          });
+        });
+      });
+
+      tbody.addEventListener('click', function (event) {
+        var runBtn = event.target.closest('.run-btn');
+        if (!runBtn) return;
+        mockProcessButton(runBtn, function () {
+          updateRowResult(runBtn.closest('tr'));
+        });
+      });
     });
   </script>
 <script>

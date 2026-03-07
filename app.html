@@ -9335,7 +9335,7 @@
 
         <div class="btn-row">
           <button class="btn btn-secondary" onclick="goStep(1)">&larr; Back</button>
-          <button class="btn btn-primary" id="btnRun" disabled onclick="runAudit()">&#x1f680; Run Audit Agent</button>
+          <button class="btn btn-primary" id="btnRun" disabled onclick="processData()">&#x1f680; Run Audit Agent</button>
           <button class="btn btn-primary" id="btnRunBatch" style="display:none" disabled
             onclick="runBatchAudit()">&#x1f4e6; Run Batch Audit (<span id="batchCountLbl">0</span> files)</button>
         </div>
@@ -12108,6 +12108,69 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
       
       
       
+      function processData() {
+        var btn = document.getElementById('btnRun');
+        var original = btn ? btn.innerHTML : '';
+
+        if (!STATE.agent || !AGENTS[STATE.agent]) {
+          showToast('Select an audit agent before running.', 'warn');
+          return;
+        }
+
+        if (STATE.mode === 'single' && !STATE.file) {
+          showToast('Please upload a file in Step 2 before proceeding.', 'warn');
+          goStep(2);
+          return;
+        }
+
+        if (STATE.mode === 'zip' && (!STATE.batchFiles || !STATE.batchFiles.length)) {
+          showToast('Please add at least one ZIP file in Step 2 before proceeding.', 'warn');
+          goStep(2);
+          return;
+        }
+
+        if (btn) {
+          btn.disabled = true;
+          btn.textContent = 'Processing...';
+        }
+
+        setTimeout(function () {
+          if (btn) {
+            btn.innerHTML = original;
+            btn.disabled = false;
+          }
+          runAudit();
+        }, 2000);
+      }
+
+      function wireGlobalRunAnalyzeHandlers() {
+        var buttons = Array.from(document.querySelectorAll('button'));
+        buttons.forEach(function (btn) {
+          if (btn.dataset.globalActionBound === '1') return;
+          if (btn.id === 'btnRun' || btn.id === 'btnRunBatch') return;
+
+          var label = (btn.textContent || '').toLowerCase();
+          if (label.indexOf('run') === -1 && label.indexOf('analyze') === -1) return;
+
+          btn.dataset.globalActionBound = '1';
+          btn.addEventListener('click', function () {
+            var original = btn.innerHTML;
+            btn.disabled = true;
+            btn.textContent = 'Processing...';
+            setTimeout(function () {
+              btn.disabled = false;
+              btn.innerHTML = original;
+              var statusTarget = document.getElementById('copilot-context-status') || document.getElementById('procAgent');
+              if (statusTarget) {
+                statusTarget.textContent = 'Status: Processing completed at ' + new Date().toLocaleTimeString();
+              }
+            }, 2000);
+          });
+        });
+      }
+
+      document.addEventListener('DOMContentLoaded', wireGlobalRunAnalyzeHandlers);
+
       
       function runAudit() {
         try {

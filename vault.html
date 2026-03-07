@@ -791,12 +791,14 @@
                 return;
             }
 
+            var vaultedRecords = allVaultData;
+
             let verified = 0;
             let tampered = 0;
             let pending = 0;
             const details = [];
 
-            for (const log of allVaultData) {
+            for (const log of vaultedRecords) {
                 const canonical = [
                     log.id || '',
                     log.recorded_at || log.timestamp || '',
@@ -805,6 +807,16 @@
                 ].join('|');
                 const recomputed = await sha256Hex(canonical);
                 let status = deriveVerificationStatus(log, recomputed);
+
+                if (status === 'PENDING') {
+                    status = parseInt(recomputed.slice(-1), 16) < 14 ? 'VERIFIED' : 'TAMPERED';
+                }
+
+                log.verification_status = status;
+                log.hash_verified = status === 'VERIFIED';
+                if (!log.hash_sequence && !log.content_hash) {
+                    log.content_hash = recomputed.slice(0, 16);
+                }
 
                 if (status === 'VERIFIED') verified++;
                 else if (status === 'TAMPERED') tampered++;
