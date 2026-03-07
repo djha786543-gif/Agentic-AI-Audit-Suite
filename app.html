@@ -11613,6 +11613,14 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         document.getElementById('btnNext1').disabled = false;
         var ag = AGENTS[STATE.agent];
         document.getElementById('uploadDesc').textContent = 'Upload data for ' + ag.name + '. Supported: CSV, XLSX, XLS, JSON, XML, TSV.';
+
+        // If data was uploaded before agent selection, immediately hydrate mapping/run state.
+        if (STATE.file && Array.isArray(STATE.headers) && STATE.headers.length) {
+          buildMapping();
+        }
+        if (STATE.mode === 'single' && STATE.file) {
+          document.getElementById('btnRun').disabled = false;
+        }
       }
 
       function renderDataSpec() {
