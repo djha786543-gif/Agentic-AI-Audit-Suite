@@ -44,6 +44,21 @@ _VALID_TRANSITIONS: Dict[str, List[str]] = {
     "closed": [],
 }
 
+# DB schema in some deployed environments keeps `audit_exceptions.state` as VARCHAR(20).
+# Persist a compact token while preserving canonical API state names.
+_CANONICAL_TO_STORAGE: Dict[str, str] = {
+    "remediation_in_progress": "remediation_progress",
+}
+_STORAGE_TO_CANONICAL: Dict[str, str] = {v: k for k, v in _CANONICAL_TO_STORAGE.items()}
+
+
+def _to_storage_state(state: str) -> str:
+    return _CANONICAL_TO_STORAGE.get(state, state)
+
+
+def _to_canonical_state(state: str) -> str:
+    return _STORAGE_TO_CANONICAL.get(state, state)
+
 
 class ExceptionTransition(BaseModel):
     new_state: str
@@ -185,12 +200,15 @@ async def transition_exception(
             detail=f"Exception {exception_id} not found.",
         )
 
-    allowed = _VALID_TRANSITIONS.get(record.state, [])
-    if body.new_state not in allowed:
+    current_state = _to_canonical_state(record.state or "open")
+    requested_state = _to_canonical_state(body.new_state)
+
+    allowed = _VALID_TRANSITIONS.get(current_state, [])
+    if requested_state not in allowed:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=(
-                f"Cannot transition from '{record.state}' to '{body.new_state}'. "
+                f"Cannot transition from '{current_state}' to '{requested_state}'. "
                 f"Allowed next states: {allowed}"
             ),
         )
@@ -198,8 +216,8 @@ async def transition_exception(
     now = datetime.now(timezone.utc)
     # Append audit trail entry to the comments log
     audit_entry: Dict[str, Any] = {
-        "from_state": record.state,
-        "to_state": body.new_state,
+        "from_state": current_state,
+        "to_state": requested_state,
         "transitioned_by": ctx.username,
         "transitioned_at": now.isoformat(),
         "comment": body.comment,
@@ -207,12 +225,14 @@ async def transition_exception(
     comments = list(record.comments or [])
     comments.append(audit_entry)
     record.comments = comments
-    record.state = body.new_state
+    record.state = _to_storage_state(requested_state)
 
-    if body.new_state in ("closed",):
+    if requested_state in ("closed",):
         record.resolved_at = now
 
     await db.commit()
     await db.refresh(record)
+    # Respond with canonical state vocabulary expected by API clients/UAT.
+    record.state = _to_canonical_state(record.state)
     return record
 
