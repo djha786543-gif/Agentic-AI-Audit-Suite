@@ -12592,10 +12592,51 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
           req.onupgradeneeded = function () {
             var db = req.result;
             if (!db.objectStoreNames.contains('agent_findings')) db.createObjectStore('agent_findings');
+            if (!db.objectStoreNames.contains('audit_context')) db.createObjectStore('audit_context');
           };
           req.onsuccess = function () { resolve(req.result); };
           req.onerror = function () { reject(req.error); };
         });
+      }
+
+      async function writeSwarmAuditContext(patch) {
+        try {
+          var db = await openSwarmDb();
+          var existing = await new Promise(function (resolve, reject) {
+            var txRead = db.transaction('audit_context', 'readonly');
+            var reqRead = txRead.objectStore('audit_context').get('shared');
+            reqRead.onsuccess = function () { resolve(reqRead.result || {}); };
+            reqRead.onerror = function () { reject(reqRead.error); };
+          });
+
+          await new Promise(function (resolve, reject) {
+            var txWrite = db.transaction('audit_context', 'readwrite');
+            txWrite.objectStore('audit_context').put(Object.assign({}, existing, patch || {}, {
+              updated_at: new Date().toISOString()
+            }), 'shared');
+            txWrite.oncomplete = function () { resolve(); };
+            txWrite.onerror = function () { reject(txWrite.error); };
+          });
+          db.close();
+        } catch (_) {
+          // Non-blocking shared context persistence.
+        }
+      }
+
+      async function readSwarmAuditContext() {
+        try {
+          var db = await openSwarmDb();
+          var value = await new Promise(function (resolve, reject) {
+            var tx = db.transaction('audit_context', 'readonly');
+            var req = tx.objectStore('audit_context').get('shared');
+            req.onsuccess = function () { resolve(req.result || {}); };
+            req.onerror = function () { reject(req.error); };
+          });
+          db.close();
+          return value || {};
+        } catch (_) {
+          return {};
+        }
       }
 
       async function saveSwarmSnapshot(agentKey, findings) {
@@ -12617,6 +12658,11 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
               if (leaverUsers.length) {
                 broadcastSwarmEvent('ITGC_LEAVER_ALERT', { users: leaverUsers });
               }
+              writeSwarmAuditContext({
+                terminated_users: leaverUsers,
+                priority_forensic_users: leaverUsers,
+                priority_reason: 'Logical Access auditor flagged active terminated users'
+              });
             }
             tx.oncomplete = function () { resolve(); };
             tx.onerror = function () { reject(tx.error); };
@@ -12647,10 +12693,14 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         if (agentKey !== 'sod' && agentKey !== 'frr') return [];
         var accessSnapshot = await getSwarmSnapshot('access');
         var itgcTermSnapshot = await getSwarmSnapshot('itgc_terminated_users');
+        var sharedCtx = await readSwarmAuditContext();
         var accessFindings = (accessSnapshot && accessSnapshot.findings) ? accessSnapshot.findings : [];
         var terminatedUsers = getTerminatedUsersFromFindings(accessFindings);
         if (itgcTermSnapshot && Array.isArray(itgcTermSnapshot.users)) {
           terminatedUsers = uniqueList(terminatedUsers.concat(itgcTermSnapshot.users));
+        }
+        if (sharedCtx && Array.isArray(sharedCtx.terminated_users)) {
+          terminatedUsers = uniqueList(terminatedUsers.concat(sharedCtx.terminated_users));
         }
         terminatedUsers = uniqueList(terminatedUsers.concat(getTerminatedUsersFromItgcSync()));
 
