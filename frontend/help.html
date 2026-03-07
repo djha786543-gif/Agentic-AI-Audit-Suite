@@ -707,6 +707,11 @@
       <div class="toc-card-title">AWS Cloud Audit</div>
       <div class="toc-card-desc">Cloud security controls & assessments</div>
     </a>
+    <a href="#docs-hub" class="toc-card">
+      <div class="toc-card-icon">📚</div>
+      <div class="toc-card-title">Documentation Hub</div>
+      <div class="toc-card-desc">Complete portal docs, flows, and reference maps</div>
+    </a>
     <a href="#troubleshooting" class="toc-card">
       <div class="toc-card-icon">🔧</div>
       <div class="toc-card-title">Troubleshooting</div>
@@ -747,6 +752,7 @@
       <div class="nav-group-title">Output</div>
       <a href="#reports" class="sidebar-link">📊 Reports & Exports</a>
       <a href="#security" class="sidebar-link">🛡️ Security & Privacy</a>
+      <a href="#docs-hub" class="sidebar-link">📚 Documentation Hub</a>
       <div class="nav-group-title">Support</div>
       <a href="#troubleshooting" class="sidebar-link">🔧 Troubleshooting</a>
       <a href="#faq" class="sidebar-link">💬 FAQ</a>
@@ -2330,6 +2336,135 @@
           <div class="feature-card-icon">🔐</div>
           <div class="feature-card-title">Integrity Assurance</div>
           <div class="feature-card-desc">Run Verify All daily and preserve forensic integrity certificate exports in audit workpapers.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================
+         SECTION: DOCUMENTATION HUB
+         ============================ -->
+    <section class="help-section" id="docs-hub">
+      <div class="section-header">
+        <div class="section-icon">📚</div>
+        <div>
+          <h2>Documentation Hub</h2>
+          <p class="section-subtitle">END-TO-END USER + ORGANIZATION REFERENCE</p>
+        </div>
+      </div>
+
+      <div class="prose">
+        <p>This hub consolidates the complete operational documentation for the current portal state. It is written for both <strong>end users</strong> and <strong>organization-level owners</strong> (Audit Managers, Risk Leads, Compliance, Admin/DevOps).</p>
+        <p>Use this section when onboarding teams, defining responsibilities, validating operating rhythm, or preparing evidence and reporting packs across the full audit lifecycle.</p>
+      </div>
+
+      <h3 class="sub-heading">Complete Docs Pack (Current Build)</h3>
+      <table class="data-table">
+        <thead>
+          <tr><th>Document</th><th>Purpose</th><th>Primary Audience</th><th>When To Use</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><a href="../docs/PORTAL_END_TO_END_GUIDE.md" target="_blank" rel="noopener">PORTAL_END_TO_END_GUIDE.md</a></td>
+            <td>Complete walkthrough of all pages, controls, handoffs, and expected outcomes.</td>
+            <td>End users, Audit Operations</td>
+            <td>Day-0 onboarding and first pilot cycles.</td>
+          </tr>
+          <tr>
+            <td><a href="../docs/ORGANIZATION_OPERATING_MODEL.md" target="_blank" rel="noopener">ORGANIZATION_OPERATING_MODEL.md</a></td>
+            <td>Operating model, RACI, governance cadence, and ownership boundaries.</td>
+            <td>Audit Managers, Executives, PMO</td>
+            <td>Program rollout and quarterly governance reviews.</td>
+          </tr>
+          <tr>
+            <td><a href="../docs/PAGE_FLOW_REFERENCE.md" target="_blank" rel="noopener">PAGE_FLOW_REFERENCE.md</a></td>
+            <td>Page-by-page functional map with user actions, inputs, and outputs.</td>
+            <td>All business users</td>
+            <td>Daily operation and training.</td>
+          </tr>
+          <tr>
+            <td><a href="../docs/API_DATAFLOW_REFERENCE.md" target="_blank" rel="noopener">API_DATAFLOW_REFERENCE.md</a></td>
+            <td>Frontend-to-API dataflow, fallback behavior, and endpoint mapping.</td>
+            <td>Admin, Engineering, QA</td>
+            <td>Troubleshooting, release validation, integration planning.</td>
+          </tr>
+          <tr>
+            <td><a href="../docs/OPERATIONS_RUNBOOK.md" target="_blank" rel="noopener">OPERATIONS_RUNBOOK.md</a></td>
+            <td>Runtime operations, deploy checks, and service-level procedures.</td>
+            <td>Platform Ops, SRE</td>
+            <td>Deployment, maintenance, incident prevention.</td>
+          </tr>
+          <tr>
+            <td><a href="../docs/INCIDENT_RESPONSE_SOP.md" target="_blank" rel="noopener">INCIDENT_RESPONSE_SOP.md</a></td>
+            <td>Severity triage, containment, recovery, and post-incident process.</td>
+            <td>Security/Ops</td>
+            <td>Service disruption or security incidents.</td>
+          </tr>
+          <tr>
+            <td><a href="../docs/SSO_CLAIM_MAPPING.md" target="_blank" rel="noopener">SSO_CLAIM_MAPPING.md</a></td>
+            <td>Enterprise claim-to-role mapping operations and validation.</td>
+            <td>Identity Admins</td>
+            <td>IdP onboarding and access model updates.</td>
+          </tr>
+          <tr>
+            <td><a href="../docs/COMPLIANCE_EVIDENCE_PACK.md" target="_blank" rel="noopener">COMPLIANCE_EVIDENCE_PACK.md</a></td>
+            <td>Compliance artifact generation, manifest/checksum verification.</td>
+            <td>Audit, Compliance, External Review</td>
+            <td>Audit cycles, control attestation, external review prep.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 class="sub-heading">End-to-End Lifecycle (Organization View)</h3>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">Plan Scope and Ownership</div>
+            <div class="step-desc">Define entities, processes, controls, and role responsibilities before execution begins.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">Connect Sources and Validate Inputs</div>
+            <div class="step-desc">Use Settings and control pages to confirm source integrity and run readiness.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">Execute ITGC/ITAC Flows</div>
+            <div class="step-desc">Run testing cycles, capture exceptions, and validate supporting evidence lineage.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <div class="step-title">Governance and Risk Prioritization</div>
+            <div class="step-desc">Translate findings into owner-assigned remediation with SLA and escalation paths.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-body">
+            <div class="step-title">Reporting and Assurance Pack</div>
+            <div class="step-desc">Generate management outputs and evidence bundles for internal and external stakeholders.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">6</div>
+          <div class="step-body">
+            <div class="step-title">UAT and Continuous Improvement</div>
+            <div class="step-desc">Use UAT guardrails and feedback loops to improve controls, data quality, and reporting fidelity.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert info">
+        <span class="alert-icon">🧭</span>
+        <div class="alert-content">
+          <strong>Recommended Team Usage</strong>
+          Keep this Help page as the quick operational guide, and use the linked docs for deep-reference procedures, ownership definitions, and audit cycle readiness checks.
         </div>
       </div>
     </section>
