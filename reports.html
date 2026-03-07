@@ -410,7 +410,7 @@
       const regulatory = regulatoryControlForFinding(f);
       const conflictPhrase = tcodeList.length >= 2
         ? 'User holds conflicting permissions for ' + tcodeList[0] + ' and ' + tcodeList[1] + ' in SAP Table ' + sourceTable
-        : 'Exception triggered by control logic evidence in ' + sourceTable;
+        : 'Conflict candidate inferred from rule \'' + policyRule + '\' using evidence fields [' + evidenceA + '] and [' + evidenceB + '] in source table ' + sourceTable;
       const flaggedSummary = 'Flagged by Rule ' + policyRule + ': ' + conflictPhrase + '.';
       const humanReadable = [
         'Finding ID: ' + (f.id || 'N/A'),

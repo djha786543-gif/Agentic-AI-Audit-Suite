@@ -12516,7 +12516,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         SWARM_BUS.onmessage = function (event) {
           var msg = event && event.data ? event.data : {};
           if (msg.type !== 'ITGC_LEAVER_ALERT') return;
-          if (STATE.agent !== 'frr') return;
+          if (STATE.agent !== 'frr' && STATE.agent !== 'txn' && STATE.agent !== 'tt' && STATE.agent !== 'transaction') return;
           var users = ((msg.payload && msg.payload.users) || []).map(function (u) { return safeText(u).toLowerCase(); });
           if (!users.length || !Array.isArray(CC.allVio) || !CC.allVio.length) return;
           var changed = false;
@@ -12538,7 +12538,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
 
       window.addEventListener('storage', function (event) {
         if (!event || (event.key !== 'auditai_terminated_users_v1' && event.key !== 'auditai_global_audit_context_v1')) return;
-        if (STATE.agent !== 'frr' && STATE.agent !== 'transaction' && STATE.agent !== 'tt') return;
+        if (STATE.agent !== 'frr' && STATE.agent !== 'txn' && STATE.agent !== 'transaction' && STATE.agent !== 'tt') return;
         var syncedUsers = getTerminatedUsersFromItgcSync();
         if (!syncedUsers.length) return;
         var changed = applyItgcTerminationFlags(CC.allVio, syncedUsers);
@@ -12690,7 +12690,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
       }
 
       async function computeSwarmNudges(agentKey, findings) {
-        if (agentKey !== 'sod' && agentKey !== 'frr') return [];
+        if (agentKey !== 'sod' && agentKey !== 'frr' && agentKey !== 'txn' && agentKey !== 'tt' && agentKey !== 'transaction') return [];
         var accessSnapshot = await getSwarmSnapshot('access');
         var itgcTermSnapshot = await getSwarmSnapshot('itgc_terminated_users');
         var sharedCtx = await readSwarmAuditContext();
@@ -12711,13 +12711,13 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
           var fieldText = (safeText(f.field1) + ' ' + safeText(f.field2) + ' ' + safeText(f.rule)).toLowerCase();
           var isTarget = terminatedUsers.indexOf(ent) !== -1 || terminatedUsers.some(function (u) { return fieldText.indexOf(u) !== -1; });
           if (isTarget) {
-            if (agentKey === 'frr') {
+            if (agentKey === 'frr' || agentKey === 'txn' || agentKey === 'tt' || agentKey === 'transaction') {
               f.review_priority = 'P1';
               f.priority_reason = 'ITGC terminated-user alert corroborates JE transaction review';
             }
             nudges.push({
               severity: 'CRITICAL',
-              message: agentKey === 'frr'
+              message: (agentKey === 'frr' || agentKey === 'txn' || agentKey === 'tt' || agentKey === 'transaction')
                 ? 'High Priority Alert: ITGC terminated-user signal matched JE exception ' + safeText(f.id || 'FRR') + '. Prioritize transaction review immediately for user \'' + (safeText(f.entity) || 'unknown') + '\'.'
                 : 'Swarm Nudge: Logical Access identified terminated user \'' + safeText(f.entity) + '\' still active. Re-check transaction and approval activity post-termination.'
             });
