@@ -607,6 +607,28 @@
                     <div id="reasoning-content" class="p-6 text-[11px] text-slate-300 leading-relaxed"></div>
                 </div>
 
+                <div class="glass overflow-hidden flex flex-col border border-white/5 mt-4">
+                    <div class="bg-black/40 border-b border-white/5 px-6 py-4 flex justify-between items-center">
+                        <h2 class="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] flex items-center gap-2">
+                            <i class="fas fa-clipboard-check text-emerald-400"></i> Remediation Lifecycle Ledger
+                        </h2>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left whitespace-nowrap min-w-[900px]">
+                            <thead class="bg-black/20 text-[9px] font-black uppercase text-slate-500 tracking-[0.15em]">
+                                <tr>
+                                    <th class="py-3 px-6 border-b border-white/5">Finding ID</th>
+                                    <th class="py-3 px-6 border-b border-white/5">Owner</th>
+                                    <th class="py-3 px-6 border-b border-white/5">Mitigation Plan</th>
+                                    <th class="py-3 px-6 border-b border-white/5">Management Response</th>
+                                    <th class="py-3 px-6 border-b border-white/5">Closure Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="remediation-ledger-tbody" class="divide-y divide-white/5 text-sm"></tbody>
+                        </table>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -719,6 +741,7 @@
         const refreshBtn = document.getElementById('refreshBtn');
         const verifyAllBtn = document.getElementById('verifyAllBtn');
         const demoBanner = document.getElementById('demo-mode-banner');
+        const remediationLedgerTbody = document.getElementById('remediation-ledger-tbody');
         let latestIntegrityCertificate = null;
 
         function toHex(buffer) {
@@ -1030,6 +1053,29 @@
             verifyAllVaultRecords();
         });
 
+        function renderRemediationLedger() {
+            if (!remediationLedgerTbody) return;
+            let ledger = [];
+            try {
+                ledger = JSON.parse(localStorage.getItem('auditai_remediation_ledger_v1') || '[]');
+            } catch (_) {
+                ledger = [];
+            }
+            if (!ledger.length) {
+                remediationLedgerTbody.innerHTML = '<tr><td colspan="5" class="py-6 px-6 text-slate-500 text-xs">No remediation lifecycle records yet. Generate mitigation plans in Governance.</td></tr>';
+                return;
+            }
+            remediationLedgerTbody.innerHTML = ledger.map(function (r) {
+                return '<tr>' +
+                    '<td class="py-3 px-6 font-mono text-[10px] text-blue-300">' + (r.finding_id || '—') + '</td>' +
+                    '<td class="py-3 px-6 text-[11px] text-slate-200">' + (r.remediation_owner || r.responsible_owner || 'Unassigned') + '</td>' +
+                    '<td class="py-3 px-6 text-[11px] text-slate-300" style="max-width:300px;white-space:normal">' + (r.mitigation_plan || '—') + '</td>' +
+                    '<td class="py-3 px-6 text-[11px] text-slate-300" style="max-width:260px;white-space:normal">' + (r.management_response || '—') + '</td>' +
+                    '<td class="py-3 px-6 text-[11px] text-slate-200">' + (r.actual_closure_date ? new Date(r.actual_closure_date).toLocaleDateString() : 'Open') + '</td>' +
+                '</tr>';
+            }).join('');
+        }
+
         function updateDashboardState(isConnected) {
             const pill = document.getElementById('status-pill');
             const scoreText = document.getElementById('score');
@@ -1041,6 +1087,7 @@
                 scoreText.innerText = '100%'; scoreBar.style.width = '100%';
                 countText.innerText = totalRunsCount;
                 renderTable();
+                renderRemediationLedger();
             } else {
                 if (isDemoMode) {
                     pill.innerHTML = '<i class="fas fa-flask-vial text-amber-400"></i> DEMO MODE';
@@ -1049,11 +1096,13 @@
                     scoreBar.style.width = '93%';
                     countText.innerText = totalRunsCount;
                     renderTable();
+                    renderRemediationLedger();
                 } else {
                     pill.innerHTML = '<i class="fas fa-circle text-red-500"></i> Engine Offline';
                     pill.className = 'glass px-6 py-2.5 rounded-full text-[10px] font-black uppercase flex items-center gap-2 border border-red-500/40 text-red-500 shadow-[0_0_15px_rgba(239,68,68,0.15)] transition-all';
                     scoreText.innerText = '--%';
                     scoreBar.style.width = '0%';
+                    renderRemediationLedger();
                 }
             }
         }

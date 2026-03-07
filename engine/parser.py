@@ -74,8 +74,17 @@ COLUMN_ALIASES = {
 # SAP short-field semantic dictionary for zero-prep ingestion.
 SAP_CODE_ALIASES = {
     "mandt": "client",
+    "bname": "user_id",
     "ersda": "creation_date",
     "usnam": "user_name",
+    "agrname": "roles",
+    "agr_name": "roles",
+    "auth": "roles",
+    "authobj": "roles",
+    "auth_object": "roles",
+    "tcode": "roles",
+    "tcod": "roles",
+    "low": "roles",
     "erdat": "creation_date",
     "aedat": "change_date",
     "uname": "user_name",
@@ -91,6 +100,8 @@ SAP_CODE_ALIASES = {
 # Light semantic token map (LLM-style intent matching without external dependency).
 SEMANTIC_TOKENS = {
     "client": {"client", "tenant", "mandant", "mandt"},
+    "user_id": {"user", "userid", "user_id", "bname", "account", "logon"},
+    "roles": {"role", "roles", "permission", "auth", "auth_object", "tcode", "agr", "agr_name", "low"},
     "creation_date": {"creation", "created", "create", "ersda", "erdat", "date"},
     "user_name": {"user", "username", "usnam", "uname", "name", "logon"},
     "invoice_amount": {"invoice", "amount", "value", "wrbtr", "dmbtr", "total"},
