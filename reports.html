@@ -406,10 +406,11 @@
       const tcodeList = Array.isArray(trace.tcodes) && trace.tcodes.length ? trace.tcodes : [];
       const tcodes = tcodeList.length ? tcodeList.join(', ') : 'Not found in evidence';
       const policyRule = trace.policy_rule || tj.rule || f.rule || f.id || 'Policy rule not provided';
+      const sourceTable = trace.source_table || 'AGR_1251';
       const regulatory = regulatoryControlForFinding(f);
       const conflictPhrase = tcodeList.length >= 2
-        ? 'Conflict between ' + tcodeList[0] + ' and ' + tcodeList[1]
-        : 'Exception triggered by control logic evidence';
+        ? 'User holds conflicting permissions for ' + tcodeList[0] + ' and ' + tcodeList[1] + ' in SAP Table ' + sourceTable
+        : 'Exception triggered by control logic evidence in ' + sourceTable;
       const flaggedSummary = 'Flagged by Rule ' + policyRule + ': ' + conflictPhrase + '.';
       const humanReadable = [
         'Finding ID: ' + (f.id || 'N/A'),
@@ -418,6 +419,7 @@
         'Rule Triggered: ' + (f.rule || 'N/A'),
         flaggedSummary,
         'Policy Rule: ' + policyRule,
+        'Decision Source Table: ' + sourceTable,
         'ERP Data Point A: ' + evidenceA,
         'ERP Data Point B: ' + evidenceB,
         'T-Code(s): ' + tcodes,

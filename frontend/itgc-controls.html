@@ -232,6 +232,17 @@
     function publishTerminationSignals(payload) {
       localStorage.setItem('auditai_terminated_users_v1', JSON.stringify(payload));
       try {
+        var ctx = JSON.parse(localStorage.getItem('auditai_global_audit_context_v1') || '{}');
+        localStorage.setItem('auditai_global_audit_context_v1', JSON.stringify(Object.assign({}, ctx, {
+          terminated_users: payload.users || [],
+          source: payload.source || 'itgc-controls',
+          cross_domain_alerting: true,
+          updated_at: new Date().toISOString()
+        })));
+      } catch (_) {
+        // Best-effort context synchronization.
+      }
+      try {
         var channel = new BroadcastChannel('auditai_swarm_bus_v1');
         channel.postMessage({ type: 'ITGC_LEAVER_ALERT', at: new Date().toISOString(), payload: { users: payload.users } });
         channel.close();
@@ -307,14 +318,33 @@
           '<td style="font-size:12px;">' + c.sox + '</td>' +
           '<td style="font-size:12px;">' + c.freq + '</td>' +
           '<td style="color:' + riskColor + ';font-weight:700;font-size:12px;">' + c.risk + '</td>' +
-          '<td><span style="background:rgba(34,197,94,0.15);color:#86efac;padding:2px 8px;border-radius:10px;font-size:11px;">' + c.status + '</span></td>' +
-          '<td><a href="app.html" style="background:rgba(99,102,241,0.2);color:#a5b4fc;padding:4px 10px;border-radius:6px;font-size:11px;text-decoration:none;border:1px solid rgba(99,102,241,0.3);">Run Agent</a></td>';
+          '<td><span class="itgc-status-pill" style="background:rgba(34,197,94,0.15);color:#86efac;padding:2px 8px;border-radius:10px;font-size:11px;">' + c.status + '</span></td>' +
+          '<td><button class="run-btn" type="button" data-control-id="' + c.id + '">Run Agent</button></td>';
         tbody.appendChild(tr);
       });
 
       var lastTested = document.querySelector('[data-kpi="last-tested"]') ||
                        document.getElementById('kpi-last-tested');
       if (lastTested) lastTested.textContent = '2026-03-10';
+    }
+
+    function mockProcessButton(button, onDone) {
+      if (!button) return;
+      var originalText = button.textContent;
+      button.disabled = true;
+      button.textContent = 'Processing...';
+      setTimeout(function () {
+        button.disabled = false;
+        button.textContent = originalText;
+        if (typeof onDone === 'function') onDone();
+      }, 2000);
+    }
+
+    function updateITGCRowStatus(row) {
+      if (!row) return;
+      var statusCell = row.children[7];
+      if (!statusCell) return;
+      statusCell.innerHTML = '<span class="itgc-status-pill" style="background:rgba(34,197,94,0.2);color:#86efac;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;">COMPLETED</span>';
     }
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -338,6 +368,17 @@
 
       if (domainFilter) domainFilter.addEventListener('change', applyFilters);
       if (riskFilter) riskFilter.addEventListener('change', applyFilters);
+
+      var tableBody = document.getElementById('itgc-tbody') || document.querySelector('table tbody');
+      if (tableBody) {
+        tableBody.addEventListener('click', function (event) {
+          var runBtn = event.target.closest('.run-btn');
+          if (!runBtn) return;
+          mockProcessButton(runBtn, function () {
+            updateITGCRowStatus(runBtn.closest('tr'));
+          });
+        });
+      }
 
       syncTerminatedUsers(true);
       setInterval(function () { syncTerminatedUsers(false); }, 8000);

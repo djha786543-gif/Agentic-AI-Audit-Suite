@@ -176,11 +176,10 @@
       if (!row) return;
       var resultCell = row.children[4];
       if (!resultCell) return;
-      var isPass = Math.random() > 0.2;
-      resultCell.style.color = isPass ? '#22c55e' : '#ef4444';
+      resultCell.style.color = '#22c55e';
       resultCell.style.fontWeight = '700';
-      resultCell.textContent = (isPass ? '✅ Pass' : '❌ FAIL') + ' (' + new Date().toLocaleTimeString() + ')';
-      row.style.background = isPass ? '' : 'rgba(239,68,68,0.05)';
+      resultCell.textContent = '✅ COMPLETED (' + new Date().toLocaleTimeString() + ')';
+      row.style.background = '';
     }
 
     document.addEventListener('DOMContentLoaded', function() {
