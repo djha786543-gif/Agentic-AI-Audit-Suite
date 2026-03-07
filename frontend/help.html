@@ -2292,7 +2292,7 @@
           <tr><th>Page</th><th>Primary Operator</th><th>Core Responsibility</th><th>Frequency</th></tr>
         </thead>
         <tbody>
-          <tr><td><code>app.html</code></td><td>Audit Analyst</td><td>Semantic ingestion, Data Integrity Scorecard, logic trace review, swarm-aware triage</td><td>Daily / per intake batch</td></tr>
+          <tr><td><code>app.html</code></td><td>Audit Analyst</td><td>Semantic ingestion, Data Integrity Scorecard, logic trace review with triggered <code>T-Code(s)</code> and <code>Policy Rule</code>, swarm-aware triage</td><td>Daily / per intake batch</td></tr>
           <tr><td><code>governance.html</code></td><td>Control Owner + Internal Audit</td><td>Assign remediation, generate mitigation plan, capture management response, closure tracking</td><td>Daily status + weekly governance cadence</td></tr>
           <tr><td><code>vault.html</code></td><td>Audit Manager / QA</td><td>Verify All cryptographic checks, forensic integrity certificate, remediation lifecycle evidence</td><td>Daily + pre-committee reporting</td></tr>
           <tr><td><code>reports.html</code></td><td>Audit Lead</td><td>Residual risk heatmap and external read-only package distribution</td><td>Weekly / month-end / quarter-end</td></tr>
@@ -2303,8 +2303,8 @@
       <ol class="ordered-list">
         <li>Open <code>app.html</code> and upload raw ERP extracts (including SAP technical headers like <code>MANDT</code>, <code>BNAME</code>, <code>AGR_NAME</code>, <code>USNAM</code>).</li>
         <li>Review the <strong>Data Integrity Scorecard</strong> before scan: missing values, duplicates, and date consistency are shown prior to execution.</li>
-        <li>Run agents and use <strong>Logic Trace</strong> on each exception to validate if-then reasoning before confirming action.</li>
-        <li>If high-priority leaver access appears, monitor <strong>swarm alerts</strong> to force JE Forensics follow-up on post-termination journals.</li>
+        <li>Run agents and use <strong>Logic Trace</strong> on each exception to validate if-then reasoning, including the exact triggered <strong>T-Code(s)</strong> and <strong>Policy Rule</strong>.</li>
+        <li>If ITGC leaver-access alerts are present, monitor <strong>swarm alerts</strong> and the <strong>P1</strong> marker in JE findings so post-termination journal review is automatically prioritized.</li>
         <li>Move to <code>governance.html</code> and generate a mitigation plan per finding; assign owner, due date, response, and actual closure date.</li>
         <li>Open <code>vault.html</code>, click <strong>Verify All</strong>, and archive the generated forensic integrity certificate with remediation lifecycle records.</li>
       </ol>
@@ -2314,12 +2314,12 @@
         <div class="feature-card">
           <div class="feature-card-icon">🧠</div>
           <div class="feature-card-title">Explainability</div>
-          <div class="feature-card-desc">Every material exception must include Logic Trace output and technical justification before escalation.</div>
+          <div class="feature-card-desc">Every material exception must include Logic Trace output, triggered T-Code(s), triggered Policy Rule, and technical justification before escalation.</div>
         </div>
         <div class="feature-card">
           <div class="feature-card-icon">🔁</div>
           <div class="feature-card-title">Cross-Agent Corroboration</div>
-          <div class="feature-card-desc">Leaver alerts from Logical Access should trigger JE Forensics review automatically through shared context memory.</div>
+          <div class="feature-card-desc">Leaver alerts from Logical Access trigger JE Forensics review automatically through shared context memory and elevate matched JE exceptions to P1 priority.</div>
         </div>
         <div class="feature-card">
           <div class="feature-card-icon">🛠️</div>
