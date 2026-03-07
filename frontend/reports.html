@@ -388,7 +388,7 @@
           '<td style="padding:8px">' + (f.severity || 'Medium') + '</td>' +
           '<td style="padding:8px">' + (f.entity || 'N/A') + '</td>' +
           '<td style="padding:8px">' + (f.rule || 'N/A') + '</td>' +
-          '<td style="padding:8px"><button class="btn-sub" onclick="showReportLogicTrace(' + idx + ')">Logic Trace</button></td>' +
+          '<td style="padding:8px"><button class="btn-sub" onclick="showReportLogicTrace(' + idx + ')">Traceability</button></td>' +
           '</tr>';
       }).join('');
       window.__reportFindings = findings;
@@ -403,14 +403,20 @@
       const trace = f.logic_trace || {};
       const evidenceA = f.field1 || (tj.evidence_summary && tj.evidence_summary.evidence_a) || 'N/A';
       const evidenceB = f.field2 || (tj.evidence_summary && tj.evidence_summary.evidence_b) || 'N/A';
-      const tcodes = Array.isArray(trace.tcodes) && trace.tcodes.length ? trace.tcodes.join(', ') : 'Not found in evidence';
+      const tcodeList = Array.isArray(trace.tcodes) && trace.tcodes.length ? trace.tcodes : [];
+      const tcodes = tcodeList.length ? tcodeList.join(', ') : 'Not found in evidence';
       const policyRule = trace.policy_rule || tj.rule || f.rule || f.id || 'Policy rule not provided';
       const regulatory = regulatoryControlForFinding(f);
+      const conflictPhrase = tcodeList.length >= 2
+        ? 'Conflict between ' + tcodeList[0] + ' and ' + tcodeList[1]
+        : 'Exception triggered by control logic evidence';
+      const flaggedSummary = 'Flagged by Rule ' + policyRule + ': ' + conflictPhrase + '.';
       const humanReadable = [
         'Finding ID: ' + (f.id || 'N/A'),
         'Severity: ' + (f.severity || 'N/A'),
         'Entity: ' + (f.entity || 'N/A'),
         'Rule Triggered: ' + (f.rule || 'N/A'),
+        flaggedSummary,
         'Policy Rule: ' + policyRule,
         'ERP Data Point A: ' + evidenceA,
         'ERP Data Point B: ' + evidenceB,

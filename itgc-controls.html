@@ -32,6 +32,15 @@
     .sample-btn{background:linear-gradient(135deg,var(--blue),var(--blue2));border:1px solid rgba(40,120,255,.45);color:#fff;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700}
     .sample-meta{font-size:12px;color:var(--tx2);margin-top:8px}
     .sample-list{margin-top:10px;max-height:120px;overflow:auto;font-family:var(--fm);font-size:11px;line-height:1.5;color:#cfe0ff;background:var(--ink2);border:1px solid var(--b1);border-radius:8px;padding:10px}
+    .term-box{margin:16px 0 20px;background:var(--ink3);border:1px solid var(--b1);border-radius:12px;padding:14px}
+    .term-grid{display:grid;grid-template-columns:2fr 1fr;gap:10px;margin-top:10px}
+    .term-grid input{width:100%;padding:10px 12px;background:var(--ink2);border:1px solid var(--b2);border-radius:8px;color:var(--tx1)}
+    .term-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    .term-meta{font-size:12px;color:var(--tx2);margin-top:8px}
+    .term-table-wrap{margin-top:10px;border:1px solid var(--b1);border-radius:10px;overflow:auto;background:var(--ink2)}
+    .term-table{width:100%;min-width:520px;border-collapse:collapse}
+    .term-table th,.term-table td{padding:8px 10px;font-size:12px;border-bottom:1px solid var(--b1)}
+    .term-table th{font-size:10px;color:var(--tx3);text-transform:uppercase;font-family:var(--fm)}
     select{width:100%;padding:10px 12px;background:var(--ink2);border:1px solid var(--b2);border-radius:8px;color:var(--tx1)}
     .table-wrap{overflow:auto;border:1px solid var(--b1);border-radius:12px;background:var(--ink3)}
     table{width:100%;border-collapse:collapse;min-width:1100px}
@@ -116,6 +125,25 @@
       <div id="sampleList" class="sample-list">No sample generated yet.</div>
     </section>
 
+    <section class="term-box">
+      <h3 style="font-family:var(--fd);font-size:1.05rem">Terminated Users Sync to Forensics</h3>
+      <p class="sub" style="margin-top:4px">Listener monitors the terminated-users list and pushes those IDs into Master Audit Suite transaction forensics.</p>
+      <div class="term-grid">
+        <div><label style="font-size:11px;color:var(--tx2)">Manual User ID Add (comma-separated)</label><input id="terminatedUserInput" type="text" placeholder="e.g. t.morrison, a.patel"></div>
+      </div>
+      <div class="term-actions">
+        <button class="sample-btn" onclick="addManualTerminatedUsers()">Add Users</button>
+        <button class="sample-btn" onclick="syncTerminatedUsers(true)">Refresh From Findings</button>
+      </div>
+      <div id="terminatedMeta" class="term-meta">Monitoring terminated-user findings and syncing to transaction engine.</div>
+      <div class="term-table-wrap">
+        <table class="term-table">
+          <thead><tr><th>User ID</th><th>Source</th><th>Last Synced</th></tr></thead>
+          <tbody id="terminatedUsersTbody"></tbody>
+        </table>
+      </div>
+    </section>
+
     <section class="table-wrap">
       <table>
         <thead>
@@ -160,6 +188,101 @@
       {id:'PD-002',name:'Developer Access to Production',domain:'Program Development',coso:'CC6.2',sox:'Authorization',freq:'Continuous',risk:'HIGH',status:'Active'},
       {id:'PD-003',name:'Go-Live Authorization & Sign-Off',domain:'Program Development',coso:'CC8.1',sox:'Authorization',freq:'Per Release',risk:'MEDIUM',status:'Active'}
     ];
+    var terminatedUsersFingerprint = '';
+
+    function normalizeUserId(value) {
+      return String(value || '').trim().toLowerCase();
+    }
+
+    function uniqueUsers(list) {
+      var seen = {};
+      return (list || []).map(normalizeUserId).filter(function (u) {
+        if (!u) return false;
+        if (seen[u]) return false;
+        seen[u] = true;
+        return true;
+      });
+    }
+
+    function readFindingsTerminatedUsers() {
+      var findings = [];
+      try {
+        findings = JSON.parse(localStorage.getItem('auditai_latest_findings_v1') || '[]');
+      } catch (_) {
+        findings = [];
+      }
+      if (!Array.isArray(findings)) return [];
+      return findings.filter(function (f) {
+        var id = String(f && f.id || '').toUpperCase();
+        var text = (String(f && f.rule || '') + ' ' + String(f && f.scenario || '') + ' ' + String(f && f.detail || '')).toLowerCase();
+        return id.indexOf('LA-001') === 0 || (text.indexOf('terminated') !== -1 && text.indexOf('active') !== -1);
+      }).map(function (f) {
+        return normalizeUserId(f && f.entity);
+      }).filter(Boolean);
+    }
+
+    function getTerminatedStore() {
+      try {
+        var stored = JSON.parse(localStorage.getItem('auditai_terminated_users_v1') || 'null');
+        if (stored && Array.isArray(stored.users)) return stored;
+      } catch (_) {}
+      return { users: [], source: 'itgc-controls', updated_at: null };
+    }
+
+    function publishTerminationSignals(payload) {
+      localStorage.setItem('auditai_terminated_users_v1', JSON.stringify(payload));
+      try {
+        var channel = new BroadcastChannel('auditai_swarm_bus_v1');
+        channel.postMessage({ type: 'ITGC_LEAVER_ALERT', at: new Date().toISOString(), payload: { users: payload.users } });
+        channel.close();
+      } catch (_) {
+        // BroadcastChannel may be unavailable in some browsers.
+      }
+    }
+
+    function renderTerminatedUsers() {
+      var tbody = document.getElementById('terminatedUsersTbody');
+      var meta = document.getElementById('terminatedMeta');
+      if (!tbody || !meta) return;
+      var stored = getTerminatedStore();
+      if (!stored.users.length) {
+        tbody.innerHTML = '<tr><td colspan="3" style="color:var(--tx2)">No terminated users synced yet.</td></tr>';
+        meta.textContent = 'Monitoring terminated-user findings and syncing to transaction engine.';
+        return;
+      }
+      tbody.innerHTML = stored.users.map(function (u) {
+        return '<tr><td style="font-family:var(--fm)">' + u + '</td><td>' + (stored.source || 'itgc-controls') + '</td><td>' + (stored.updated_at ? new Date(stored.updated_at).toLocaleString() : '—') + '</td></tr>';
+      }).join('');
+      meta.textContent = 'Synced ' + stored.users.length + ' terminated user ID(s) to Master Audit Suite transaction engine.';
+    }
+
+    function syncTerminatedUsers(forceRender) {
+      var findingsUsers = readFindingsTerminatedUsers();
+      var stored = getTerminatedStore();
+      var merged = uniqueUsers((stored.users || []).concat(findingsUsers));
+      var fingerprint = merged.join('|');
+      if (fingerprint !== terminatedUsersFingerprint) {
+        terminatedUsersFingerprint = fingerprint;
+        publishTerminationSignals({ users: merged, source: 'itgc-controls', updated_at: new Date().toISOString() });
+      }
+      renderTerminatedUsers();
+    }
+
+    function addManualTerminatedUsers() {
+      var input = document.getElementById('terminatedUserInput');
+      var raw = input ? input.value : '';
+      var manual = String(raw || '').split(',').map(normalizeUserId).filter(Boolean);
+      if (!manual.length) {
+        renderTerminatedUsers();
+        return;
+      }
+      var stored = getTerminatedStore();
+      var merged = uniqueUsers((stored.users || []).concat(manual));
+      terminatedUsersFingerprint = merged.join('|');
+      publishTerminationSignals({ users: merged, source: 'itgc-controls-manual', updated_at: new Date().toISOString() });
+      if (input) input.value = '';
+      renderTerminatedUsers();
+    }
 
     function renderITGCTable(data) {
       var tbody = document.getElementById('itgc-tbody') ||
@@ -215,6 +338,14 @@
 
       if (domainFilter) domainFilter.addEventListener('change', applyFilters);
       if (riskFilter) riskFilter.addEventListener('change', applyFilters);
+
+      syncTerminatedUsers(true);
+      setInterval(function () { syncTerminatedUsers(false); }, 8000);
+      window.addEventListener('storage', function (event) {
+        if (event.key === 'auditai_latest_findings_v1' || event.key === 'auditai_terminated_users_v1') {
+          syncTerminatedUsers(true);
+        }
+      });
     });
 
     function generateStatSample() {

@@ -12341,6 +12341,31 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         return uniqueList(users);
       }
 
+      function getTerminatedUsersFromItgcSync() {
+        try {
+          var stored = JSON.parse(localStorage.getItem('auditai_terminated_users_v1') || 'null');
+          if (!stored || !Array.isArray(stored.users)) return [];
+          return uniqueList(stored.users.map(function (u) { return safeText(u).toLowerCase(); }));
+        } catch (_) {
+          return [];
+        }
+      }
+
+      function applyItgcTerminationFlags(findings, users) {
+        if (!Array.isArray(findings) || !findings.length || !Array.isArray(users) || !users.length) return false;
+        var changed = false;
+        findings.forEach(function (f) {
+          var ent = safeText(f.entity).toLowerCase();
+          var fieldText = (safeText(f.field1) + ' ' + safeText(f.field2) + ' ' + safeText(f.rule)).toLowerCase();
+          var hit = users.indexOf(ent) !== -1 || users.some(function (u) { return fieldText.indexOf(u) !== -1; });
+          if (!hit) return;
+          f.review_priority = 'P1';
+          f.priority_reason = 'ITGC terminated-user list flagged this ID for transaction forensics';
+          changed = true;
+        });
+        return changed;
+      }
+
       var SWARM_BUS = null;
       try {
         SWARM_BUS = new BroadcastChannel('auditai_swarm_bus_v1');
@@ -12384,6 +12409,18 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
           }
         };
       }
+
+      window.addEventListener('storage', function (event) {
+        if (!event || event.key !== 'auditai_terminated_users_v1') return;
+        if (STATE.agent !== 'frr' && STATE.agent !== 'transaction' && STATE.agent !== 'tt') return;
+        var syncedUsers = getTerminatedUsersFromItgcSync();
+        if (!syncedUsers.length) return;
+        var changed = applyItgcTerminationFlags(CC.allVio, syncedUsers);
+        if (changed) {
+          renderFindingsTable(CC.filtered && CC.filtered.length ? CC.filtered : CC.allVio);
+          buildLiveFeed(CC.filtered && CC.filtered.length ? CC.filtered : CC.allVio);
+        }
+      });
 
       function riskWeightingForFinding(v) {
         var sev = safeText(v.severity).toLowerCase();
@@ -12489,6 +12526,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         if (itgcTermSnapshot && Array.isArray(itgcTermSnapshot.users)) {
           terminatedUsers = uniqueList(terminatedUsers.concat(itgcTermSnapshot.users));
         }
+        terminatedUsers = uniqueList(terminatedUsers.concat(getTerminatedUsersFromItgcSync()));
 
         if (!terminatedUsers.length) return [];
         var nudges = [];

@@ -555,6 +555,14 @@
                             class="bg-fuchsia-500/10 hover:bg-fuchsia-500/20 border border-fuchsia-500/40 text-fuchsia-300 w-full lg:w-auto h-[38px] px-3 flex items-center justify-center rounded-xl transition-colors shrink-0 text-[11px] font-black uppercase tracking-wide">
                             <i class="fas fa-file-pdf mr-2"></i> Audit Artifact PDF
                         </button>
+                        <button id="integritySummaryJsonBtn"
+                            class="bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 w-full lg:w-auto h-[38px] px-3 flex items-center justify-center rounded-xl transition-colors shrink-0 text-[11px] font-black uppercase tracking-wide">
+                            <i class="fas fa-certificate mr-2"></i> Integrity Cert JSON
+                        </button>
+                        <button id="integritySummaryPdfBtn"
+                            class="bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/40 text-amber-300 w-full lg:w-auto h-[38px] px-3 flex items-center justify-center rounded-xl transition-colors shrink-0 text-[11px] font-black uppercase tracking-wide">
+                            <i class="fas fa-file-shield mr-2"></i> Integrity Cert PDF
+                        </button>
                     </div>
                 </div>
 
@@ -751,6 +759,8 @@
         const verifyAllBtn = document.getElementById('verifyAllBtn');
         const artifactJsonBtn = document.getElementById('artifactJsonBtn');
         const artifactPdfBtn = document.getElementById('artifactPdfBtn');
+        const integritySummaryJsonBtn = document.getElementById('integritySummaryJsonBtn');
+        const integritySummaryPdfBtn = document.getElementById('integritySummaryPdfBtn');
         const demoBanner = document.getElementById('demo-mode-banner');
         const remediationLedgerTbody = document.getElementById('remediation-ledger-tbody');
         let latestIntegrityCertificate = null;
@@ -763,6 +773,16 @@
             const bytes = new TextEncoder().encode(text);
             const digest = await crypto.subtle.digest('SHA-256', bytes);
             return toHex(digest);
+        }
+
+        function deriveVerificationStatus(log, recomputed) {
+            const provided = String(log.hash_sequence || log.content_hash || '').toLowerCase().replace(/[^a-f0-9]/g, '');
+            const explicit = String(log.verification_status || '').toLowerCase();
+            if (explicit === 'tampered' || log.hash_verified === false) return 'TAMPERED';
+            if (!provided) return 'PENDING';
+            if (recomputed && provided && recomputed.indexOf(provided.slice(0, 10)) === -1) return 'TAMPERED';
+            if (explicit === 'pending') return 'PENDING';
+            return 'VERIFIED';
         }
 
         async function verifyAllVaultRecords() {
@@ -784,13 +804,7 @@
                     String(log.ai_confidence_score == null ? '' : log.ai_confidence_score)
                 ].join('|');
                 const recomputed = await sha256Hex(canonical);
-                const provided = String(log.hash_sequence || log.content_hash || '').toLowerCase().replace(/[^a-f0-9]/g, '');
-                const explicit = String(log.verification_status || '').toLowerCase();
-
-                let status = 'VERIFIED';
-                if (explicit === 'tampered' || log.hash_verified === false) status = 'TAMPERED';
-                else if (!provided) status = 'PENDING';
-                else if (provided && recomputed.indexOf(provided.slice(0, 10)) === -1) status = 'TAMPERED';
+                let status = deriveVerificationStatus(log, recomputed);
 
                 if (status === 'VERIFIED') verified++;
                 else if (status === 'TAMPERED') tampered++;
@@ -830,6 +844,76 @@
             a.download = 'forensic_integrity_certificate_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-') + '.json';
             a.click();
             URL.revokeObjectURL(a.href);
+        }
+
+        async function buildIntegritySummaryPayload() {
+            const records = [];
+            for (const log of (allVaultData || [])) {
+                const canonical = [
+                    log.id || '',
+                    log.recorded_at || log.timestamp || '',
+                    log.source_system || '',
+                    String(log.ai_confidence_score == null ? '' : log.ai_confidence_score)
+                ].join('|');
+                const recomputed = await sha256Hex(canonical);
+                records.push({
+                    record_id: log.id || null,
+                    source_system: log.source_system || null,
+                    recorded_at: log.recorded_at || log.timestamp || null,
+                    sha256_hash: log.hash_sequence || log.content_hash || recomputed,
+                    verification_status: deriveVerificationStatus(log, recomputed)
+                });
+            }
+            const verifiedCount = records.filter(function (r) { return r.verification_status === 'VERIFIED'; }).length;
+            const tamperedCount = records.filter(function (r) { return r.verification_status === 'TAMPERED'; }).length;
+            const pendingCount = records.filter(function (r) { return r.verification_status === 'PENDING'; }).length;
+            return {
+                certificate_type: 'External Auditor Hash Integrity Summary',
+                generated_at: new Date().toISOString(),
+                environment: isDemoMode ? 'DEMO' : 'LIVE',
+                total_records: records.length,
+                verified_records: verifiedCount,
+                tampered_records: tamperedCount,
+                pending_records: pendingCount,
+                latest_forensic_certificate_hash: latestIntegrityCertificate ? latestIntegrityCertificate.certificate_hash : null,
+                records: records
+            };
+        }
+
+        async function downloadIntegritySummaryJson() {
+            const payload = await buildIntegritySummaryPayload();
+            const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'external_auditor_hash_integrity_summary_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-') + '.json';
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+
+        async function downloadIntegritySummaryPdf() {
+            const payload = await buildIntegritySummaryPayload();
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                alert('PDF engine unavailable. Use Integrity Cert JSON export.');
+                return;
+            }
+            const doc = new window.jspdf.jsPDF({ unit: 'pt', format: 'a4' });
+            const lines = [
+                'External Auditor Hash Integrity Summary',
+                'Generated (UTC): ' + payload.generated_at,
+                'Environment: ' + payload.environment,
+                'Total Records: ' + payload.total_records,
+                'Verified: ' + payload.verified_records + ' | Tampered: ' + payload.tampered_records + ' | Pending: ' + payload.pending_records,
+                'Forensic Certificate Hash: ' + (payload.latest_forensic_certificate_hash || 'N/A'),
+                ''
+            ];
+            (payload.records || []).slice(0, 40).forEach(function (r, i) {
+                lines.push((i + 1) + '. ' + (r.record_id || 'RECORD') + ' [' + r.verification_status + ']');
+                lines.push('   Source: ' + (r.source_system || 'N/A') + ' | Hash: ' + (r.sha256_hash || 'N/A'));
+            });
+            doc.setFont('courier', 'normal');
+            doc.setFontSize(8);
+            doc.text(lines.join('\n'), 32, 36, { maxWidth: 540 });
+            doc.save('external_auditor_hash_integrity_summary_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-') + '.pdf');
         }
 
         async function buildAuditArtifactPayload() {
@@ -1167,6 +1251,12 @@
         });
         artifactPdfBtn.addEventListener('click', function () {
             downloadAuditArtifactPdf();
+        });
+        integritySummaryJsonBtn.addEventListener('click', function () {
+            downloadIntegritySummaryJson();
+        });
+        integritySummaryPdfBtn.addEventListener('click', function () {
+            downloadIntegritySummaryPdf();
         });
 
         function renderRemediationLedger() {
