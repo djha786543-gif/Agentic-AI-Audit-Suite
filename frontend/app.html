@@ -11590,6 +11590,19 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         window.scrollTo(0, 0);
       }
 
+      function transitionToStep(stepNumber, options) {
+        var opts = options || {};
+        goStep(stepNumber);
+        if (stepNumber !== 4) return;
+
+        if (opts.batchMode) {
+          renderBatchResults();
+        } else {
+          renderResults();
+        }
+        if (opts.showCopilot !== false) showCopilotFab();
+      }
+
       // =====================================================
       // AGENT SELECTION
       // =====================================================
@@ -12050,7 +12063,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
               f.riskSummary = { Critical: 0, High: 0, Medium: 0, Low: 0 };
               f.violations.forEach(function (v) { if (f.riskSummary[v.severity] !== undefined) f.riskSummary[v.severity]++ });
             });
-            setTimeout(function () { goStep(4); renderBatchResults(); showCopilotFab(); }, 400);
+            setTimeout(function () { transitionToStep(4, { batchMode: true, showCopilot: true }); }, 400);
           }
         }
         next();
@@ -12284,6 +12297,20 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
               agent: STATE.agent,
               generated_at: new Date().toISOString()
             }));
+            var terminatedUsers = getTerminatedUsersFromItgcSync();
+            var prioritizedUsers = uniqueList((window._lastFindings || []).filter(function (f) {
+              return safeText(f.review_priority).toUpperCase() === 'P1';
+            }).map(function (f) {
+              return safeText(f.entity).toLowerCase();
+            }));
+            writeAuditContext({
+              run_id: runId,
+              selected_agent: STATE.agent,
+              findings_count: (window._lastFindings || []).length,
+              terminated_users: terminatedUsers,
+              priority_forensic_users: prioritizedUsers,
+              cross_domain_alerting: terminatedUsers.length > 0
+            });
           } catch (_) {
             // Cross-page finding persistence is best-effort only.
           }
@@ -12309,7 +12336,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
               summary: STATE.riskSummary
             }
           }));
-          setTimeout(function () { goStep(4); renderResults(); showCopilotFab(); }, 500);
+          setTimeout(function () { transitionToStep(4, { batchMode: false, showCopilot: true }); }, 500);
         }
 
         next();
@@ -12412,17 +12439,39 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
 
       function getTerminatedUsersFromItgcSync() {
         try {
+          var users = [];
           var stored = JSON.parse(localStorage.getItem('auditai_terminated_users_v1') || 'null');
-          if (!stored || !Array.isArray(stored.users)) return [];
-          return uniqueList(stored.users.map(function (u) { return safeText(u).toLowerCase(); }));
+          if (stored && Array.isArray(stored.users)) {
+            users = users.concat(stored.users);
+          }
+          var ctx = JSON.parse(localStorage.getItem('auditai_global_audit_context_v1') || 'null');
+          if (ctx && Array.isArray(ctx.terminated_users)) {
+            users = users.concat(ctx.terminated_users);
+          }
+          return uniqueList(users.map(function (u) { return safeText(u).toLowerCase(); }));
         } catch (_) {
           return [];
         }
       }
 
+      function readAuditContext() {
+        try {
+          return JSON.parse(localStorage.getItem('auditai_global_audit_context_v1') || '{}');
+        } catch (_) {
+          return {};
+        }
+      }
+
+      function writeAuditContext(patch) {
+        var current = readAuditContext();
+        var next = Object.assign({}, current, patch || {}, { updated_at: new Date().toISOString() });
+        localStorage.setItem('auditai_global_audit_context_v1', JSON.stringify(next));
+      }
+
       function applyItgcTerminationFlags(findings, users) {
         if (!Array.isArray(findings) || !findings.length || !Array.isArray(users) || !users.length) return false;
         var changed = false;
+        var prioritized = [];
         findings.forEach(function (f) {
           var ent = safeText(f.entity).toLowerCase();
           var fieldText = (safeText(f.field1) + ' ' + safeText(f.field2) + ' ' + safeText(f.rule)).toLowerCase();
@@ -12430,8 +12479,16 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
           if (!hit) return;
           f.review_priority = 'P1';
           f.priority_reason = 'ITGC terminated-user list flagged this ID for transaction forensics';
+          if (ent) prioritized.push(ent);
           changed = true;
         });
+        if (prioritized.length) {
+          writeAuditContext({
+            terminated_users: uniqueList(users),
+            priority_forensic_users: uniqueList(prioritized),
+            priority_reason: 'Logical Access auditor flagged active terminated users'
+          });
+        }
         return changed;
       }
 
@@ -12480,7 +12537,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
       }
 
       window.addEventListener('storage', function (event) {
-        if (!event || event.key !== 'auditai_terminated_users_v1') return;
+        if (!event || (event.key !== 'auditai_terminated_users_v1' && event.key !== 'auditai_global_audit_context_v1')) return;
         if (STATE.agent !== 'frr' && STATE.agent !== 'transaction' && STATE.agent !== 'tt') return;
         var syncedUsers = getTerminatedUsersFromItgcSync();
         if (!syncedUsers.length) return;

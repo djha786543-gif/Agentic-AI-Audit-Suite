@@ -402,7 +402,7 @@
         </div>
         <div class="form-group" style="margin-bottom:12px"><label>Mitigation Plan</label><textarea id="mitigationPlanText" placeholder="AI-generated remediation recommendation will appear here"></textarea></div>
         <div class="actions"><button class="btn btn-primary" onclick="assignRemediation()">Assign Owner & Due Date</button></div>
-        <div class="actions"><button class="btn btn-outline" onclick="generateRemediation()">Generate Mitigation Plan</button></div>
+        <div class="actions"><button class="btn btn-outline" onclick="generateRemediationPlan()">Generate Mitigation Plan</button></div>
       </div>
     </div>
   </div>
@@ -482,7 +482,7 @@
     const owner = f.remediation_owner || 'Assigned Process Owner';
     const entity = f.id;
     if (control.includes('SOD') || control.includes('LA')) {
-      return `Remove conflicting SAP role(s) from user tied to finding ${entity}; enforce dual-authorization and complete access recertification. Owner: ${owner}.`;
+      return `Revoke T-Code FB60 from user tied to finding ${entity}; implement dual-authorization for payments over $10k; complete access recertification and monitor posting activity for 30 days. Owner: ${owner}.`;
     }
     if (control.includes('FRR') || control.includes('TT')) {
       return `Block posting rights for affected preparer in finding ${entity}; require independent reviewer sign-off and retrospective JE validation. Owner: ${owner}.`;
@@ -816,7 +816,7 @@
           <td>${severityBadge((f.severity || '').toUpperCase())}</td>
           <td>${f.remediation_owner || 'Unassigned'}</td>
           <td>${f.remediation_due_date ? new Date(f.remediation_due_date).toLocaleDateString() : '—'}</td>
-          <td><button class="btn btn-outline" onclick="generateMitigationPlan('${f.id}')">Generate Mitigation Plan</button><div id="plan-${f.id}" style="margin-top:6px;font-size:.75rem;color:#9fb3d1">${(byFinding[f.id] && byFinding[f.id].mitigation_plan) || '—'}</div></td>
+          <td><button class="btn btn-outline" onclick="generateRemediationPlan('${f.id}')">Generate Mitigation Plan</button><div id="plan-${f.id}" style="margin-top:6px;font-size:.75rem;color:#9fb3d1">${(byFinding[f.id] && byFinding[f.id].mitigation_plan) || '—'}</div></td>
           <td>
             <button class="btn btn-outline" onclick="generateAutonomousFix('${f.id}','sap')">Generate SAP Fix</button>
             <button class="btn btn-outline" style="margin-left:6px" onclick="generateAutonomousFix('${f.id}','snow')">Create SNOW Ticket</button>
@@ -865,6 +865,11 @@
 
   async function generateMitigationPlan(findingId) {
     await generateRemediation(findingId);
+  }
+
+  async function generateMitigationPlan(findingId) {
+    // Backward-compatible alias for existing UI hooks.
+    await generateRemediationPlan(findingId);
   }
 
   async function generateRemediation(findingIdFromButton) {
