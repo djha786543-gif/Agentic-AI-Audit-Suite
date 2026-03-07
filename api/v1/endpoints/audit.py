@@ -11,11 +11,12 @@ from sqlalchemy import func, desc, select
 from typing import List, Optional
 import logging
 
+from auth.context import AuthContext, get_auth_context
+from auth.rbac import Permission, require_permission
 from db.async_session import get_async_db
 from models.evidence_vault import AuditEntry, ExtractionRun
 from schemas.evidence import EvidenceCreate, EvidenceResponse, VaultSummary
 from vault.writer import write_evidence, verify_hash
-from core.security import get_current_user
 from core.config import settings
 
 router = APIRouter()
@@ -26,7 +27,7 @@ logger = logging.getLogger(__name__)
 async def submit_evidence(
     evidence_in: EvidenceCreate,
     db: AsyncSession = Depends(get_async_db),
-    current_user: str = Depends(get_current_user),
+    ctx: AuthContext = Depends(require_permission(Permission.WRITE_EVIDENCE)),
 ):
     """Submit evidence — requires Bearer token. Use POST /auth/login first."""
     try:
@@ -41,10 +42,10 @@ async def submit_evidence(
             source_system=evidence_in.source_system,
             ai_confidence_score=85,
             raw_payload=raw,
-            performed_by_agent_id=current_user,
-            connector_id=current_user,
+            performed_by_agent_id=ctx.username,
+            connector_id=ctx.username,
             triggered_by="api",
-            org_id="default-org"
+            org_id=ctx.org_id,
         )
         return record
     except Exception as exc:
@@ -53,14 +54,21 @@ async def submit_evidence(
 
 
 @router.get("/vault", response_model=List[EvidenceResponse])
-async def get_vault(limit: int = 100, db: AsyncSession = Depends(get_async_db)):
+async def get_vault(
+    limit: int = 100,
+    db: AsyncSession = Depends(get_async_db),
+    _: AuthContext = Depends(require_permission(Permission.VIEW_REPORTS)),
+):
     """List vault records — public, used by dashboard."""
     result = await db.execute(select(AuditEntry).order_by(desc(AuditEntry.recorded_at)).limit(limit))
     return result.scalars().all()
 
 
 @router.get("/vault/summary", response_model=VaultSummary)
-async def vault_summary(db: AsyncSession = Depends(get_async_db)):
+async def vault_summary(
+    db: AsyncSession = Depends(get_async_db),
+    _: AuthContext = Depends(require_permission(Permission.VIEW_DASHBOARD)),
+):
     """Counts for the dashboard stats strip."""
     total = (await db.execute(select(func.count(AuditEntry.id)))).scalar() or 0
     verified = (await db.execute(select(func.count(AuditEntry.id)).filter(AuditEntry.hash_verified == True))).scalar() or 0
@@ -80,7 +88,11 @@ async def vault_summary(db: AsyncSession = Depends(get_async_db)):
 
 
 @router.get("/vault/{record_id}", response_model=EvidenceResponse)
-async def get_vault_record(record_id: str, db: AsyncSession = Depends(get_async_db)):
+async def get_vault_record(
+    record_id: str,
+    db: AsyncSession = Depends(get_async_db),
+    _: AuthContext = Depends(require_permission(Permission.VIEW_REPORTS)),
+):
     result = await db.execute(select(AuditEntry).filter(AuditEntry.id == record_id))
     record = result.scalars().first()
     
@@ -95,16 +107,23 @@ async def get_vault_record(record_id: str, db: AsyncSession = Depends(get_async_
 
 
 @router.get("/runs")
-async def list_runs(limit: int = 50, db: AsyncSession = Depends(get_async_db)):
+async def list_runs(
+    limit: int = 50,
+    db: AsyncSession = Depends(get_async_db),
+    _: AuthContext = Depends(require_permission(Permission.VIEW_AUDIT_LOGS)),
+):
     result = await db.execute(select(ExtractionRun).order_by(desc(ExtractionRun.started_at)).limit(limit))
     return result.scalars().all()
 
 
 @router.post("/runs/heartbeat", status_code=201)
-async def record_heartbeat(db: AsyncSession = Depends(get_async_db)):
+async def record_heartbeat(
+    db: AsyncSession = Depends(get_async_db),
+    ctx: AuthContext = Depends(require_permission(Permission.RUN_CONNECTORS)),
+):
     from datetime import datetime, timezone
     new_run = ExtractionRun(
-        org_id="default-org",
+        org_id=ctx.org_id,
         connector_id="watcher_agent_heartbeat",
         source_system="watcher_agent",
         status="Success",
@@ -116,6 +135,9 @@ async def record_heartbeat(db: AsyncSession = Depends(get_async_db)):
 
 
 @router.get("/runs/count")
-async def get_runs_count(db: AsyncSession = Depends(get_async_db)):
+async def get_runs_count(
+    db: AsyncSession = Depends(get_async_db),
+    _: AuthContext = Depends(require_permission(Permission.VIEW_DASHBOARD)),
+):
     count = (await db.execute(select(func.count(ExtractionRun.id)))).scalar() or 0
     return {"count": count}

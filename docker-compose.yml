@@ -49,6 +49,9 @@ services:
       REDIS_URL:         redis://redis:6379/0
       SECRET_KEY:        ${SECRET_KEY:-acap-dev-secret-key-change-in-production}
       ENVIRONMENT:       ${ENVIRONMENT:-development}
+      ENABLE_OTEL_TRACING: ${ENABLE_OTEL_TRACING:-false}
+      OTEL_SERVICE_NAME: ${OTEL_SERVICE_NAME:-acap-api}
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-http://otel-collector:4318}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
       interval: 15s
@@ -105,6 +108,63 @@ services:
     environment:
       API_HOST: api
       API_PORT: 8000
+
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    restart: unless-stopped
+    profiles: ["monitoring"]
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
+      - ./monitoring/prometheus/recording_rules.yml:/etc/prometheus/recording_rules.yml:ro
+    depends_on:
+      api:
+        condition: service_healthy
+
+  alertmanager:
+    image: prom/alertmanager:v0.28.1
+    restart: unless-stopped
+    profiles: ["monitoring"]
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./monitoring/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.107.0
+    restart: unless-stopped
+    profiles: ["monitoring"]
+    ports:
+      - "4318:4318"
+      - "13133:13133"
+    volumes:
+      - ./monitoring/otel-collector/config.yml:/etc/otelcol-contrib/config.yml:ro
+    command:
+      - "--config=/etc/otelcol-contrib/config.yml"
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    restart: unless-stopped
+    profiles: ["monitoring"]
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ./monitoring/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./monitoring/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      prometheus:
+        condition: service_started
+      otel-collector:
+        condition: service_started
 
 volumes:
   postgres_data:

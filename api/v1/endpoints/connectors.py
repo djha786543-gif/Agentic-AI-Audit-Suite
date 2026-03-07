@@ -21,7 +21,7 @@ from typing import Any, Dict, List
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from auth.context import AuthContext
-from auth.rbac import UserRole, require_role
+from auth.rbac import Permission, require_permission
 from connectors import CONNECTOR_REGISTRY
 
 router = APIRouter()
@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 
 @router.get("/health", summary="Health of all registered connectors")
 async def all_connectors_health(
-    _: AuthContext = Depends(require_role(UserRole.INTERNAL_AUDITOR, UserRole.EXTERNAL_AUDITOR)),
+    _: AuthContext = Depends(require_permission(Permission.VIEW_DASHBOARD)),
 ) -> Dict[str, Any]:
     """
     Check health for every connector in the registry.
@@ -65,7 +65,7 @@ async def all_connectors_health(
 @router.get("/{connector_id}/health", summary="Health of a single connector")
 async def single_connector_health(
     connector_id: str,
-    _: AuthContext = Depends(require_role(UserRole.INTERNAL_AUDITOR, UserRole.EXTERNAL_AUDITOR)),
+    _: AuthContext = Depends(require_permission(Permission.VIEW_DASHBOARD)),
 ) -> Dict[str, Any]:
     """
     Check health for the specified connector.
@@ -92,7 +92,7 @@ async def single_connector_health(
 @router.post("/{connector_id}/fetch", summary="Trigger an on-demand data fetch")
 async def trigger_fetch(
     connector_id: str,
-    ctx: AuthContext = Depends(require_role(UserRole.INTERNAL_AUDITOR)),
+    ctx: AuthContext = Depends(require_permission(Permission.RUN_CONNECTORS)),
 ) -> Dict[str, Any]:
     """
     Trigger an immediate data fetch from the specified connector.

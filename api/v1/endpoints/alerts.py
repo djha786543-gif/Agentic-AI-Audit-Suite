@@ -14,7 +14,7 @@ from sqlalchemy import select, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from auth.context import AuthContext
-from auth.rbac import UserRole, require_role
+from auth.rbac import Permission, require_permission
 from db.async_session import get_async_db
 from models.alerts import AlertRule, ComplianceAlert
 from schemas.alerts import (
@@ -36,6 +36,7 @@ router = APIRouter()
 @router.get("/rules", response_model=List[AlertRuleResponse])
 async def list_alert_rules(
     db: AsyncSession = Depends(get_async_db),
+    _: AuthContext = Depends(require_permission(Permission.VIEW_DASHBOARD)),
 ) -> List[AlertRuleResponse]:
     result = await db.execute(
         select(AlertRule).order_by(AlertRule.rule_id)
@@ -47,7 +48,7 @@ async def list_alert_rules(
 async def create_alert_rule(
     rule_in: AlertRuleCreate,
     db: AsyncSession = Depends(get_async_db),
-    ctx: AuthContext = Depends(require_role(UserRole.INTERNAL_AUDITOR)),
+    ctx: AuthContext = Depends(require_permission(Permission.MANAGE_POLICIES)),
 ) -> AlertRuleResponse:
     record = AlertRule(org_id=ctx.org_id, **rule_in.model_dump())
     db.add(record)
@@ -65,6 +66,7 @@ async def list_alerts(
     alert_status: str | None = None,
     limit: int = 50,
     db: AsyncSession = Depends(get_async_db),
+    _: AuthContext = Depends(require_permission(Permission.VIEW_DASHBOARD)),
 ) -> List[ComplianceAlertResponse]:
     q = select(ComplianceAlert).order_by(desc(ComplianceAlert.created_at))
     if alert_status:
@@ -77,7 +79,7 @@ async def list_alerts(
 async def create_alert(
     alert_in: ComplianceAlertCreate,
     db: AsyncSession = Depends(get_async_db),
-    ctx: AuthContext = Depends(require_role(UserRole.INTERNAL_AUDITOR, UserRole.CONNECTOR_SERVICE)),
+    ctx: AuthContext = Depends(require_permission(Permission.WRITE_EVIDENCE)),
 ) -> ComplianceAlertResponse:
     record = ComplianceAlert(org_id=ctx.org_id, **alert_in.model_dump())
     db.add(record)
@@ -91,7 +93,7 @@ async def acknowledge_alert(
     alert_id: str,
     body: AlertAcknowledge,
     db: AsyncSession = Depends(get_async_db),
-    ctx: AuthContext = Depends(require_role(UserRole.INTERNAL_AUDITOR)),
+    ctx: AuthContext = Depends(require_permission(Permission.APPROVE_WORKFLOW)),
 ) -> ComplianceAlertResponse:
     result = await db.execute(
         select(ComplianceAlert).filter(ComplianceAlert.id == alert_id)
@@ -117,7 +119,7 @@ async def resolve_alert(
     alert_id: str,
     body: AlertResolve,
     db: AsyncSession = Depends(get_async_db),
-    ctx: AuthContext = Depends(require_role(UserRole.INTERNAL_AUDITOR)),
+    ctx: AuthContext = Depends(require_permission(Permission.APPROVE_WORKFLOW)),
 ) -> ComplianceAlertResponse:
     result = await db.execute(
         select(ComplianceAlert).filter(ComplianceAlert.id == alert_id)

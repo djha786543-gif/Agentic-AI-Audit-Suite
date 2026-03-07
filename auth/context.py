@@ -21,9 +21,9 @@ from dataclasses import dataclass
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
+from jose import JWTError
 
-from core.config import settings
+from auth.token_validation import validate_access_token
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/auth/login")
 
@@ -61,13 +61,12 @@ async def get_auth_context(token: str = Depends(oauth2_scheme)) -> AuthContext:
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
-        username: str = payload.get("sub")
-        if not username:
-            raise credentials_exception
-        role: str = payload.get("role", "internal_auditor")
-        org_id: str = payload.get("org_id", "default-org")
+        claims = validate_access_token(token)
     except JWTError:
         raise credentials_exception
 
-    return AuthContext(username=username, role=role, org_id=org_id)
+    return AuthContext(
+        username=claims.username,
+        role=claims.role,
+        org_id=claims.org_id,
+    )

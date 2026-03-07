@@ -22,7 +22,12 @@ router = APIRouter()
 # ── Development / demo credential table ──────────────────────────────────────
 # Maps username → (password, role, org_id)
 _DEMO_USERS: dict = {
+    "sysadmin": ("Admin123!", "system_admin", "default-org"),
     "admin": ("Audit123!", "internal_auditor", "default-org"),
+    "auditmanager": ("Manager123!", "audit_manager", "default-org"),
+    "riskmanager": ("Risk123!", "risk_manager", "default-org"),
+    "compliance": ("Compliance123!", "compliance_officer", "default-org"),
+    "executive": ("Viewer123!", "executive_viewer", "default-org"),
     "external": ("External123!", "external_auditor", "default-org"),
     "connector": ("Service123!", "connector_service", "default-org"),
     "processowner": ("Owner123!", "process_owner", "default-org"),

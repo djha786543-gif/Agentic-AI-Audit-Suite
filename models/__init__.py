@@ -12,3 +12,6 @@ from models.governance import GovernancePolicy, ComplianceFramework, ComplianceM
 from models.alerts import AlertRule, ComplianceAlert  # noqa
 # Phase 6 — Enterprise Reporting
 from models.reports import ReportDefinition, ReportRun, ReportSchedule  # noqa
+from models.system_logs import SystemLog, WorkflowLog  # noqa
+from models.ai_decision import AIDecision  # noqa
+from models.iam import Role, PermissionGrant, RolePermission, UserRoleAssignment  # noqa

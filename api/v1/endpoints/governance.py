@@ -21,7 +21,7 @@ from sqlalchemy import select, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from auth.context import AuthContext
-from auth.rbac import UserRole, require_role
+from auth.rbac import Permission, require_permission
 from db.async_session import get_async_db
 from models.governance import (
     ComplianceFramework,
@@ -113,6 +113,7 @@ async def append_governance_log(
 async def list_policies(
     limit: int = 50,
     db: AsyncSession = Depends(get_async_db),
+    _: AuthContext = Depends(require_permission(Permission.VIEW_REPORTS)),
 ) -> List[GovernancePolicyResponse]:
     result = await db.execute(
         select(GovernancePolicy)
@@ -126,7 +127,7 @@ async def list_policies(
 async def create_policy(
     policy_in: GovernancePolicyCreate,
     db: AsyncSession = Depends(get_async_db),
-    ctx: AuthContext = Depends(require_role(UserRole.INTERNAL_AUDITOR)),
+    ctx: AuthContext = Depends(require_permission(Permission.MANAGE_POLICIES)),
 ) -> GovernancePolicyResponse:
     record = GovernancePolicy(
         org_id=ctx.org_id,
@@ -149,6 +150,7 @@ async def create_policy(
 async def get_policy(
     policy_id: str,
     db: AsyncSession = Depends(get_async_db),
+    _: AuthContext = Depends(require_permission(Permission.VIEW_REPORTS)),
 ) -> GovernancePolicyResponse:
     result = await db.execute(
         select(GovernancePolicy).filter(GovernancePolicy.policy_id == policy_id)
@@ -166,6 +168,7 @@ async def get_policy(
 @router.get("/frameworks", response_model=List[ComplianceFrameworkResponse])
 async def list_frameworks(
     db: AsyncSession = Depends(get_async_db),
+    _: AuthContext = Depends(require_permission(Permission.VIEW_REPORTS)),
 ) -> List[ComplianceFrameworkResponse]:
     result = await db.execute(
         select(ComplianceFramework).order_by(ComplianceFramework.framework_id)
@@ -177,7 +180,7 @@ async def list_frameworks(
 async def create_framework(
     fw_in: ComplianceFrameworkCreate,
     db: AsyncSession = Depends(get_async_db),
-    ctx: AuthContext = Depends(require_role(UserRole.INTERNAL_AUDITOR)),
+    ctx: AuthContext = Depends(require_permission(Permission.MANAGE_FRAMEWORKS)),
 ) -> ComplianceFrameworkResponse:
     record = ComplianceFramework(org_id=ctx.org_id, **fw_in.model_dump())
     db.add(record)
@@ -202,6 +205,7 @@ async def list_mappings(
     framework_id: str | None = None,
     limit: int = 100,
     db: AsyncSession = Depends(get_async_db),
+    _: AuthContext = Depends(require_permission(Permission.VIEW_REPORTS)),
 ) -> List[ComplianceMappingResponse]:
     q = select(ComplianceMapping).order_by(ComplianceMapping.framework_id)
     if framework_id:
@@ -214,7 +218,7 @@ async def list_mappings(
 async def create_mapping(
     mapping_in: ComplianceMappingCreate,
     db: AsyncSession = Depends(get_async_db),
-    ctx: AuthContext = Depends(require_role(UserRole.INTERNAL_AUDITOR)),
+    ctx: AuthContext = Depends(require_permission(Permission.MANAGE_FRAMEWORKS)),
 ) -> ComplianceMappingResponse:
     record = ComplianceMapping(org_id=ctx.org_id, **mapping_in.model_dump())
     db.add(record)
@@ -239,6 +243,7 @@ async def list_risks(
     status: str | None = None,
     limit: int = 100,
     db: AsyncSession = Depends(get_async_db),
+    _: AuthContext = Depends(require_permission(Permission.VIEW_REPORTS)),
 ) -> List[RiskRegisterResponse]:
     q = select(RiskRegisterEntry).order_by(desc(RiskRegisterEntry.risk_score))
     if status:
@@ -251,7 +256,7 @@ async def list_risks(
 async def create_risk(
     risk_in: RiskRegisterCreate,
     db: AsyncSession = Depends(get_async_db),
-    ctx: AuthContext = Depends(require_role(UserRole.INTERNAL_AUDITOR)),
+    ctx: AuthContext = Depends(require_permission(Permission.MANAGE_RISKS)),
 ) -> RiskRegisterResponse:
     data = risk_in.model_dump()
     score, rating = _compute_risk(data["inherent_likelihood"], data["inherent_impact"])
@@ -279,6 +284,7 @@ async def create_risk(
 async def get_risk(
     risk_id: str,
     db: AsyncSession = Depends(get_async_db),
+    _: AuthContext = Depends(require_permission(Permission.VIEW_REPORTS)),
 ) -> RiskRegisterResponse:
     result = await db.execute(
         select(RiskRegisterEntry).filter(RiskRegisterEntry.risk_id == risk_id)
@@ -292,6 +298,7 @@ async def get_risk(
 @router.get("/risk-heatmap")
 async def residual_risk_heatmap(
     db: AsyncSession = Depends(get_async_db),
+    _: AuthContext = Depends(require_permission(Permission.VIEW_DASHBOARD)),
 ) -> dict:
     """Return residual likelihood/impact heatmap aligned to ERM 5x5 model."""
     result = await db.execute(select(RiskRegisterEntry))
@@ -323,7 +330,7 @@ async def residual_risk_heatmap(
 async def list_governance_logs(
     limit: int = 200,
     db: AsyncSession = Depends(get_async_db),
-    _: AuthContext = Depends(require_role(UserRole.INTERNAL_AUDITOR, UserRole.EXTERNAL_AUDITOR)),
+    _: AuthContext = Depends(require_permission(Permission.VIEW_AUDIT_LOGS)),
 ) -> List[GovernanceAuditLogResponse]:
     result = await db.execute(
         select(GovernanceAuditLog).order_by(desc(GovernanceAuditLog.created_at)).limit(limit)

@@ -5,6 +5,7 @@ from api.v1.endpoints import evaluation
 from api.v1.endpoints import governance, alerts, reports
 from api.v1.endpoints import findings
 from api.v1.endpoints import uat
+from api.v1.endpoints import system_logs
 
 api_router = APIRouter()
 api_router.include_router(auth.router,        prefix="/auth",        tags=["Auth"])
@@ -21,5 +22,6 @@ api_router.include_router(alerts.router,      prefix="/alerts",      tags=["Comp
 api_router.include_router(reports.router,     prefix="/reports",     tags=["Enterprise Reports"])
 api_router.include_router(findings.router,    prefix="/findings",    tags=["Findings Workflow"])
 api_router.include_router(uat.router,         prefix="/uat",         tags=["UAT Reports"])
+api_router.include_router(system_logs.router, prefix="/logs",        tags=["System Logs"])
 api_router.include_router(health.router,      prefix="",             tags=["Health"])
 

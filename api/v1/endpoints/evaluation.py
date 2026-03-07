@@ -23,6 +23,7 @@ from auth.rbac import UserRole, require_role
 from db.async_session import get_async_db
 from models.evaluation import ControlEvaluation, SODConflict
 from models.exceptions import AuditException
+from models.system_logs import WorkflowLog
 from schemas.evaluation import (
     AuditExceptionCreate,
     AuditExceptionResponse,
@@ -226,6 +227,21 @@ async def transition_exception(
     comments.append(audit_entry)
     record.comments = comments
     record.state = _to_storage_state(requested_state)
+
+    db.add(
+        WorkflowLog(
+            org_id=ctx.org_id,
+            user=ctx.username,
+            action="workflow_approval",
+            workflow_name="exception_lifecycle",
+            resource=str(exception_id),
+            stage_from=current_state,
+            stage_to=requested_state,
+            approval_required=True,
+            approved=True,
+            metadata_json={"comment": body.comment},
+        )
+    )
 
     if requested_state in ("closed",):
         record.resolved_at = now

@@ -21,6 +21,196 @@ ACAP is engineered on a highly secure, enterprise-grade architecture:
 
 ## 🚀 Quick Start Guide
 
+### Production Database Migrations (Alembic)
+For controlled enterprise releases, use Alembic migrations instead of schema re-create.
+
+```bash
+alembic upgrade head
+```
+
+Create a new migration after model changes:
+
+```bash
+alembic revision --autogenerate -m "describe change"
+alembic upgrade head
+```
+
+Current enterprise hardening baseline migration:
+`alembic/versions/20260307_enterprise_hardening_tables.py`
+
+Seed enterprise IAM roles/permissions after migration:
+
+```bash
+python scripts/seed_iam.py
+```
+
+Startup schema initialization safety flags:
+
+```env
+INIT_DB_ON_STARTUP=true
+RESET_DB_ON_STARTUP=false
+```
+
+Use `RESET_DB_ON_STARTUP=true` only in ephemeral local environments.
+
+Production security guardrails:
+
+```env
+ENVIRONMENT=production
+STRICT_PRODUCTION_GUARDS=true
+ENABLE_HTTPS_REDIRECT=true
+ENABLE_REQUEST_ID_HEADER=true
+REQUEST_ID_HEADER_NAME=X-Request-ID
+```
+
+With strict guards enabled, startup fails fast if unsafe production settings are detected (for example wildcard CORS/trusted hosts, default `SECRET_KEY`, or destructive DB reset).
+
+Prometheus metrics endpoint:
+
+```env
+ENABLE_PROMETHEUS_METRICS=true
+PROMETHEUS_METRICS_PATH=/metrics
+METRICS_TRACK_API_ONLY=true
+```
+
+This exposes Prometheus-compatible counters/histograms for request volume, status codes, and latency.
+
+### Monitoring Profile (Prometheus)
+Optional Docker Compose monitoring profile:
+
+```bash
+docker compose --profile monitoring up -d
+```
+
+Prometheus UI: `http://localhost:9090`
+Alertmanager UI/API: `http://localhost:9093`
+Grafana UI: `http://localhost:3000` (default `admin/admin`)
+OTEL Collector health: `http://localhost:13133`
+
+Config files:
+- `monitoring/prometheus/prometheus.yml`
+- `monitoring/prometheus/alerts.yml`
+- `monitoring/prometheus/recording_rules.yml`
+- `monitoring/alertmanager/alertmanager.yml`
+- `monitoring/grafana/provisioning/datasources/prometheus.yml`
+- `monitoring/grafana/provisioning/dashboards/dashboards.yml`
+- `monitoring/grafana/dashboards/acap-overview.json`
+- `monitoring/otel-collector/config.yml`
+
+Built-in alert rules cover:
+- High 5xx error rate
+- High p95 latency
+- Near-zero traffic detection
+
+Alert routing defaults:
+- Critical alerts -> critical webhook + email receiver
+- Warning alerts -> warning webhook
+- All others -> default webhook
+
+SLO recording series (5-minute windows):
+- `acap:http_requests:availability5m`
+- `acap:http_requests:error_ratio5m`
+- `acap:http_requests:p95_latency_seconds5m`
+- `acap:http_requests:p99_latency_seconds5m`
+- `acap:traces:calls_rate5m`
+- `acap:traces:error_ratio5m`
+
+Monitoring smoke CI workflow:
+- `.github/workflows/monitoring-smoke.yml`
+
+It boots the compose monitoring profile and verifies API, Prometheus, Alertmanager, and Grafana health endpoints.
+
+OpenTelemetry tracing settings:
+
+```env
+ENABLE_OTEL_TRACING=true
+OTEL_SERVICE_NAME=acap-api
+OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318
+```
+
+Request correlation (`X-Request-ID`) is attached to both structured logs and active spans.
+System logs also expose correlated `trace_id` and `span_id` values in `/api/v1/logs/system` responses.
+
+Incident triage endpoint:
+- `/api/v1/logs/system/errors/trace-groups`
+
+This groups recent error events by `trace_id` with linked `request_id` and `span_id` values for rapid root-cause navigation.
+Supported query parameters:
+- `min_status` (default `400`)
+- `since_minutes` (optional rolling window)
+- `resource_prefix` (optional path prefix filter)
+- `offset` (default `0`)
+- `group_limit` (default `100`)
+- `event_limit_per_group` (default `25`)
+- `view` (`compact`, `ids`, or `full` preset)
+- `include_event_fields` (optional comma-separated event keys)
+- `q` (optional free-text search across trace_id, request_id, resource, and user)
+- `q_ranked` (optional boolean relevance ranking for `q` matches)
+- `trace_id_prefix` (optional trace ID prefix filter)
+- `request_id_prefix` (optional request ID prefix filter)
+- `sort_by` (`last_seen_at` or `error_count`)
+- `sort_order` (`asc` or `desc`)
+
+Notes:
+- `view=compact` returns a minimal default event payload.
+- `view=ids` returns request/span/time identifiers optimized for high-volume triage.
+- `view=full` returns the full allowlisted event payload.
+- If `include_event_fields` is provided, it overrides the selected `view` preset.
+- If `q_ranked=true`, exact/strong ID matches are prioritized over broad text matches.
+
+### CI Security Quality Gates
+GitHub Actions workflow:
+`.github/workflows/security-quality-gates.yml`
+
+It enforces startup guardrail, observability, endpoint authorization, and core regression tests on pull requests and pushes to `main`.
+
+### External IdP Token Validation (Azure AD / Okta)
+Optional environment settings for externally-issued JWT validation:
+
+```env
+ENABLE_EXTERNAL_IDP_TOKENS=true
+IDP_ISSUERS=https://login.microsoftonline.com/<tenant-id>/v2.0,https://<okta-domain>/oauth2/default
+IDP_AUDIENCES=api://acap-api
+IDP_JWKS_URLS=https://login.microsoftonline.com/<tenant-id>/discovery/v2.0/keys,https://<okta-domain>/oauth2/default/v1/keys
+```
+
+Optional claim mapping controls for enterprise federation:
+
+```env
+IDP_ROLE_CLAIM_KEYS=roles,groups,role
+IDP_ORG_CLAIM_KEYS=org_id,tenant_id,tid
+IDP_ROLE_MAPPING={"acap-audit-manager":"audit_manager","acap-admin":"system_admin"}
+IDP_DEFAULT_ROLE=internal_auditor
+```
+
+These controls map external IdP claims/groups into ACAP internal roles without code changes.
+See `docs/SSO_CLAIM_MAPPING.md` for operational guidance and test validation.
+
+Optional SAML placeholders (for future SSO bridge integration):
+
+```env
+ENABLE_SAML=false
+SAML_ENTITY_ID=acap-api
+SAML_IDP_METADATA_URL=
+SAML_IDP_METADATA_FILE=
+```
+
+### Compliance Evidence Pack Automation
+Generate an auditable control evidence bundle:
+
+```bash
+make compliance-pack
+```
+
+Artifacts are generated in `artifacts/` with a manifest, SHA-256 checksum file, and zip archive.
+See `docs/COMPLIANCE_EVIDENCE_PACK.md` for details.
+
+### Operations and Incident SOPs
+- `docs/OPERATIONS_RUNBOOK.md`
+- `docs/INCIDENT_RESPONSE_SOP.md`
+- `docs/SSO_CLAIM_MAPPING.md`
+- `docs/COMPLIANCE_EVIDENCE_PACK.md`
+
 ### Prerequisites
 * **Python 3.10+** (Required for `asyncpg` and FastAPI compatibility)
 * **Docker Desktop** (For native PostgreSQL and Redis instances)

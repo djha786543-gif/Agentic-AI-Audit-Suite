@@ -18,6 +18,7 @@ from core.config import settings
 from db.async_session import get_async_db
 from models.finding import Finding, ManagementResponse
 from models.governance import GovernanceAuditLog
+from models.system_logs import WorkflowLog
 from schemas.finding import (
     FindingResponse,
     ManagementResponseCreate,
@@ -113,6 +114,26 @@ async def assign_remediation(
             "due_date": body.remediation_due_date.isoformat(),
         },
     )
+
+    if hasattr(db, "add"):
+        db.add(
+            WorkflowLog(
+                org_id=ctx.org_id,
+                user=ctx.username,
+                action="workflow_approval",
+                workflow_name="finding_remediation_assignment",
+                resource=str(finding.id),
+                stage_from="open",
+                stage_to="management_response",
+                approval_required=True,
+                approved=True,
+                metadata_json={
+                    "remediation_owner": body.remediation_owner,
+                    "remediation_due_date": body.remediation_due_date.isoformat(),
+                },
+            )
+        )
+
     await db.commit()
     await db.refresh(finding)
     return finding
@@ -151,6 +172,25 @@ async def submit_management_response(
             "target_date": body.target_date.isoformat() if body.target_date else None,
         },
     )
+
+    if hasattr(db, "add"):
+        db.add(
+            WorkflowLog(
+                org_id=ctx.org_id,
+                user=ctx.username,
+                action="workflow_approval",
+                workflow_name="finding_management_response",
+                resource=str(finding_id),
+                stage_from="management_response",
+                stage_to="remediation",
+                approval_required=True,
+                approved=True,
+                metadata_json={
+                    "responsible_owner": body.responsible_owner,
+                    "target_date": body.target_date.isoformat() if body.target_date else None,
+                },
+            )
+        )
 
     await db.commit()
     await db.refresh(record)
@@ -195,6 +235,22 @@ async def delete_finding_blocked(
             "message": "Write-once policy prevented deletion.",
         },
     )
+
+    if hasattr(db, "add"):
+        db.add(
+            WorkflowLog(
+                org_id=ctx.org_id,
+                user=ctx.username,
+                action="workflow_approval",
+                workflow_name="finding_worm_guard",
+                resource=str(finding_id),
+                stage_from="delete_requested",
+                stage_to="delete_blocked",
+                approval_required=False,
+                approved=False,
+                metadata_json={"policy": "WORM"},
+            )
+        )
     await db.commit()
     raise HTTPException(
         status_code=status.HTTP_409_CONFLICT,

@@ -1,0 +1,43 @@
+groups:
+  - name: acap-api-slo-recording-rules
+    rules:
+      - record: acap:http_requests:rate5m
+        expr: sum(rate(acap_http_requests_total[5m]))
+
+      - record: acap:http_requests:5xx_rate5m
+        expr: sum(rate(acap_http_requests_total{status=~"5.."}[5m]))
+
+      - record: acap:http_requests:error_ratio5m
+        expr: |
+          acap:http_requests:5xx_rate5m
+          /
+          clamp_min(acap:http_requests:rate5m, 0.001)
+
+      - record: acap:http_requests:availability5m
+        expr: 1 - acap:http_requests:error_ratio5m
+
+      - record: acap:http_requests:p95_latency_seconds5m
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum(rate(acap_http_request_duration_seconds_bucket[5m])) by (le)
+          )
+
+      - record: acap:http_requests:p99_latency_seconds5m
+        expr: |
+          histogram_quantile(
+            0.99,
+            sum(rate(acap_http_request_duration_seconds_bucket[5m])) by (le)
+          )
+
+      - record: acap:traces:calls_rate5m
+        expr: sum(rate(traces_spanmetrics_calls_total[5m]))
+
+      - record: acap:traces:error_rate5m
+        expr: sum(rate(traces_spanmetrics_calls_total{status_code="STATUS_CODE_ERROR"}[5m]))
+
+      - record: acap:traces:error_ratio5m
+        expr: |
+          acap:traces:error_rate5m
+          /
+          clamp_min(acap:traces:calls_rate5m, 0.001)

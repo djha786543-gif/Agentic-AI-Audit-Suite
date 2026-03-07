@@ -1,0 +1,43 @@
+name: Security Quality Gates
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  security-and-observability-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run security and quality test gates
+        run: |
+          python -m pytest -q \
+            tests/test_alert_rules_pack.py \
+            tests/test_tracing.py \
+            tests/test_system_logs_serialization.py \
+            tests/test_system_logs_trace_groups.py \
+            tests/test_startup_guardrails.py \
+            tests/test_observability.py \
+            tests/test_metrics.py \
+            tests/test_endpoint_authz.py \
+            tests/test_auth_enterprise.py \
+            tests/test_idp_claim_mapping.py \
+            tests/test_compliance_pack_builder.py \
+            tests/test_runner_tier1.py \
+            tests/test_worm_tamper.py

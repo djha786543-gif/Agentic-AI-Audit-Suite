@@ -1,0 +1,54 @@
+name: Monitoring Smoke
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  monitoring-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Start monitoring stack
+        run: docker compose --profile monitoring up -d --build
+
+      - name: Wait for API health
+        run: |
+          for i in $(seq 1 60); do
+            if curl -fsS http://localhost:8000/api/v1/health >/dev/null; then
+              echo "API healthy"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "API did not become healthy in time"
+          docker compose ps
+          exit 1
+
+      - name: Check monitoring endpoints
+        run: |
+          curl -fsS http://localhost:9090/-/ready
+          curl -fsS http://localhost:9093/-/ready
+          curl -fsS http://localhost:3000/api/health
+          curl -fsS http://localhost:13133/
+
+      - name: Verify ACAP metrics available
+        run: |
+          METRICS=$(curl -fsS http://localhost:9090/api/v1/query --get --data-urlencode 'query=acap_http_requests_total')
+          echo "$METRICS" | grep -q '"status":"success"'
+
+      - name: Dump compose status on failure
+        if: failure()
+        run: |
+          docker compose ps
+          docker compose logs --tail=200 api prometheus alertmanager grafana otel-collector || true
+
+      - name: Tear down stack
+        if: always()
+        run: docker compose --profile monitoring down -v

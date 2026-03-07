@@ -7,13 +7,17 @@ GET /health        — basic liveness probe (load balancer / Docker healthcheck)
 GET /health/ready  — readiness probe: checks DB connectivity and Redis
 """
 
-from fastapi import APIRouter, Depends
+import asyncio
+
+from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
 from datetime import datetime, timezone
 import logging
+import redis
 
 from db.async_session import get_async_db
+from core.config import settings
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -39,7 +43,10 @@ def liveness():
     description="Returns 200 only when the DB is reachable. Used by docker-compose depends_on.",
     tags=["health"],
 )
-async def readiness(db: AsyncSession = Depends(get_async_db)):
+async def readiness(
+    response: Response,
+    db: AsyncSession = Depends(get_async_db),
+):
     try:
         await db.execute(text("SELECT 1"))
         db_status = "ok"
@@ -47,9 +54,21 @@ async def readiness(db: AsyncSession = Depends(get_async_db)):
         logger.error("health.db_unreachable  error=%s", str(exc))
         db_status = "error"
 
-    overall = "ready" if db_status == "ok" else "not_ready"
+    try:
+        redis_client = redis.from_url(settings.REDIS_URL)
+        await asyncio.to_thread(redis_client.ping)
+        redis_status = "ok"
+    except Exception as exc:
+        logger.error("health.redis_unreachable error=%s", str(exc))
+        redis_status = "error"
+
+    overall = "ready" if db_status == "ok" and redis_status == "ok" else "not_ready"
+    if overall != "ready":
+        response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+
     return {
         "status": overall,
         "database": db_status,
+        "redis": redis_status,
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }

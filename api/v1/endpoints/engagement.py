@@ -5,8 +5,11 @@ from db.async_session import get_async_db
 from typing import List
 from schemas.engagement import EngagementCreate, EngagementResponse
 from models.engagement import Engagement
+from auth import Permission, require_permission
 
-router = APIRouter()
+router = APIRouter(
+    dependencies=[Depends(require_permission(Permission.MANAGE_ENGAGEMENTS))]
+)
 
 @router.post("/", response_model=EngagementResponse, status_code=status.HTTP_201_CREATED)
 async def create_engagement(

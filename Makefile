@@ -7,7 +7,7 @@
 # make test      — run tests
 # make shell     — open psql shell in the DB container
 
-.PHONY: up down logs restart watcher worker beat test shell env sync sync-watch
+.PHONY: up down logs restart watcher worker beat test shell env sync sync-watch compliance-pack
 
 # ── Docker Compose ────────────────────────────────────────
 
@@ -78,6 +78,9 @@ test:
 
 install:
 	pip install -r requirements.txt
+
+compliance-pack:
+	python scripts/build_compliance_pack.py
 
 # ── Git Sync ─────────────────────────────────────────────
 

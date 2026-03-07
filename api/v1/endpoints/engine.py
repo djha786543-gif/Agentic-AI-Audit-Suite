@@ -26,6 +26,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Depends
 from db.async_session import get_async_db
 from sqlalchemy import text
+from auth import Permission, require_permission
 
 from engine.parser import parse_file
 from engine.runner import run_audit_engine
@@ -82,6 +83,7 @@ async def analyze_file(
     source_system: str = Form(default="Uploaded File"),
     audit_period: Optional[str] = Form(default=None),
     anonymize: bool = Form(default=False),
+    _: object = Depends(require_permission(Permission.REVIEW_FINDINGS)),
 ):
     """
     Upload a CSV, Excel, JSON, or SAP TXT file and run all applicable
@@ -198,7 +200,10 @@ async def analyze_file(
 
 
 @router.post("/integrity-check")
-async def integrity_check(payload: dict):
+async def integrity_check(
+    payload: dict,
+    _: object = Depends(require_permission(Permission.REVIEW_FINDINGS)),
+):
     """
     Referential integrity validation for Universal ERP Engine.
 
@@ -220,7 +225,10 @@ async def integrity_check(payload: dict):
 
 
 @router.post("/sampling")
-async def run_sampling(payload: dict):
+async def run_sampling(
+    payload: dict,
+    _: object = Depends(require_permission(Permission.REVIEW_FINDINGS)),
+):
     """
     Statistical sampling endpoint:
       - attribute sampling
@@ -257,6 +265,7 @@ async def run_sampling(payload: dict):
 @router.post("/analyze/validate")
 async def validate_file(
     file: UploadFile = File(...),
+    _: object = Depends(require_permission(Permission.REVIEW_FINDINGS)),
 ):
     """
     Validation-only endpoint -> extracts schema validation, duplicates, and hash.
@@ -282,7 +291,10 @@ async def validate_file(
 
 
 @router.post("/analyze/sod")
-async def analyze_sod_direct(payload: dict):
+async def analyze_sod_direct(
+    payload: dict,
+    _: object = Depends(require_permission(Permission.REVIEW_FINDINGS)),
+):
     """
     Direct SoD analysis with explicit user-roles payload.
     No file upload needed.
@@ -318,7 +330,8 @@ async def analyze_sod_direct(payload: dict):
 async def set_verdict(
     finding_id: str, 
     payload: dict,
-    db: AsyncSession = Depends(get_async_db)
+    db: AsyncSession = Depends(get_async_db),
+    _: object = Depends(require_permission(Permission.APPROVE_WORKFLOW)),
 ):
     """
     Accuracy Tracking: Allows auditor to classify as TRUE or FALSE POSITIVE.
@@ -336,7 +349,11 @@ async def set_verdict(
 
 
 @router.get("/accuracy")
-async def get_accuracy(agent: Optional[str] = None, db: AsyncSession = Depends(get_async_db)):
+async def get_accuracy(
+    agent: Optional[str] = None,
+    db: AsyncSession = Depends(get_async_db),
+    _: object = Depends(require_permission(Permission.VIEW_DASHBOARD)),
+):
     """
     Computes real-time precision/recall accuracy of the AI engine.
     """
@@ -384,7 +401,10 @@ async def get_accuracy(agent: Optional[str] = None, db: AsyncSession = Depends(g
 
 
 @router.post("/analyze/controls")
-async def submit_control_result(payload: dict):
+async def submit_control_result(
+    payload: dict,
+    _: object = Depends(require_permission(Permission.WRITE_EVIDENCE)),
+):
     """
     Submit a pre-evaluated control result to the engine.
     Used by the frontend to POST manual test results.
@@ -409,7 +429,10 @@ async def submit_control_result(payload: dict):
 
 
 @router.get("/sample/{data_type}")
-async def get_sample_data(data_type: str):
+async def get_sample_data(
+    data_type: str,
+    _: object = Depends(require_permission(Permission.VIEW_DASHBOARD)),
+):
     """
     Return sample CSV templates for each data type.
     data_type: users | changes | transactions | backup | incident | interfaces

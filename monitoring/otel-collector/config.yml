@@ -1,0 +1,31 @@
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: 0.0.0.0:4318
+
+extensions:
+  health_check: {}
+
+processors:
+  batch: {}
+
+connectors:
+  spanmetrics: {}
+
+exporters:
+  debug:
+    verbosity: basic
+  prometheus:
+    endpoint: 0.0.0.0:8889
+
+service:
+  extensions: [health_check]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug, spanmetrics]
+    metrics:
+      receivers: [spanmetrics]
+      exporters: [prometheus]

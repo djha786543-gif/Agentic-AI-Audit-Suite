@@ -5,6 +5,7 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
+from auth.token_validation import validate_access_token
 from core.config import settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -21,8 +22,8 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
 def get_current_user(token: str = Depends(oauth2_scheme)):
     """Return the username (sub claim) from the JWT.  Used by legacy endpoints."""
     try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
-        username: str = payload.get("sub")
+        claims = validate_access_token(token)
+        username: str = claims.username
         if username is None:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                                 detail="Invalid token")

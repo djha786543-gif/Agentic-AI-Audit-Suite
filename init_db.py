@@ -22,6 +22,10 @@ _RLS_TABLES = [
     "risk_register", "governance_audit_logs", "alert_rules", "compliance_alerts",
     # Phase 6 — Enterprise Reporting
     "report_definitions", "report_runs", "report_schedules",
+    # Enterprise logging + explainability
+    "system_logs", "workflow_logs", "ai_decisions",
+    # Enterprise IAM
+    "roles", "permissions", "role_permissions", "user_role_assignments",
 ]
 
 
@@ -49,9 +53,11 @@ def _apply_rls(conn, table: str) -> None:
     """))
 
 
-def init_db():
+def init_db(reset_schema: bool = False):
     print("🔄 Initializing Audit Vault Schema...")
-    Base.metadata.drop_all(bind=engine)
+    if reset_schema:
+        print("⚠️ RESET_DB_ON_STARTUP enabled: dropping all tables before create.")
+        Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
 
     with engine.begin() as conn:
@@ -62,5 +68,5 @@ def init_db():
 
 
 if __name__ == "__main__":
-    init_db()
+    init_db(reset_schema=False)
 

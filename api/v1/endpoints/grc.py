@@ -2,8 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List, Dict, Any
 from schemas.grc import GRCControlResponse, GRCTestResult, GRCIssue
 from datetime import date
+from auth import Permission, require_permission
 
-router = APIRouter()
+router = APIRouter(
+    dependencies=[Depends(require_permission(Permission.REVIEW_FINDINGS))]
+)
 
 # 1. Pull Controls
 @router.get("/controls", response_model=List[GRCControlResponse])

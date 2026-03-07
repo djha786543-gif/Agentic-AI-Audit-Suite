@@ -20,9 +20,12 @@ import threading
 import time
 from typing import Any, Dict, List, Optional
 
-from fastapi import APIRouter, Body, HTTPException
+from fastapi import APIRouter, Body, Depends, HTTPException
+from auth import Permission, require_permission
 
-router = APIRouter()
+router = APIRouter(
+    dependencies=[Depends(require_permission(Permission.MANAGE_USERS))]
+)
 
 REPORT_GLOB = "*uat*.json"
 PATCH_DIR_NAME = "patches"

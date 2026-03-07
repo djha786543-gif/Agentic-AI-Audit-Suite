@@ -24,7 +24,7 @@ from sqlalchemy import func, select, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from auth.context import AuthContext
-from auth.rbac import UserRole, require_role
+from auth.rbac import Permission, require_permission
 from db.async_session import get_async_db
 from models.alerts import ComplianceAlert
 from models.evaluation import ControlEvaluation, SODConflict
@@ -147,6 +147,7 @@ async def _build_compliance_status(db: AsyncSession) -> List[ComplianceStatusSum
 @router.get("/dashboard", response_model=ExecutiveDashboard)
 async def executive_dashboard(
     db: AsyncSession = Depends(get_async_db),
+    _: AuthContext = Depends(require_permission(Permission.VIEW_DASHBOARD)),
 ) -> ExecutiveDashboard:
     """
     Real-time executive dashboard aggregating KPIs, compliance coverage,
@@ -208,6 +209,7 @@ async def executive_dashboard(
 @router.get("/kpis", response_model=KPISummary)
 async def kpi_summary(
     db: AsyncSession = Depends(get_async_db),
+    _: AuthContext = Depends(require_permission(Permission.VIEW_DASHBOARD)),
 ) -> KPISummary:
     """Standalone KPI snapshot for embedding in other dashboards."""
     return await _build_kpis(db)
@@ -220,6 +222,7 @@ async def kpi_summary(
 @router.get("/definitions", response_model=List[ReportDefinitionResponse])
 async def list_report_definitions(
     db: AsyncSession = Depends(get_async_db),
+    _: AuthContext = Depends(require_permission(Permission.VIEW_REPORTS)),
 ) -> List[ReportDefinitionResponse]:
     result = await db.execute(
         select(ReportDefinition).order_by(desc(ReportDefinition.created_at))
@@ -231,7 +234,7 @@ async def list_report_definitions(
 async def create_report_definition(
     defn_in: ReportDefinitionCreate,
     db: AsyncSession = Depends(get_async_db),
-    ctx: AuthContext = Depends(require_role(UserRole.INTERNAL_AUDITOR)),
+    ctx: AuthContext = Depends(require_permission(Permission.GENERATE_REPORTS)),
 ) -> ReportDefinitionResponse:
     record = ReportDefinition(
         org_id=ctx.org_id,
@@ -252,6 +255,7 @@ async def create_report_definition(
 async def list_report_runs(
     limit: int = 50,
     db: AsyncSession = Depends(get_async_db),
+    _: AuthContext = Depends(require_permission(Permission.VIEW_REPORTS)),
 ) -> List[ReportRunResponse]:
     result = await db.execute(
         select(ReportRun).order_by(desc(ReportRun.created_at)).limit(limit)
@@ -263,7 +267,7 @@ async def list_report_runs(
 async def generate_report(
     req: ReportRunRequest,
     db: AsyncSession = Depends(get_async_db),
-    ctx: AuthContext = Depends(require_role(UserRole.INTERNAL_AUDITOR)),
+    ctx: AuthContext = Depends(require_permission(Permission.GENERATE_REPORTS)),
 ) -> ReportRunResponse:
     """
     Trigger an on-demand report.  The result_payload is generated synchronously
@@ -431,7 +435,7 @@ async def generate_report(
 @router.get("/external/review-package")
 async def external_review_package(
     db: AsyncSession = Depends(get_async_db),
-    _: AuthContext = Depends(require_role(UserRole.EXTERNAL_AUDITOR, UserRole.INTERNAL_AUDITOR)),
+    _: AuthContext = Depends(require_permission(Permission.VIEW_REPORTS)),
 ) -> Dict[str, Any]:
     """Read-only package for external auditors to review evidence and conclusions."""
     finding_result = await db.execute(select(Finding).order_by(desc(Finding.created_at)).limit(200))
@@ -459,7 +463,7 @@ async def external_review_package(
 async def export_workpaper(
     target: str = "workiva",
     db: AsyncSession = Depends(get_async_db),
-    _: AuthContext = Depends(require_role(UserRole.INTERNAL_AUDITOR, UserRole.EXTERNAL_AUDITOR)),
+    _: AuthContext = Depends(require_permission(Permission.VIEW_REPORTS)),
 ):
     """One-click export payloads for audit management tools."""
     finding_result = await db.execute(select(Finding).order_by(desc(Finding.created_at)).limit(1000))
@@ -503,6 +507,7 @@ async def export_workpaper(
 async def get_report_run(
     run_id: str,
     db: AsyncSession = Depends(get_async_db),
+    _: AuthContext = Depends(require_permission(Permission.VIEW_REPORTS)),
 ) -> ReportRunResponse:
     result = await db.execute(
         select(ReportRun).filter(ReportRun.id == run_id)
@@ -520,6 +525,7 @@ async def get_report_run(
 @router.get("/schedules", response_model=List[ReportScheduleResponse])
 async def list_schedules(
     db: AsyncSession = Depends(get_async_db),
+    _: AuthContext = Depends(require_permission(Permission.VIEW_REPORTS)),
 ) -> List[ReportScheduleResponse]:
     result = await db.execute(
         select(ReportSchedule).order_by(ReportSchedule.created_at)
@@ -531,7 +537,7 @@ async def list_schedules(
 async def create_schedule(
     sched_in: ReportScheduleCreate,
     db: AsyncSession = Depends(get_async_db),
-    ctx: AuthContext = Depends(require_role(UserRole.INTERNAL_AUDITOR)),
+    ctx: AuthContext = Depends(require_permission(Permission.GENERATE_REPORTS)),
 ) -> ReportScheduleResponse:
     record = ReportSchedule(
         org_id=ctx.org_id,
