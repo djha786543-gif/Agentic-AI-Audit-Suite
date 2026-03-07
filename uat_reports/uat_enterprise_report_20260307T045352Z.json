@@ -1,0 +1,3048 @@
+{
+  "run_id": "20260307T045352Z",
+  "started_at": "2026-03-07T04:53:52.854892+00:00",
+  "config": {
+    "base_url": "http://127.0.0.1:8000",
+    "username": "admin",
+    "scale": "small",
+    "seed": 42
+  },
+  "steps": [
+    {
+      "name": "auth_login",
+      "method": "POST",
+      "path": "/auth/login",
+      "status_code": 200,
+      "latency_ms": 3.71,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/auth/login",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_evidence_0",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 201,
+      "latency_ms": 9.62,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_evidence_1",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 201,
+      "latency_ms": 7.91,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_evidence_2",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 201,
+      "latency_ms": 7.07,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_evidence_3",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 201,
+      "latency_ms": 7.08,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_evidence_4",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 201,
+      "latency_ms": 8.37,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_evidence_5",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 201,
+      "latency_ms": 7.49,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_evidence_6",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 201,
+      "latency_ms": 6.99,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_evidence_7",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 201,
+      "latency_ms": 7.05,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_evidence_8",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 201,
+      "latency_ms": 7.02,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_evidence_9",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 201,
+      "latency_ms": 7.15,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_evidence_10",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 201,
+      "latency_ms": 7.12,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_evidence_11",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 201,
+      "latency_ms": 6.97,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_evidence_12",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 201,
+      "latency_ms": 10.58,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_evidence_13",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 201,
+      "latency_ms": 7.79,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_evidence_14",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 201,
+      "latency_ms": 7.4,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_evidence_15",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 201,
+      "latency_ms": 6.99,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_evidence_16",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 201,
+      "latency_ms": 6.98,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_evidence_17",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 201,
+      "latency_ms": 7.03,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_evidence_18",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 201,
+      "latency_ms": 7.09,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_evidence_19",
+      "method": "POST",
+      "path": "/audit/evidence",
+      "status_code": 201,
+      "latency_ms": 6.93,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/evidence",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_control_eval_0",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 201,
+      "latency_ms": 12.73,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_control_eval_1",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 201,
+      "latency_ms": 8.82,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_control_eval_2",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 201,
+      "latency_ms": 7.13,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_control_eval_3",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 201,
+      "latency_ms": 7.57,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_control_eval_4",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 201,
+      "latency_ms": 6.44,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_control_eval_5",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 201,
+      "latency_ms": 6.85,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_control_eval_6",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 201,
+      "latency_ms": 6.52,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_control_eval_7",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 201,
+      "latency_ms": 10.76,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_control_eval_8",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 201,
+      "latency_ms": 7.28,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_control_eval_9",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 201,
+      "latency_ms": 7.3,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_control_eval_10",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 201,
+      "latency_ms": 6.11,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_control_eval_11",
+      "method": "POST",
+      "path": "/evaluation/controls",
+      "status_code": 201,
+      "latency_ms": 5.19,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_sod_0",
+      "method": "POST",
+      "path": "/evaluation/sod",
+      "status_code": 201,
+      "latency_ms": 8.59,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/sod",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_sod_1",
+      "method": "POST",
+      "path": "/evaluation/sod",
+      "status_code": 201,
+      "latency_ms": 6.1,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/sod",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_sod_2",
+      "method": "POST",
+      "path": "/evaluation/sod",
+      "status_code": 201,
+      "latency_ms": 5.69,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/sod",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_sod_3",
+      "method": "POST",
+      "path": "/evaluation/sod",
+      "status_code": 201,
+      "latency_ms": 5.23,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/sod",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_sod_4",
+      "method": "POST",
+      "path": "/evaluation/sod",
+      "status_code": 201,
+      "latency_ms": 5.18,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/sod",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "seed_sod_5",
+      "method": "POST",
+      "path": "/evaluation/sod",
+      "status_code": 201,
+      "latency_ms": 5.16,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/sod",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "list_controls_for_exceptions",
+      "method": "GET",
+      "path": "/evaluation/controls",
+      "status_code": 200,
+      "latency_ms": 5.6,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "create_exception_0",
+      "method": "POST",
+      "path": "/evaluation/exceptions",
+      "status_code": 201,
+      "latency_ms": 8.4,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/exceptions",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "transition_exception_0_acknowledged",
+      "method": "PATCH",
+      "path": "/evaluation/exceptions/eb004f72-c12f-4e69-a077-7a912a4e3b03/transition",
+      "status_code": 200,
+      "latency_ms": 7.81,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/exceptions/eb004f72-c12f-4e69-a077-7a912a4e3b03/transition",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "transition_exception_0_remediation_in_progress",
+      "method": "PATCH",
+      "path": "/evaluation/exceptions/eb004f72-c12f-4e69-a077-7a912a4e3b03/transition",
+      "status_code": 500,
+      "latency_ms": 878.9,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/exceptions/eb004f72-c12f-4e69-a077-7a912a4e3b03/transition",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "transition_exception_0_remediated",
+      "method": "PATCH",
+      "path": "/evaluation/exceptions/eb004f72-c12f-4e69-a077-7a912a4e3b03/transition",
+      "status_code": 422,
+      "latency_ms": 4.46,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/exceptions/eb004f72-c12f-4e69-a077-7a912a4e3b03/transition",
+        "attempts": 1
+      },
+      "error": "Unexpected status: 422"
+    },
+    {
+      "name": "transition_exception_0_closed",
+      "method": "PATCH",
+      "path": "/evaluation/exceptions/eb004f72-c12f-4e69-a077-7a912a4e3b03/transition",
+      "status_code": 422,
+      "latency_ms": 3.8,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/exceptions/eb004f72-c12f-4e69-a077-7a912a4e3b03/transition",
+        "attempts": 1
+      },
+      "error": "Unexpected status: 422"
+    },
+    {
+      "name": "create_exception_1",
+      "method": "POST",
+      "path": "/evaluation/exceptions",
+      "status_code": 201,
+      "latency_ms": 6.09,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/exceptions",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "transition_exception_1_accepted_risk",
+      "method": "PATCH",
+      "path": "/evaluation/exceptions/11bc7e0b-3fae-444e-bb13-fea41f0a0c00/transition",
+      "status_code": 200,
+      "latency_ms": 6.01,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/exceptions/11bc7e0b-3fae-444e-bb13-fea41f0a0c00/transition",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "transition_exception_1_closed",
+      "method": "PATCH",
+      "path": "/evaluation/exceptions/11bc7e0b-3fae-444e-bb13-fea41f0a0c00/transition",
+      "status_code": 200,
+      "latency_ms": 6.65,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/exceptions/11bc7e0b-3fae-444e-bb13-fea41f0a0c00/transition",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "create_exception_2",
+      "method": "POST",
+      "path": "/evaluation/exceptions",
+      "status_code": 201,
+      "latency_ms": 5.51,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/exceptions",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "transition_exception_2_acknowledged",
+      "method": "PATCH",
+      "path": "/evaluation/exceptions/097b5d8f-11d4-4371-af39-4f83f212d035/transition",
+      "status_code": 200,
+      "latency_ms": 5.84,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/exceptions/097b5d8f-11d4-4371-af39-4f83f212d035/transition",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "transition_exception_2_remediation_in_progress",
+      "method": "PATCH",
+      "path": "/evaluation/exceptions/097b5d8f-11d4-4371-af39-4f83f212d035/transition",
+      "status_code": 500,
+      "latency_ms": 640.59,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/exceptions/097b5d8f-11d4-4371-af39-4f83f212d035/transition",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "transition_exception_2_remediated",
+      "method": "PATCH",
+      "path": "/evaluation/exceptions/097b5d8f-11d4-4371-af39-4f83f212d035/transition",
+      "status_code": 422,
+      "latency_ms": 3.91,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/exceptions/097b5d8f-11d4-4371-af39-4f83f212d035/transition",
+        "attempts": 1
+      },
+      "error": "Unexpected status: 422"
+    },
+    {
+      "name": "transition_exception_2_closed",
+      "method": "PATCH",
+      "path": "/evaluation/exceptions/097b5d8f-11d4-4371-af39-4f83f212d035/transition",
+      "status_code": 422,
+      "latency_ms": 3.3,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/exceptions/097b5d8f-11d4-4371-af39-4f83f212d035/transition",
+        "attempts": 1
+      },
+      "error": "Unexpected status: 422"
+    },
+    {
+      "name": "create_exception_3",
+      "method": "POST",
+      "path": "/evaluation/exceptions",
+      "status_code": 201,
+      "latency_ms": 6.62,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/exceptions",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "transition_exception_3_acknowledged",
+      "method": "PATCH",
+      "path": "/evaluation/exceptions/bae60346-b575-452f-88bc-f3b96f339143/transition",
+      "status_code": 200,
+      "latency_ms": 6.12,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/exceptions/bae60346-b575-452f-88bc-f3b96f339143/transition",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "transition_exception_3_remediation_in_progress",
+      "method": "PATCH",
+      "path": "/evaluation/exceptions/bae60346-b575-452f-88bc-f3b96f339143/transition",
+      "status_code": 500,
+      "latency_ms": 626.23,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/exceptions/bae60346-b575-452f-88bc-f3b96f339143/transition",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "transition_exception_3_remediated",
+      "method": "PATCH",
+      "path": "/evaluation/exceptions/bae60346-b575-452f-88bc-f3b96f339143/transition",
+      "status_code": 422,
+      "latency_ms": 3.88,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/exceptions/bae60346-b575-452f-88bc-f3b96f339143/transition",
+        "attempts": 1
+      },
+      "error": "Unexpected status: 422"
+    },
+    {
+      "name": "transition_exception_3_closed",
+      "method": "PATCH",
+      "path": "/evaluation/exceptions/bae60346-b575-452f-88bc-f3b96f339143/transition",
+      "status_code": 422,
+      "latency_ms": 3.27,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/exceptions/bae60346-b575-452f-88bc-f3b96f339143/transition",
+        "attempts": 1
+      },
+      "error": "Unexpected status: 422"
+    },
+    {
+      "name": "create_framework_SOX404",
+      "method": "POST",
+      "path": "/governance/frameworks",
+      "status_code": 201,
+      "latency_ms": 15.24,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/frameworks",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "create_framework_ISO27001",
+      "method": "POST",
+      "path": "/governance/frameworks",
+      "status_code": 201,
+      "latency_ms": 6.58,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/frameworks",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "create_framework_COBIT2019",
+      "method": "POST",
+      "path": "/governance/frameworks",
+      "status_code": 201,
+      "latency_ms": 6.41,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/frameworks",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "create_policy_0",
+      "method": "POST",
+      "path": "/governance/policies",
+      "status_code": 201,
+      "latency_ms": 10.32,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/policies",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "create_policy_1",
+      "method": "POST",
+      "path": "/governance/policies",
+      "status_code": 201,
+      "latency_ms": 6.54,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/policies",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "create_policy_2",
+      "method": "POST",
+      "path": "/governance/policies",
+      "status_code": 201,
+      "latency_ms": 6.38,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/policies",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "create_mapping_0",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 201,
+      "latency_ms": 9.55,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/mappings",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "create_mapping_1",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 201,
+      "latency_ms": 6.33,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/mappings",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "create_mapping_2",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 201,
+      "latency_ms": 6.32,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/mappings",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "create_mapping_3",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 201,
+      "latency_ms": 6.23,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/mappings",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "create_mapping_4",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 201,
+      "latency_ms": 6.29,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/mappings",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "create_mapping_5",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 201,
+      "latency_ms": 6.45,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/mappings",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "create_mapping_6",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 201,
+      "latency_ms": 6.35,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/mappings",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "create_mapping_7",
+      "method": "POST",
+      "path": "/governance/mappings",
+      "status_code": 201,
+      "latency_ms": 6.2,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/mappings",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "create_risk_0",
+      "method": "POST",
+      "path": "/governance/risks",
+      "status_code": 201,
+      "latency_ms": 11.25,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/risks",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "create_risk_1",
+      "method": "POST",
+      "path": "/governance/risks",
+      "status_code": 201,
+      "latency_ms": 6.61,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/risks",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "create_risk_2",
+      "method": "POST",
+      "path": "/governance/risks",
+      "status_code": 201,
+      "latency_ms": 6.46,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/risks",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "create_risk_3",
+      "method": "POST",
+      "path": "/governance/risks",
+      "status_code": 201,
+      "latency_ms": 6.38,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/risks",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "create_risk_4",
+      "method": "POST",
+      "path": "/governance/risks",
+      "status_code": 201,
+      "latency_ms": 6.31,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/risks",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "create_risk_5",
+      "method": "POST",
+      "path": "/governance/risks",
+      "status_code": 201,
+      "latency_ms": 6.42,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/risks",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "create_alert_rule_0",
+      "method": "POST",
+      "path": "/alerts/rules",
+      "status_code": 201,
+      "latency_ms": 8.95,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/rules",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "create_alert_rule_1",
+      "method": "POST",
+      "path": "/alerts/rules",
+      "status_code": 201,
+      "latency_ms": 5.37,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/rules",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "create_alert_rule_2",
+      "method": "POST",
+      "path": "/alerts/rules",
+      "status_code": 201,
+      "latency_ms": 5.23,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/rules",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "create_alert_0",
+      "method": "POST",
+      "path": "/alerts/",
+      "status_code": 201,
+      "latency_ms": 10.19,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "ack_alert_0",
+      "method": "PATCH",
+      "path": "/alerts/2e377779-67c3-45fd-8e0b-a04ab487aa6a/acknowledge",
+      "status_code": 200,
+      "latency_ms": 7.62,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/2e377779-67c3-45fd-8e0b-a04ab487aa6a/acknowledge",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "resolve_alert_0",
+      "method": "PATCH",
+      "path": "/alerts/2e377779-67c3-45fd-8e0b-a04ab487aa6a/resolve",
+      "status_code": 200,
+      "latency_ms": 55.91,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/2e377779-67c3-45fd-8e0b-a04ab487aa6a/resolve",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "create_alert_1",
+      "method": "POST",
+      "path": "/alerts/",
+      "status_code": 201,
+      "latency_ms": 6.08,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "create_alert_2",
+      "method": "POST",
+      "path": "/alerts/",
+      "status_code": 201,
+      "latency_ms": 5.32,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "ack_alert_2",
+      "method": "PATCH",
+      "path": "/alerts/cddef932-6a9f-45b9-b4bd-244fbd153ac6/acknowledge",
+      "status_code": 200,
+      "latency_ms": 5.94,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/cddef932-6a9f-45b9-b4bd-244fbd153ac6/acknowledge",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "create_alert_3",
+      "method": "POST",
+      "path": "/alerts/",
+      "status_code": 201,
+      "latency_ms": 5.24,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "resolve_alert_3",
+      "method": "PATCH",
+      "path": "/alerts/13fa277a-ea6f-4aac-9776-21798974710f/resolve",
+      "status_code": 200,
+      "latency_ms": 5.78,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/13fa277a-ea6f-4aac-9776-21798974710f/resolve",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "create_alert_4",
+      "method": "POST",
+      "path": "/alerts/",
+      "status_code": 201,
+      "latency_ms": 5.29,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "ack_alert_4",
+      "method": "PATCH",
+      "path": "/alerts/db4482dd-5670-4992-ad77-de86b1a2d2e8/acknowledge",
+      "status_code": 200,
+      "latency_ms": 5.82,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/db4482dd-5670-4992-ad77-de86b1a2d2e8/acknowledge",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "create_alert_5",
+      "method": "POST",
+      "path": "/alerts/",
+      "status_code": 201,
+      "latency_ms": 5.4,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "engine_health",
+      "method": "GET",
+      "path": "/engine/health",
+      "status_code": 200,
+      "latency_ms": 1.35,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/health",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "engine_analyze_sod",
+      "method": "POST",
+      "path": "/engine/analyze/sod",
+      "status_code": 200,
+      "latency_ms": 5.02,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/analyze/sod",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "run_report_executive_summary",
+      "method": "POST",
+      "path": "/reports/runs",
+      "status_code": 201,
+      "latency_ms": 28.49,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/reports/runs",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "run_report_compliance_status",
+      "method": "POST",
+      "path": "/reports/runs",
+      "status_code": 201,
+      "latency_ms": 13.75,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/reports/runs",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "run_report_kpi_dashboard",
+      "method": "POST",
+      "path": "/reports/runs",
+      "status_code": 201,
+      "latency_ms": 10.93,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/reports/runs",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "run_report_audit_findings",
+      "method": "POST",
+      "path": "/reports/runs",
+      "status_code": 201,
+      "latency_ms": 10.9,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/reports/runs",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "run_report_sod_matrix",
+      "method": "POST",
+      "path": "/reports/runs",
+      "status_code": 201,
+      "latency_ms": 10.59,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/reports/runs",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "run_report_risk_register",
+      "method": "POST",
+      "path": "/reports/runs",
+      "status_code": 201,
+      "latency_ms": 10.3,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/reports/runs",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "run_report_continuous_assurance",
+      "method": "POST",
+      "path": "/reports/runs",
+      "status_code": 201,
+      "latency_ms": 12.76,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/reports/runs",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "ai_audit_analyze_0_users_toxic_sod",
+      "method": "POST",
+      "path": "/engine/analyze",
+      "status_code": 200,
+      "latency_ms": 45.25,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/analyze",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "ai_audit_verdict_0",
+      "method": "PATCH",
+      "path": "/engine/findings/6f503ce3-812c-4952-82c6-7ae2d70f14bb/verdict",
+      "status_code": 200,
+      "latency_ms": 8.63,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/findings/6f503ce3-812c-4952-82c6-7ae2d70f14bb/verdict",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "ai_audit_analyze_1_users_dormant_privileged",
+      "method": "POST",
+      "path": "/engine/analyze",
+      "status_code": 200,
+      "latency_ms": 7.46,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/analyze",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "ai_audit_verdict_1",
+      "method": "PATCH",
+      "path": "/engine/findings/ab2dfd6b-a35a-4055-a286-926665328e72/verdict",
+      "status_code": 200,
+      "latency_ms": 5.05,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/findings/ab2dfd6b-a35a-4055-a286-926665328e72/verdict",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "ai_audit_analyze_2_changes_self_approval",
+      "method": "POST",
+      "path": "/engine/analyze",
+      "status_code": 200,
+      "latency_ms": 7.95,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/analyze",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "ai_audit_verdict_2",
+      "method": "PATCH",
+      "path": "/engine/findings/2fd8bbe2-65ed-43c6-a5c8-19bbe112d8ba/verdict",
+      "status_code": 200,
+      "latency_ms": 4.23,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/findings/2fd8bbe2-65ed-43c6-a5c8-19bbe112d8ba/verdict",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "ai_audit_analyze_3_transactions_three_way_bypass",
+      "method": "POST",
+      "path": "/engine/analyze",
+      "status_code": 200,
+      "latency_ms": 2.54,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/analyze",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "ai_audit_analyze_4_interfaces_recon_mismatch",
+      "method": "POST",
+      "path": "/engine/analyze",
+      "status_code": 200,
+      "latency_ms": 2.34,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/analyze",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "ai_audit_analyze_5_users_toxic_sod",
+      "method": "POST",
+      "path": "/engine/analyze",
+      "status_code": 200,
+      "latency_ms": 4.76,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/analyze",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "ai_audit_verdict_5",
+      "method": "PATCH",
+      "path": "/engine/findings/0ba7e05f-97b9-495e-a9e5-248de15acdc0/verdict",
+      "status_code": 200,
+      "latency_ms": 3.64,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/findings/0ba7e05f-97b9-495e-a9e5-248de15acdc0/verdict",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "ai_audit_validate_invalid_schema",
+      "method": "POST",
+      "path": "/engine/analyze/validate",
+      "status_code": 200,
+      "latency_ms": 1.69,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/analyze/validate",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "ai_audit_accuracy",
+      "method": "GET",
+      "path": "/engine/accuracy",
+      "status_code": 500,
+      "latency_ms": 625.36,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/accuracy",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    },
+    {
+      "name": "snapshot_vault_summary",
+      "method": "GET",
+      "path": "/audit/vault/summary",
+      "status_code": 200,
+      "latency_ms": 9.66,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/audit/vault/summary",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "snapshot_controls",
+      "method": "GET",
+      "path": "/evaluation/controls",
+      "status_code": 200,
+      "latency_ms": 4.19,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/controls",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "snapshot_sod",
+      "method": "GET",
+      "path": "/evaluation/sod",
+      "status_code": 200,
+      "latency_ms": 4.69,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/sod",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "snapshot_exceptions",
+      "method": "GET",
+      "path": "/evaluation/exceptions",
+      "status_code": 200,
+      "latency_ms": 5.65,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/evaluation/exceptions",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "snapshot_risks",
+      "method": "GET",
+      "path": "/governance/risks",
+      "status_code": 200,
+      "latency_ms": 5.08,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/governance/risks",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "snapshot_alerts",
+      "method": "GET",
+      "path": "/alerts/",
+      "status_code": 200,
+      "latency_ms": 3.91,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/alerts/",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "snapshot_dashboard",
+      "method": "GET",
+      "path": "/reports/dashboard",
+      "status_code": 200,
+      "latency_ms": 14.28,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/reports/dashboard",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "snapshot_kpis",
+      "method": "GET",
+      "path": "/reports/kpis",
+      "status_code": 200,
+      "latency_ms": 5.68,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/reports/kpis",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "snapshot_report_runs",
+      "method": "GET",
+      "path": "/reports/runs",
+      "status_code": 200,
+      "latency_ms": 4.46,
+      "success": true,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/reports/runs",
+        "attempts": 1
+      }
+    },
+    {
+      "name": "snapshot_engine_accuracy",
+      "method": "GET",
+      "path": "/engine/accuracy",
+      "status_code": 500,
+      "latency_ms": 620.62,
+      "success": false,
+      "details": {
+        "url": "http://127.0.0.1:8000/api/v1/engine/accuracy",
+        "attempts": 3
+      },
+      "error": "Unexpected status: 500"
+    }
+  ],
+  "summary": {
+    "total_steps": 123,
+    "failed_steps": 11,
+    "success_rate_pct": 91.06,
+    "p95_latency_ms": 53.78,
+    "created_counts": {
+      "evidence_ids": 20,
+      "control_ids": 12,
+      "exception_ids": 4,
+      "framework_ids": 3,
+      "policy_ids": 3,
+      "mapping_ids": 8,
+      "risk_ids": 6,
+      "alert_rule_ids": 3,
+      "alert_ids": 6,
+      "report_run_ids": 7,
+      "ai_audit_case_ids": 6
+    },
+    "improvement_candidates": 1
+  },
+  "improvement_candidates": [
+    {
+      "type": "api_failures",
+      "severity": "high",
+      "summary": "11 API steps failed during UAT run",
+      "evidence": [
+        {
+          "name": "transition_exception_0_remediation_in_progress",
+          "method": "PATCH",
+          "path": "/evaluation/exceptions/eb004f72-c12f-4e69-a077-7a912a4e3b03/transition",
+          "status_code": 500,
+          "latency_ms": 878.9,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/evaluation/exceptions/eb004f72-c12f-4e69-a077-7a912a4e3b03/transition",
+            "attempts": 3
+          },
+          "error": "Unexpected status: 500"
+        },
+        {
+          "name": "transition_exception_0_remediated",
+          "method": "PATCH",
+          "path": "/evaluation/exceptions/eb004f72-c12f-4e69-a077-7a912a4e3b03/transition",
+          "status_code": 422,
+          "latency_ms": 4.46,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/evaluation/exceptions/eb004f72-c12f-4e69-a077-7a912a4e3b03/transition",
+            "attempts": 1
+          },
+          "error": "Unexpected status: 422"
+        },
+        {
+          "name": "transition_exception_0_closed",
+          "method": "PATCH",
+          "path": "/evaluation/exceptions/eb004f72-c12f-4e69-a077-7a912a4e3b03/transition",
+          "status_code": 422,
+          "latency_ms": 3.8,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/evaluation/exceptions/eb004f72-c12f-4e69-a077-7a912a4e3b03/transition",
+            "attempts": 1
+          },
+          "error": "Unexpected status: 422"
+        },
+        {
+          "name": "transition_exception_2_remediation_in_progress",
+          "method": "PATCH",
+          "path": "/evaluation/exceptions/097b5d8f-11d4-4371-af39-4f83f212d035/transition",
+          "status_code": 500,
+          "latency_ms": 640.59,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/evaluation/exceptions/097b5d8f-11d4-4371-af39-4f83f212d035/transition",
+            "attempts": 3
+          },
+          "error": "Unexpected status: 500"
+        },
+        {
+          "name": "transition_exception_2_remediated",
+          "method": "PATCH",
+          "path": "/evaluation/exceptions/097b5d8f-11d4-4371-af39-4f83f212d035/transition",
+          "status_code": 422,
+          "latency_ms": 3.91,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/evaluation/exceptions/097b5d8f-11d4-4371-af39-4f83f212d035/transition",
+            "attempts": 1
+          },
+          "error": "Unexpected status: 422"
+        },
+        {
+          "name": "transition_exception_2_closed",
+          "method": "PATCH",
+          "path": "/evaluation/exceptions/097b5d8f-11d4-4371-af39-4f83f212d035/transition",
+          "status_code": 422,
+          "latency_ms": 3.3,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/evaluation/exceptions/097b5d8f-11d4-4371-af39-4f83f212d035/transition",
+            "attempts": 1
+          },
+          "error": "Unexpected status: 422"
+        },
+        {
+          "name": "transition_exception_3_remediation_in_progress",
+          "method": "PATCH",
+          "path": "/evaluation/exceptions/bae60346-b575-452f-88bc-f3b96f339143/transition",
+          "status_code": 500,
+          "latency_ms": 626.23,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/evaluation/exceptions/bae60346-b575-452f-88bc-f3b96f339143/transition",
+            "attempts": 3
+          },
+          "error": "Unexpected status: 500"
+        },
+        {
+          "name": "transition_exception_3_remediated",
+          "method": "PATCH",
+          "path": "/evaluation/exceptions/bae60346-b575-452f-88bc-f3b96f339143/transition",
+          "status_code": 422,
+          "latency_ms": 3.88,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/evaluation/exceptions/bae60346-b575-452f-88bc-f3b96f339143/transition",
+            "attempts": 1
+          },
+          "error": "Unexpected status: 422"
+        },
+        {
+          "name": "transition_exception_3_closed",
+          "method": "PATCH",
+          "path": "/evaluation/exceptions/bae60346-b575-452f-88bc-f3b96f339143/transition",
+          "status_code": 422,
+          "latency_ms": 3.27,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/evaluation/exceptions/bae60346-b575-452f-88bc-f3b96f339143/transition",
+            "attempts": 1
+          },
+          "error": "Unexpected status: 422"
+        },
+        {
+          "name": "ai_audit_accuracy",
+          "method": "GET",
+          "path": "/engine/accuracy",
+          "status_code": 500,
+          "latency_ms": 625.36,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/engine/accuracy",
+            "attempts": 3
+          },
+          "error": "Unexpected status: 500"
+        },
+        {
+          "name": "snapshot_engine_accuracy",
+          "method": "GET",
+          "path": "/engine/accuracy",
+          "status_code": 500,
+          "latency_ms": 620.62,
+          "success": false,
+          "details": {
+            "url": "http://127.0.0.1:8000/api/v1/engine/accuracy",
+            "attempts": 3
+          },
+          "error": "Unexpected status: 500"
+        }
+      ]
+    }
+  ],
+  "artifacts": {
+    "snapshots": {
+      "vault_summary": {
+        "total_records": 44,
+        "verified_records": 44,
+        "tampered_records": 0,
+        "low_confidence_records": 0,
+        "latest_source_system": "Network-Firewall",
+        "latest_recorded_at": "2026-03-07T04:53:53.990909Z"
+      },
+      "controls": [
+        {
+          "id": "8db4905e-f767-4c00-a016-82af5d9a1894",
+          "org_id": "default-org",
+          "control_id": "ITGC-CHANGE-45352Z-011",
+          "description": "Synthetic enterprise test for ITGC-CHANGE across multi-entity flows, approval hierarchy, and policy thresholds",
+          "test_type": "Hybrid",
+          "status": "passed",
+          "evidence_vault_id": null,
+          "metrics": {
+            "records_tested": 1363,
+            "records_failed": 172,
+            "threshold_pct": 1.73,
+            "observed_pct": 12.62,
+            "entity_count": 11,
+            "country_count": 3,
+            "source_mix": [
+              "ERP",
+              "IAM",
+              "PAM",
+              "ITSM"
+            ],
+            "run_id": "20260307T045352Z"
+          },
+          "evaluated_at": "2026-03-07T04:53:53.100407Z"
+        },
+        {
+          "id": "4f1c6494-34fd-4e99-abb4-5fc65e91a6fe",
+          "org_id": "default-org",
+          "control_id": "ITAC-R2R-45352Z-010",
+          "description": "Synthetic enterprise test for ITAC-R2R across multi-entity flows, approval hierarchy, and policy thresholds",
+          "test_type": "Automated",
+          "status": "exception",
+          "evidence_vault_id": null,
+          "metrics": {
+            "records_tested": 8951,
+            "records_failed": 322,
+            "threshold_pct": 3.85,
+            "observed_pct": 3.6,
+            "entity_count": 3,
+            "country_count": 8,
+            "source_mix": [
+              "ERP",
+              "IAM",
+              "PAM",
+              "ITSM"
+            ],
+            "run_id": "20260307T045352Z"
+          },
+          "evaluated_at": "2026-03-07T04:53:53.095046Z"
+        },
+        {
+          "id": "e6c4bc30-4c27-49da-9c72-d473d9405bb1",
+          "org_id": "default-org",
+          "control_id": "ITGC-ACCESS-45352Z-009",
+          "description": "Synthetic enterprise test for ITGC-ACCESS across multi-entity flows, approval hierarchy, and policy thresholds",
+          "test_type": "Continuous",
+          "status": "failed",
+          "evidence_vault_id": null,
+          "metrics": {
+            "records_tested": 9133,
+            "records_failed": 124,
+            "threshold_pct": 0.42,
+            "observed_pct": 1.36,
+            "entity_count": 11,
+            "country_count": 5,
+            "source_mix": [
+              "ERP",
+              "IAM",
+              "PAM",
+              "ITSM"
+            ],
+            "run_id": "20260307T045352Z"
+          },
+          "evaluated_at": "2026-03-07T04:53:53.087583Z"
+        },
+        {
+          "id": "3ac5720e-7c45-4323-af71-33ad1ddd2fa0",
+          "org_id": "default-org",
+          "control_id": "FRAUD-DETECT-45352Z-008",
+          "description": "Synthetic enterprise test for FRAUD-DETECT across multi-entity flows, approval hierarchy, and policy thresholds",
+          "test_type": "Detective",
+          "status": "passed",
+          "evidence_vault_id": null,
+          "metrics": {
+            "records_tested": 7180,
+            "records_failed": 1138,
+            "threshold_pct": 0.79,
+            "observed_pct": 15.85,
+            "entity_count": 6,
+            "country_count": 3,
+            "source_mix": [
+              "ERP",
+              "IAM",
+              "PAM",
+              "ITSM"
+            ],
+            "run_id": "20260307T045352Z"
+          },
+          "evaluated_at": "2026-03-07T04:53:53.081029Z"
+        },
+        {
+          "id": "aa841f9c-8ed4-4a1a-b525-9e7bbe607a76",
+          "org_id": "default-org",
+          "control_id": "ITAC-P2P-45352Z-007",
+          "description": "Synthetic enterprise test for ITAC-P2P across multi-entity flows, approval hierarchy, and policy thresholds",
+          "test_type": "Automated",
+          "status": "exception",
+          "evidence_vault_id": null,
+          "metrics": {
+            "records_tested": 2947,
+            "records_failed": 388,
+            "threshold_pct": 3.94,
+            "observed_pct": 13.17,
+            "entity_count": 6,
+            "country_count": 8,
+            "source_mix": [
+              "ERP",
+              "IAM",
+              "PAM",
+              "ITSM"
+            ],
+            "run_id": "20260307T045352Z"
+          },
+          "evaluated_at": "2026-03-07T04:53:53.073575Z"
+        },
+        {
+          "id": "37d733c5-03a3-499c-a725-1977d2351eaf",
+          "org_id": "default-org",
+          "control_id": "ITGC-ACCESS-45352Z-006",
+          "description": "Synthetic enterprise test for ITGC-ACCESS across multi-entity flows, approval hierarchy, and policy thresholds",
+          "test_type": "Detective",
+          "status": "exception",
+          "evidence_vault_id": null,
+          "metrics": {
+            "records_tested": 4122,
+            "records_failed": 170,
+            "threshold_pct": 2.05,
+            "observed_pct": 4.12,
+            "entity_count": 5,
+            "country_count": 8,
+            "source_mix": [
+              "ERP",
+              "IAM",
+              "PAM",
+              "ITSM"
+            ],
+            "run_id": "20260307T045352Z"
+          },
+          "evaluated_at": "2026-03-07T04:53:53.062760Z"
+        },
+        {
+          "id": "975937d8-f460-41f0-be0a-a71bbad6be66",
+          "org_id": "default-org",
+          "control_id": "ITAC-P2P-45352Z-005",
+          "description": "Synthetic enterprise test for ITAC-P2P across multi-entity flows, approval hierarchy, and policy thresholds",
+          "test_type": "Automated",
+          "status": "passed",
+          "evidence_vault_id": null,
+          "metrics": {
+            "records_tested": 1485,
+            "records_failed": 226,
+            "threshold_pct": 0.39,
+            "observed_pct": 15.22,
+            "entity_count": 10,
+            "country_count": 8,
+            "source_mix": [
+              "ERP",
+              "IAM",
+              "PAM",
+              "ITSM"
+            ],
+            "run_id": "20260307T045352Z"
+          },
+          "evaluated_at": "2026-03-07T04:53:53.056191Z"
+        },
+        {
+          "id": "bff80f8b-ec4d-433b-9d7f-ebe46c704d66",
+          "org_id": "default-org",
+          "control_id": "FRAUD-DETECT-45352Z-004",
+          "description": "Synthetic enterprise test for FRAUD-DETECT across multi-entity flows, approval hierarchy, and policy thresholds",
+          "test_type": "Detective",
+          "status": "passed",
+          "evidence_vault_id": null,
+          "metrics": {
+            "records_tested": 3389,
+            "records_failed": 194,
+            "threshold_pct": 0.73,
+            "observed_pct": 5.72,
+            "entity_count": 4,
+            "country_count": 4,
+            "source_mix": [
+              "ERP",
+              "IAM",
+              "PAM",
+              "ITSM"
+            ],
+            "run_id": "20260307T045352Z"
+          },
+          "evaluated_at": "2026-03-07T04:53:53.049339Z"
+        },
+        {
+          "id": "93e32f85-c235-43c9-bf42-b2d576822d2e",
+          "org_id": "default-org",
+          "control_id": "ITAC-P2P-45352Z-003",
+          "description": "Synthetic enterprise test for ITAC-P2P across multi-entity flows, approval hierarchy, and policy thresholds",
+          "test_type": "Automated",
+          "status": "passed",
+          "evidence_vault_id": null,
+          "metrics": {
+            "records_tested": 1137,
+            "records_failed": 172,
+            "threshold_pct": 0.43,
+            "observed_pct": 15.13,
+            "entity_count": 7,
+            "country_count": 8,
+            "source_mix": [
+              "ERP",
+              "IAM",
+              "PAM",
+              "ITSM"
+            ],
+            "run_id": "20260307T045352Z"
+          },
+          "evaluated_at": "2026-03-07T04:53:53.042815Z"
+        },
+        {
+          "id": "8928d13b-d614-4b2d-84bc-4be73956f4bc",
+          "org_id": "default-org",
+          "control_id": "ITAC-P2P-45352Z-002",
+          "description": "Synthetic enterprise test for ITAC-P2P across multi-entity flows, approval hierarchy, and policy thresholds",
+          "test_type": "Hybrid",
+          "status": "passed",
+          "evidence_vault_id": null,
+          "metrics": {
+            "records_tested": 7999,
+            "records_failed": 833,
+            "threshold_pct": 0.56,
+            "observed_pct": 10.41,
+            "entity_count": 8,
+            "country_count": 4,
+            "source_mix": [
+              "ERP",
+              "IAM",
+              "PAM",
+              "ITSM"
+            ],
+            "run_id": "20260307T045352Z"
+          },
+          "evaluated_at": "2026-03-07T04:53:53.034684Z"
+        },
+        {
+          "id": "df5ec00c-e3ef-413d-992a-dd06c0506670",
+          "org_id": "default-org",
+          "control_id": "ITAC-R2R-45352Z-001",
+          "description": "Synthetic enterprise test for ITAC-R2R across multi-entity flows, approval hierarchy, and policy thresholds",
+          "test_type": "Hybrid",
+          "status": "passed",
+          "evidence_vault_id": null,
+          "metrics": {
+            "records_tested": 8203,
+            "records_failed": 438,
+            "threshold_pct": 2.95,
+            "observed_pct": 5.34,
+            "entity_count": 11,
+            "country_count": 6,
+            "source_mix": [
+              "ERP",
+              "IAM",
+              "PAM",
+              "ITSM"
+            ],
+            "run_id": "20260307T045352Z"
+          },
+          "evaluated_at": "2026-03-07T04:53:53.026054Z"
+        },
+        {
+          "id": "e2d280d8-ad90-40e7-8e14-794d4c3c4ff7",
+          "org_id": "default-org",
+          "control_id": "ITGC-ACCESS-45352Z-000",
+          "description": "Synthetic enterprise test for ITGC-ACCESS across multi-entity flows, approval hierarchy, and policy thresholds",
+          "test_type": "Automated",
+          "status": "passed",
+          "evidence_vault_id": null,
+          "metrics": {
+            "records_tested": 1214,
+            "records_failed": 58,
+            "threshold_pct": 3.64,
+            "observed_pct": 4.78,
+            "entity_count": 7,
+            "country_count": 2,
+            "source_mix": [
+              "ERP",
+              "IAM",
+              "PAM",
+              "ITSM"
+            ],
+            "run_id": "20260307T045352Z"
+          },
+          "evaluated_at": "2026-03-07T04:53:53.013331Z"
+        }
+      ],
+      "sod": [
+        {
+          "id": "314624a5-ffa8-4f9e-8785-e493806db5ab",
+          "org_id": "default-org",
+          "user_id": "UAT-USER-44814",
+          "role_a": "journal_create",
+          "role_b": "journal_post",
+          "conflict_type": "toxic_combination",
+          "risk_level": "High",
+          "detected_at": "2026-03-07T04:53:53.136421Z",
+          "resolved": false
+        },
+        {
+          "id": "86686700-b145-4ebe-a53e-f30153f59327",
+          "org_id": "default-org",
+          "user_id": "UAT-USER-97782",
+          "role_a": "journal_create",
+          "role_b": "journal_post",
+          "conflict_type": "toxic_combination",
+          "risk_level": "Medium",
+          "detected_at": "2026-03-07T04:53:53.131224Z",
+          "resolved": false
+        },
+        {
+          "id": "90e0da56-cca3-4070-b081-b30593f14300",
+          "org_id": "default-org",
+          "user_id": "UAT-USER-51467",
+          "role_a": "po_create",
+          "role_b": "po_approve",
+          "conflict_type": "toxic_combination",
+          "risk_level": "Medium",
+          "detected_at": "2026-03-07T04:53:53.126006Z",
+          "resolved": false
+        },
+        {
+          "id": "bbfd922e-107a-40b1-8315-c9e3ca7fc169",
+          "org_id": "default-org",
+          "user_id": "UAT-USER-86503",
+          "role_a": "gl_master_change",
+          "role_b": "posting_execute",
+          "conflict_type": "toxic_combination",
+          "risk_level": "Critical",
+          "detected_at": "2026-03-07T04:53:53.120754Z",
+          "resolved": false
+        },
+        {
+          "id": "a3b9a164-9393-41f0-8105-14a3da43e6bf",
+          "org_id": "default-org",
+          "user_id": "UAT-USER-20745",
+          "role_a": "po_create",
+          "role_b": "po_approve",
+          "conflict_type": "toxic_combination",
+          "risk_level": "High",
+          "detected_at": "2026-03-07T04:53:53.114205Z",
+          "resolved": false
+        },
+        {
+          "id": "a5682d90-0a17-4655-8876-71df4cc155dc",
+          "org_id": "default-org",
+          "user_id": "UAT-USER-87924",
+          "role_a": "po_create",
+          "role_b": "po_approve",
+          "conflict_type": "toxic_combination",
+          "risk_level": "High",
+          "detected_at": "2026-03-07T04:53:53.106577Z",
+          "resolved": false
+        }
+      ],
+      "exceptions": [
+        {
+          "id": "bae60346-b575-452f-88bc-f3b96f339143",
+          "org_id": "default-org",
+          "control_test_id": "37d733c5-03a3-499c-a725-1977d2351eaf",
+          "description": "Exception opened by enterprise UAT for remediation workflow testing on control ITGC-ACCESS-45352Z-006",
+          "state": "acknowledged",
+          "owner_id": "owner_3@examplecorp.test",
+          "comments": [
+            {
+              "from_state": "open",
+              "to_state": "acknowledged",
+              "transitioned_by": "admin",
+              "transitioned_at": "2026-03-07T04:53:54.735843+00:00",
+              "comment": "UAT transition to acknowledged"
+            }
+          ],
+          "created_at": "2026-03-07T04:53:54.728877Z",
+          "resolved_at": null
+        },
+        {
+          "id": "097b5d8f-11d4-4371-af39-4f83f212d035",
+          "org_id": "default-org",
+          "control_test_id": "aa841f9c-8ed4-4a1a-b525-9e7bbe607a76",
+          "description": "Exception opened by enterprise UAT for remediation workflow testing on control ITAC-P2P-45352Z-007",
+          "state": "acknowledged",
+          "owner_id": "owner_2@examplecorp.test",
+          "comments": [
+            {
+              "from_state": "open",
+              "to_state": "acknowledged",
+              "transitioned_by": "admin",
+              "transitioned_at": "2026-03-07T04:53:54.075527+00:00",
+              "comment": "UAT transition to acknowledged"
+            }
+          ],
+          "created_at": "2026-03-07T04:53:54.069724Z",
+          "resolved_at": null
+        },
+        {
+          "id": "11bc7e0b-3fae-444e-bb13-fea41f0a0c00",
+          "org_id": "default-org",
+          "control_test_id": "e6c4bc30-4c27-49da-9c72-d473d9405bb1",
+          "description": "Exception opened by enterprise UAT for remediation workflow testing on control ITGC-ACCESS-45352Z-009",
+          "state": "closed",
+          "owner_id": "owner_1@examplecorp.test",
+          "comments": [
+            {
+              "from_state": "open",
+              "to_state": "accepted_risk",
+              "transitioned_by": "admin",
+              "transitioned_at": "2026-03-07T04:53:54.057345+00:00",
+              "comment": "UAT transition to accepted_risk"
+            },
+            {
+              "from_state": "accepted_risk",
+              "to_state": "closed",
+              "transitioned_by": "admin",
+              "transitioned_at": "2026-03-07T04:53:54.063367+00:00",
+              "comment": "UAT transition to closed"
+            }
+          ],
+          "created_at": "2026-03-07T04:53:54.050880Z",
+          "resolved_at": "2026-03-07T04:53:54.063367Z"
+        },
+        {
+          "id": "eb004f72-c12f-4e69-a077-7a912a4e3b03",
+          "org_id": "default-org",
+          "control_test_id": "4f1c6494-34fd-4e99-abb4-5fc65e91a6fe",
+          "description": "Exception opened by enterprise UAT for remediation workflow testing on control ITAC-R2R-45352Z-010",
+          "state": "acknowledged",
+          "owner_id": "owner_0@examplecorp.test",
+          "comments": [
+            {
+              "from_state": "open",
+              "to_state": "acknowledged",
+              "transitioned_by": "admin",
+              "transitioned_at": "2026-03-07T04:53:53.156483+00:00",
+              "comment": "UAT transition to acknowledged"
+            }
+          ],
+          "created_at": "2026-03-07T04:53:53.148127Z",
+          "resolved_at": null
+        }
+      ],
+      "risks": [
+        {
+          "id": "f9a22a18-bb59-460a-a1ba-3760486c0a88",
+          "org_id": "default-org",
+          "risk_id": "RISK-UAT-45352Z-000",
+          "title": "Enterprise risk scenario 000",
+          "description": "Synthetic industry-like risk scenario covering controls, legal entities, and cross-border operations.",
+          "category": "Operational",
+          "inherent_likelihood": 3,
+          "inherent_impact": 4,
+          "residual_likelihood": 3,
+          "residual_impact": 4,
+          "risk_score": 12.0,
+          "risk_rating": "HIGH",
+          "owner": "risk.owner0@examplecorp.test",
+          "treatment": "accept",
+          "status": "open",
+          "related_controls": [
+            "CTRL-UAT-000",
+            "CTRL-UAT-001"
+          ],
+          "created_at": "2026-03-07T04:53:55.482817Z",
+          "updated_at": "2026-03-07T04:53:55.482819Z"
+        },
+        {
+          "id": "09df5372-be70-4009-88dc-cd4320a12332",
+          "org_id": "default-org",
+          "risk_id": "RISK-UAT-45352Z-001",
+          "title": "Enterprise risk scenario 001",
+          "description": "Synthetic industry-like risk scenario covering controls, legal entities, and cross-border operations.",
+          "category": "Regulatory",
+          "inherent_likelihood": 5,
+          "inherent_impact": 4,
+          "residual_likelihood": 3,
+          "residual_impact": 2,
+          "risk_score": 6.0,
+          "risk_rating": "MEDIUM",
+          "owner": "risk.owner1@examplecorp.test",
+          "treatment": "mitigate",
+          "status": "monitoring",
+          "related_controls": [
+            "CTRL-UAT-001",
+            "CTRL-UAT-002"
+          ],
+          "created_at": "2026-03-07T04:53:55.493002Z",
+          "updated_at": "2026-03-07T04:53:55.493004Z"
+        },
+        {
+          "id": "65a666d4-10e4-47fc-a902-11c69d5e15c2",
+          "org_id": "default-org",
+          "risk_id": "RISK-UAT-45352Z-003",
+          "title": "Enterprise risk scenario 003",
+          "description": "Synthetic industry-like risk scenario covering controls, legal entities, and cross-border operations.",
+          "category": "Cyber",
+          "inherent_likelihood": 4,
+          "inherent_impact": 3,
+          "residual_likelihood": 2,
+          "residual_impact": 2,
+          "risk_score": 4.0,
+          "risk_rating": "LOW",
+          "owner": "risk.owner3@examplecorp.test",
+          "treatment": "accept",
+          "status": "mitigated",
+          "related_controls": [
+            "CTRL-UAT-003",
+            "CTRL-UAT-004"
+          ],
+          "created_at": "2026-03-07T04:53:55.506078Z",
+          "updated_at": "2026-03-07T04:53:55.506080Z"
+        },
+        {
+          "id": "584bee8f-6dcc-4aac-80eb-d16596849df6",
+          "org_id": "default-org",
+          "risk_id": "RISK-UAT-45352Z-004",
+          "title": "Enterprise risk scenario 004",
+          "description": "Synthetic industry-like risk scenario covering controls, legal entities, and cross-border operations.",
+          "category": "ThirdParty",
+          "inherent_likelihood": 4,
+          "inherent_impact": 2,
+          "residual_likelihood": 4,
+          "residual_impact": 1,
+          "risk_score": 4.0,
+          "risk_rating": "MEDIUM",
+          "owner": "risk.owner4@examplecorp.test",
+          "treatment": "accept",
+          "status": "open",
+          "related_controls": [
+            "CTRL-UAT-004",
+            "CTRL-UAT-005"
+          ],
+          "created_at": "2026-03-07T04:53:55.512459Z",
+          "updated_at": "2026-03-07T04:53:55.512460Z"
+        },
+        {
+          "id": "aa0aa9dc-81d7-4a25-9084-f4394fffbf20",
+          "org_id": "default-org",
+          "risk_id": "RISK-UAT-45352Z-005",
+          "title": "Enterprise risk scenario 005",
+          "description": "Synthetic industry-like risk scenario covering controls, legal entities, and cross-border operations.",
+          "category": "Operational",
+          "inherent_likelihood": 2,
+          "inherent_impact": 4,
+          "residual_likelihood": 2,
+          "residual_impact": 2,
+          "risk_score": 4.0,
+          "risk_rating": "LOW",
+          "owner": "risk.owner5@examplecorp.test",
+          "treatment": "transfer",
+          "status": "mitigated",
+          "related_controls": [
+            "CTRL-UAT-005",
+            "CTRL-UAT-006"
+          ],
+          "created_at": "2026-03-07T04:53:55.518815Z",
+          "updated_at": "2026-03-07T04:53:55.518817Z"
+        },
+        {
+          "id": "1d1f7638-9f44-4f38-b138-674ec391672d",
+          "org_id": "default-org",
+          "risk_id": "RISK-UAT-45352Z-002",
+          "title": "Enterprise risk scenario 002",
+          "description": "Synthetic industry-like risk scenario covering controls, legal entities, and cross-border operations.",
+          "category": "Financial",
+          "inherent_likelihood": 2,
+          "inherent_impact": 3,
+          "residual_likelihood": 1,
+          "residual_impact": 3,
+          "risk_score": 3.0,
+          "risk_rating": "LOW",
+          "owner": "risk.owner2@examplecorp.test",
+          "treatment": "transfer",
+          "status": "monitoring",
+          "related_controls": [
+            "CTRL-UAT-002",
+            "CTRL-UAT-003"
+          ],
+          "created_at": "2026-03-07T04:53:55.499654Z",
+          "updated_at": "2026-03-07T04:53:55.499656Z"
+        }
+      ],
+      "alerts": [
+        {
+          "id": "70417a59-076c-41fb-96e3-4b1e1b4bdb67",
+          "org_id": "default-org",
+          "alert_rule_id": "ef620623-81d3-4a80-b236-c2c99325ffb3",
+          "title": "UAT Compliance Alert 005",
+          "description": "Synthetic scenario: cascading control breakdown across geographies, late remediation, and unresolved segregation conflicts",
+          "severity": "MEDIUM",
+          "status": "open",
+          "metric_value": 86,
+          "affected_controls": [
+            "CTRL-UAT-005",
+            "CTRL-UAT-010"
+          ],
+          "acknowledged_by": null,
+          "acknowledged_at": null,
+          "resolved_by": null,
+          "resolved_at": null,
+          "created_at": "2026-03-07T04:53:55.657417Z"
+        },
+        {
+          "id": "db4482dd-5670-4992-ad77-de86b1a2d2e8",
+          "org_id": "default-org",
+          "alert_rule_id": "7826023f-4733-4060-b88f-c30550db5d71",
+          "title": "UAT Compliance Alert 004",
+          "description": "Synthetic scenario: cascading control breakdown across geographies, late remediation, and unresolved segregation conflicts",
+          "severity": "HIGH",
+          "status": "acknowledged",
+          "metric_value": 27,
+          "affected_controls": [
+            "CTRL-UAT-004",
+            "CTRL-UAT-009"
+          ],
+          "acknowledged_by": "admin",
+          "acknowledged_at": "2026-03-07T04:53:55.651844Z",
+          "resolved_by": null,
+          "resolved_at": null,
+          "created_at": "2026-03-07T04:53:55.646196Z"
+        },
+        {
+          "id": "13fa277a-ea6f-4aac-9776-21798974710f",
+          "org_id": "default-org",
+          "alert_rule_id": "d2f12318-a0cb-4b59-a200-8a6f76f9e7e1",
+          "title": "UAT Compliance Alert 003",
+          "description": "Synthetic scenario: cascading control breakdown across geographies, late remediation, and unresolved segregation conflicts",
+          "severity": "LOW",
+          "status": "resolved",
+          "metric_value": 116,
+          "affected_controls": [
+            "CTRL-UAT-003",
+            "CTRL-UAT-008"
+          ],
+          "acknowledged_by": null,
+          "acknowledged_at": null,
+          "resolved_by": "admin",
+          "resolved_at": "2026-03-07T04:53:55.640764Z",
+          "created_at": "2026-03-07T04:53:55.635105Z"
+        },
+        {
+          "id": "cddef932-6a9f-45b9-b4bd-244fbd153ac6",
+          "org_id": "default-org",
+          "alert_rule_id": "ef620623-81d3-4a80-b236-c2c99325ffb3",
+          "title": "UAT Compliance Alert 002",
+          "description": "Synthetic scenario: cascading control breakdown across geographies, late remediation, and unresolved segregation conflicts",
+          "severity": "HIGH",
+          "status": "acknowledged",
+          "metric_value": 47,
+          "affected_controls": [
+            "CTRL-UAT-002",
+            "CTRL-UAT-007"
+          ],
+          "acknowledged_by": "admin",
+          "acknowledged_at": "2026-03-07T04:53:55.629577Z",
+          "resolved_by": null,
+          "resolved_at": null,
+          "created_at": "2026-03-07T04:53:55.623820Z"
+        },
+        {
+          "id": "565c9621-c93c-403f-8403-a649b0430145",
+          "org_id": "default-org",
+          "alert_rule_id": "7826023f-4733-4060-b88f-c30550db5d71",
+          "title": "UAT Compliance Alert 001",
+          "description": "Synthetic scenario: cascading control breakdown across geographies, late remediation, and unresolved segregation conflicts",
+          "severity": "MEDIUM",
+          "status": "open",
+          "metric_value": 6,
+          "affected_controls": [
+            "CTRL-UAT-001",
+            "CTRL-UAT-006"
+          ],
+          "acknowledged_by": null,
+          "acknowledged_at": null,
+          "resolved_by": null,
+          "resolved_at": null,
+          "created_at": "2026-03-07T04:53:55.618161Z"
+        },
+        {
+          "id": "2e377779-67c3-45fd-8e0b-a04ab487aa6a",
+          "org_id": "default-org",
+          "alert_rule_id": "d2f12318-a0cb-4b59-a200-8a6f76f9e7e1",
+          "title": "UAT Compliance Alert 000",
+          "description": "Synthetic scenario: cascading control breakdown across geographies, late remediation, and unresolved segregation conflicts",
+          "severity": "MEDIUM",
+          "status": "resolved",
+          "metric_value": 56,
+          "affected_controls": [
+            "CTRL-UAT-000",
+            "CTRL-UAT-005"
+          ],
+          "acknowledged_by": "admin",
+          "acknowledged_at": "2026-03-07T04:53:55.555578Z",
+          "resolved_by": "admin",
+          "resolved_at": "2026-03-07T04:53:55.562134Z",
+          "created_at": "2026-03-07T04:53:55.544768Z"
+        }
+      ],
+      "dashboard": {
+        "kpis": {
+          "total_controls_tested": 12,
+          "controls_passed": 8,
+          "controls_failed": 1,
+          "controls_exception": 3,
+          "pass_rate_pct": 66.7,
+          "open_exceptions": 3,
+          "critical_findings": 0,
+          "sod_conflicts": 6,
+          "open_alerts": 2,
+          "overall_risk_rating": "CRITICAL",
+          "generated_at": "2026-03-07T04:53:56.524980Z"
+        },
+        "compliance_status": [
+          {
+            "framework_id": "SOX404-352Z",
+            "framework_name": "SOX Internal Control",
+            "total_mapped": 3,
+            "fully_mapped": 1,
+            "gaps": 1,
+            "partial": 1,
+            "coverage_pct": 33.3
+          },
+          {
+            "framework_id": "ISO27001-352Z",
+            "framework_name": "ISO 27001",
+            "total_mapped": 3,
+            "fully_mapped": 2,
+            "gaps": 0,
+            "partial": 1,
+            "coverage_pct": 66.7
+          },
+          {
+            "framework_id": "COBIT2019-352Z",
+            "framework_name": "COBIT",
+            "total_mapped": 2,
+            "fully_mapped": 2,
+            "gaps": 0,
+            "partial": 0,
+            "coverage_pct": 100.0
+          }
+        ],
+        "recent_alerts": [
+          {
+            "id": "70417a59-076c-41fb-96e3-4b1e1b4bdb67",
+            "title": "UAT Compliance Alert 005",
+            "severity": "MEDIUM",
+            "status": "open",
+            "created_at": "2026-03-07T04:53:55.657417+00:00"
+          },
+          {
+            "id": "db4482dd-5670-4992-ad77-de86b1a2d2e8",
+            "title": "UAT Compliance Alert 004",
+            "severity": "HIGH",
+            "status": "acknowledged",
+            "created_at": "2026-03-07T04:53:55.646196+00:00"
+          },
+          {
+            "id": "cddef932-6a9f-45b9-b4bd-244fbd153ac6",
+            "title": "UAT Compliance Alert 002",
+            "severity": "HIGH",
+            "status": "acknowledged",
+            "created_at": "2026-03-07T04:53:55.623820+00:00"
+          },
+          {
+            "id": "565c9621-c93c-403f-8403-a649b0430145",
+            "title": "UAT Compliance Alert 001",
+            "severity": "MEDIUM",
+            "status": "open",
+            "created_at": "2026-03-07T04:53:55.618161+00:00"
+          }
+        ],
+        "top_risks": [
+          {
+            "risk_id": "RISK-UAT-45352Z-000",
+            "title": "Enterprise risk scenario 000",
+            "risk_score": 12.0,
+            "risk_rating": "HIGH",
+            "status": "open",
+            "owner": "risk.owner0@examplecorp.test"
+          },
+          {
+            "risk_id": "RISK-UAT-45352Z-001",
+            "title": "Enterprise risk scenario 001",
+            "risk_score": 6.0,
+            "risk_rating": "MEDIUM",
+            "status": "monitoring",
+            "owner": "risk.owner1@examplecorp.test"
+          },
+          {
+            "risk_id": "RISK-UAT-45352Z-003",
+            "title": "Enterprise risk scenario 003",
+            "risk_score": 4.0,
+            "risk_rating": "LOW",
+            "status": "mitigated",
+            "owner": "risk.owner3@examplecorp.test"
+          },
+          {
+            "risk_id": "RISK-UAT-45352Z-004",
+            "title": "Enterprise risk scenario 004",
+            "risk_score": 4.0,
+            "risk_rating": "MEDIUM",
+            "status": "open",
+            "owner": "risk.owner4@examplecorp.test"
+          },
+          {
+            "risk_id": "RISK-UAT-45352Z-005",
+            "title": "Enterprise risk scenario 005",
+            "risk_score": 4.0,
+            "risk_rating": "LOW",
+            "status": "mitigated",
+            "owner": "risk.owner5@examplecorp.test"
+          }
+        ],
+        "generated_at": "2026-03-07T04:53:56.531030Z"
+      },
+      "kpis": {
+        "total_controls_tested": 12,
+        "controls_passed": 8,
+        "controls_failed": 1,
+        "controls_exception": 3,
+        "pass_rate_pct": 66.7,
+        "open_exceptions": 3,
+        "critical_findings": 0,
+        "sod_conflicts": 6,
+        "open_alerts": 2,
+        "overall_risk_rating": "CRITICAL",
+        "generated_at": "2026-03-07T04:53:56.536843Z"
+      },
+      "report_runs": [
+        {
+          "id": "e0619d58-d9ef-46b6-a5a3-a3a21b41b42f",
+          "org_id": "default-org",
+          "report_definition_id": null,
+          "report_type": "continuous_assurance",
+          "name": "UAT continuous_assurance 20260307T045352Z",
+          "status": "complete",
+          "parameters": {
+            "run_id": "20260307T045352Z",
+            "scope": "enterprise",
+            "generated_by": "uat_enterprise_agent"
+          },
+          "result_payload": {
+            "report_type": "continuous_assurance",
+            "kpis": {
+              "total_controls_tested": 12,
+              "controls_passed": 8,
+              "controls_failed": 1,
+              "controls_exception": 3,
+              "pass_rate_pct": 66.7,
+              "open_exceptions": 3,
+              "critical_findings": 0,
+              "sod_conflicts": 6,
+              "open_alerts": 2,
+              "overall_risk_rating": "CRITICAL",
+              "generated_at": "2026-03-07T04:53:55.759771Z"
+            },
+            "alerts": [
+              {
+                "id": "70417a59-076c-41fb-96e3-4b1e1b4bdb67",
+                "title": "UAT Compliance Alert 005",
+                "severity": "MEDIUM",
+                "status": "open",
+                "created_at": "2026-03-07T04:53:55.657417+00:00"
+              },
+              {
+                "id": "db4482dd-5670-4992-ad77-de86b1a2d2e8",
+                "title": "UAT Compliance Alert 004",
+                "severity": "HIGH",
+                "status": "acknowledged",
+                "created_at": "2026-03-07T04:53:55.646196+00:00"
+              },
+              {
+                "id": "13fa277a-ea6f-4aac-9776-21798974710f",
+                "title": "UAT Compliance Alert 003",
+                "severity": "LOW",
+                "status": "resolved",
+                "created_at": "2026-03-07T04:53:55.635105+00:00"
+              },
+              {
+                "id": "cddef932-6a9f-45b9-b4bd-244fbd153ac6",
+                "title": "UAT Compliance Alert 002",
+                "severity": "HIGH",
+                "status": "acknowledged",
+                "created_at": "2026-03-07T04:53:55.623820+00:00"
+              },
+              {
+                "id": "565c9621-c93c-403f-8403-a649b0430145",
+                "title": "UAT Compliance Alert 001",
+                "severity": "MEDIUM",
+                "status": "open",
+                "created_at": "2026-03-07T04:53:55.618161+00:00"
+              },
+              {
+                "id": "2e377779-67c3-45fd-8e0b-a04ab487aa6a",
+                "title": "UAT Compliance Alert 000",
+                "severity": "MEDIUM",
+                "status": "resolved",
+                "created_at": "2026-03-07T04:53:55.544768+00:00"
+              }
+            ]
+          },
+          "generated_by": "admin",
+          "started_at": "2026-03-07T04:53:55.754205Z",
+          "completed_at": "2026-03-07T04:53:55.761314Z",
+          "error_message": null,
+          "created_at": "2026-03-07T04:53:55.754458Z"
+        },
+        {
+          "id": "1d8aa920-92e4-43d4-9970-a2a2b13ae695",
+          "org_id": "default-org",
+          "report_definition_id": null,
+          "report_type": "risk_register",
+          "name": "UAT risk_register 20260307T045352Z",
+          "status": "complete",
+          "parameters": {
+            "run_id": "20260307T045352Z",
+            "scope": "enterprise",
+            "generated_by": "uat_enterprise_agent"
+          },
+          "result_payload": {
+            "report_type": "risk_register",
+            "total_risks": 6,
+            "risks": [
+              {
+                "risk_id": "RISK-UAT-45352Z-000",
+                "title": "Enterprise risk scenario 000",
+                "category": "Operational",
+                "risk_score": 12.0,
+                "risk_rating": "HIGH",
+                "status": "open",
+                "treatment": "accept",
+                "owner": "risk.owner0@examplecorp.test"
+              },
+              {
+                "risk_id": "RISK-UAT-45352Z-001",
+                "title": "Enterprise risk scenario 001",
+                "category": "Regulatory",
+                "risk_score": 6.0,
+                "risk_rating": "MEDIUM",
+                "status": "monitoring",
+                "treatment": "mitigate",
+                "owner": "risk.owner1@examplecorp.test"
+              },
+              {
+                "risk_id": "RISK-UAT-45352Z-003",
+                "title": "Enterprise risk scenario 003",
+                "category": "Cyber",
+                "risk_score": 4.0,
+                "risk_rating": "LOW",
+                "status": "mitigated",
+                "treatment": "accept",
+                "owner": "risk.owner3@examplecorp.test"
+              },
+              {
+                "risk_id": "RISK-UAT-45352Z-004",
+                "title": "Enterprise risk scenario 004",
+                "category": "ThirdParty",
+                "risk_score": 4.0,
+                "risk_rating": "MEDIUM",
+                "status": "open",
+                "treatment": "accept",
+                "owner": "risk.owner4@examplecorp.test"
+              },
+              {
+                "risk_id": "RISK-UAT-45352Z-005",
+                "title": "Enterprise risk scenario 005",
+                "category": "Operational",
+                "risk_score": 4.0,
+                "risk_rating": "LOW",
+                "status": "mitigated",
+                "treatment": "transfer",
+                "owner": "risk.owner5@examplecorp.test"
+              },
+              {
+                "risk_id": "RISK-UAT-45352Z-002",
+                "title": "Enterprise risk scenario 002",
+                "category": "Financial",
+                "risk_score": 3.0,
+                "risk_rating": "LOW",
+                "status": "monitoring",
+                "treatment": "transfer",
+                "owner": "risk.owner2@examplecorp.test"
+              }
+            ]
+          },
+          "generated_by": "admin",
+          "started_at": "2026-03-07T04:53:55.743908Z",
+          "completed_at": "2026-03-07T04:53:55.748605Z",
+          "error_message": null,
+          "created_at": "2026-03-07T04:53:55.744134Z"
+        },
+        {
+          "id": "392c7d32-394b-4cb7-aa92-b02a8e84e77e",
+          "org_id": "default-org",
+          "report_definition_id": null,
+          "report_type": "sod_matrix",
+          "name": "UAT sod_matrix 20260307T045352Z",
+          "status": "complete",
+          "parameters": {
+            "run_id": "20260307T045352Z",
+            "scope": "enterprise",
+            "generated_by": "uat_enterprise_agent"
+          },
+          "result_payload": {
+            "report_type": "sod_matrix",
+            "total_conflicts": 6,
+            "unresolved": 6,
+            "conflicts": [
+              {
+                "id": "314624a5-ffa8-4f9e-8785-e493806db5ab",
+                "user_id": "UAT-USER-44814",
+                "role_a": "journal_create",
+                "role_b": "journal_post",
+                "conflict_type": "toxic_combination",
+                "risk_level": "High",
+                "resolved": false
+              },
+              {
+                "id": "86686700-b145-4ebe-a53e-f30153f59327",
+                "user_id": "UAT-USER-97782",
+                "role_a": "journal_create",
+                "role_b": "journal_post",
+                "conflict_type": "toxic_combination",
+                "risk_level": "Medium",
+                "resolved": false
+              },
+              {
+                "id": "90e0da56-cca3-4070-b081-b30593f14300",
+                "user_id": "UAT-USER-51467",
+                "role_a": "po_create",
+                "role_b": "po_approve",
+                "conflict_type": "toxic_combination",
+                "risk_level": "Medium",
+                "resolved": false
+              },
+              {
+                "id": "bbfd922e-107a-40b1-8315-c9e3ca7fc169",
+                "user_id": "UAT-USER-86503",
+                "role_a": "gl_master_change",
+                "role_b": "posting_execute",
+                "conflict_type": "toxic_combination",
+                "risk_level": "Critical",
+                "resolved": false
+              },
+              {
+                "id": "a3b9a164-9393-41f0-8105-14a3da43e6bf",
+                "user_id": "UAT-USER-20745",
+                "role_a": "po_create",
+                "role_b": "po_approve",
+                "conflict_type": "toxic_combination",
+                "risk_level": "High",
+                "resolved": false
+              },
+              {
+                "id": "a5682d90-0a17-4655-8876-71df4cc155dc",
+                "user_id": "UAT-USER-87924",
+                "role_a": "po_create",
+                "role_b": "po_approve",
+                "conflict_type": "toxic_combination",
+                "risk_level": "High",
+                "resolved": false
+              }
+            ]
+          },
+          "generated_by": "admin",
+          "started_at": "2026-03-07T04:53:55.733328Z",
+          "completed_at": "2026-03-07T04:53:55.738018Z",
+          "error_message": null,
+          "created_at": "2026-03-07T04:53:55.733548Z"
+        },
+        {
+          "id": "94e40cdb-8572-4b66-9b50-7b0f9453f70c",
+          "org_id": "default-org",
+          "report_definition_id": null,
+          "report_type": "audit_findings",
+          "name": "UAT audit_findings 20260307T045352Z",
+          "status": "complete",
+          "parameters": {
+            "run_id": "20260307T045352Z",
+            "scope": "enterprise",
+            "generated_by": "uat_enterprise_agent"
+          },
+          "result_payload": {
+            "report_type": "audit_findings",
+            "total": 0,
+            "findings": []
+          },
+          "generated_by": "admin",
+          "started_at": "2026-03-07T04:53:55.722331Z",
+          "completed_at": "2026-03-07T04:53:55.727874Z",
+          "error_message": null,
+          "created_at": "2026-03-07T04:53:55.722551Z"
+        },
+        {
+          "id": "84ad09f4-ae9a-4a53-a8f8-44e8f2862d72",
+          "org_id": "default-org",
+          "report_definition_id": null,
+          "report_type": "kpi_dashboard",
+          "name": "UAT kpi_dashboard 20260307T045352Z",
+          "status": "complete",
+          "parameters": {
+            "run_id": "20260307T045352Z",
+            "scope": "enterprise",
+            "generated_by": "uat_enterprise_agent"
+          },
+          "result_payload": {
+            "report_type": "kpi_dashboard",
+            "kpis": {
+              "total_controls_tested": 12,
+              "controls_passed": 8,
+              "controls_failed": 1,
+              "controls_exception": 3,
+              "pass_rate_pct": 66.7,
+              "open_exceptions": 3,
+              "critical_findings": 0,
+              "sod_conflicts": 6,
+              "open_alerts": 2,
+              "overall_risk_rating": "CRITICAL",
+              "generated_at": "2026-03-07T04:53:55.716770Z"
+            }
+          },
+          "generated_by": "admin",
+          "started_at": "2026-03-07T04:53:55.711420Z",
+          "completed_at": "2026-03-07T04:53:55.716845Z",
+          "error_message": null,
+          "created_at": "2026-03-07T04:53:55.711652Z"
+        },
+        {
+          "id": "aad27189-b725-4541-880a-ecf9533986ef",
+          "org_id": "default-org",
+          "report_definition_id": null,
+          "report_type": "compliance_status",
+          "name": "UAT compliance_status 20260307T045352Z",
+          "status": "complete",
+          "parameters": {
+            "run_id": "20260307T045352Z",
+            "scope": "enterprise",
+            "generated_by": "uat_enterprise_agent"
+          },
+          "result_payload": {
+            "report_type": "compliance_status",
+            "frameworks": [
+              {
+                "framework_id": "SOX404-352Z",
+                "framework_name": "SOX Internal Control",
+                "total_mapped": 3,
+                "fully_mapped": 1,
+                "gaps": 1,
+                "partial": 1,
+                "coverage_pct": 33.3
+              },
+              {
+                "framework_id": "ISO27001-352Z",
+                "framework_name": "ISO 27001",
+                "total_mapped": 3,
+                "fully_mapped": 2,
+                "gaps": 0,
+                "partial": 1,
+                "coverage_pct": 66.7
+              },
+              {
+                "framework_id": "COBIT2019-352Z",
+                "framework_name": "COBIT",
+                "total_mapped": 2,
+                "fully_mapped": 2,
+                "gaps": 0,
+                "partial": 0,
+                "coverage_pct": 100.0
+              }
+            ]
+          },
+          "generated_by": "admin",
+          "started_at": "2026-03-07T04:53:55.697770Z",
+          "completed_at": "2026-03-07T04:53:55.705477Z",
+          "error_message": null,
+          "created_at": "2026-03-07T04:53:55.698021Z"
+        },
+        {
+          "id": "756d1a3c-46e6-461d-a07a-8ce010af34f0",
+          "org_id": "default-org",
+          "report_definition_id": null,
+          "report_type": "executive_summary",
+          "name": "UAT executive_summary 20260307T045352Z",
+          "status": "complete",
+          "parameters": {
+            "run_id": "20260307T045352Z",
+            "scope": "enterprise",
+            "generated_by": "uat_enterprise_agent"
+          },
+          "result_payload": {
+            "report_type": "executive_summary",
+            "kpis": {
+              "total_controls_tested": 12,
+              "controls_passed": 8,
+              "controls_failed": 1,
+              "controls_exception": 3,
+              "pass_rate_pct": 66.7,
+              "open_exceptions": 3,
+              "critical_findings": 0,
+              "sod_conflicts": 6,
+              "open_alerts": 2,
+              "overall_risk_rating": "CRITICAL",
+              "generated_at": "2026-03-07T04:53:55.686289Z"
+            },
+            "compliance_status": [
+              {
+                "framework_id": "SOX404-352Z",
+                "framework_name": "SOX Internal Control",
+                "total_mapped": 3,
+                "fully_mapped": 1,
+                "gaps": 1,
+                "partial": 1,
+                "coverage_pct": 33.3
+              },
+              {
+                "framework_id": "ISO27001-352Z",
+                "framework_name": "ISO 27001",
+                "total_mapped": 3,
+                "fully_mapped": 2,
+                "gaps": 0,
+                "partial": 1,
+                "coverage_pct": 66.7
+              },
+              {
+                "framework_id": "COBIT2019-352Z",
+                "framework_name": "COBIT",
+                "total_mapped": 2,
+                "fully_mapped": 2,
+                "gaps": 0,
+                "partial": 0,
+                "coverage_pct": 100.0
+              }
+            ],
+            "standard_refs": [
+              "COSO 2013 Internal Control Framework",
+              "SOX Section 302 & 404",
+              "PCAOB AS 2201",
+              "ISO 27001:2022",
+              "COBIT 2019"
+            ]
+          },
+          "generated_by": "admin",
+          "started_at": "2026-03-07T04:53:55.669089Z",
+          "completed_at": "2026-03-07T04:53:55.690264Z",
+          "error_message": null,
+          "created_at": "2026-03-07T04:53:55.670129Z"
+        }
+      ],
+      "engine_accuracy": "Internal Server Error"
+    },
+    "created_objects": {
+      "evidence_ids": [
+        "be950ca7-159f-458c-844b-7bb38a6f200d",
+        "54b5f16b-adcd-4fe9-8382-e5efcb0273d1",
+        "ec8656da-7998-4a56-8261-c4f72e2f033a",
+        "50ebf1c3-b363-407d-9b88-9f192b172207",
+        "6aaeead0-8b20-4758-b091-66fb7cec94f9",
+        "7a7896ef-f913-424c-8c94-a0b528a38ca9",
+        "55ac03af-462e-4eca-90e1-fbc9749cadd5",
+        "1f437a03-b837-407d-a5db-7f5dab973da4",
+        "82884d9f-3b96-4b04-98d4-feec33b3c062",
+        "a5310d47-3708-4b7a-acb5-73dc4196c90c",
+        "7c8ce7eb-d704-415b-ab5d-b81b0f498562",
+        "15721e8d-7bd5-4bd7-8172-9d58a0131756",
+        "e3a9bee4-371d-40b2-89ff-0a893f030cff",
+        "a12e55d2-4ee7-421a-94cb-4f3c9d3fdd3c",
+        "2366a5b4-bc14-4a8e-8a9e-a6bbbc59f576",
+        "efc97e9a-d7ee-4a9b-802f-2ef7b3b3e78e",
+        "935f2b5e-0455-4f36-9463-5f59ce81d6ac",
+        "24e900eb-90e0-46df-ac61-59ca5e4a3f01",
+        "24e719d1-765e-4ee6-ab7d-655707555fba",
+        "5e4cf59e-c60d-4df9-94cb-86d816f79f8b"
+      ],
+      "control_ids": [
+        "e2d280d8-ad90-40e7-8e14-794d4c3c4ff7",
+        "df5ec00c-e3ef-413d-992a-dd06c0506670",
+        "8928d13b-d614-4b2d-84bc-4be73956f4bc",
+        "93e32f85-c235-43c9-bf42-b2d576822d2e",
+        "bff80f8b-ec4d-433b-9d7f-ebe46c704d66",
+        "975937d8-f460-41f0-be0a-a71bbad6be66",
+        "37d733c5-03a3-499c-a725-1977d2351eaf",
+        "aa841f9c-8ed4-4a1a-b525-9e7bbe607a76",
+        "3ac5720e-7c45-4323-af71-33ad1ddd2fa0",
+        "e6c4bc30-4c27-49da-9c72-d473d9405bb1",
+        "4f1c6494-34fd-4e99-abb4-5fc65e91a6fe",
+        "8db4905e-f767-4c00-a016-82af5d9a1894"
+      ],
+      "exception_ids": [
+        "eb004f72-c12f-4e69-a077-7a912a4e3b03",
+        "11bc7e0b-3fae-444e-bb13-fea41f0a0c00",
+        "097b5d8f-11d4-4371-af39-4f83f212d035",
+        "bae60346-b575-452f-88bc-f3b96f339143"
+      ],
+      "framework_ids": [
+        "SOX404-352Z",
+        "ISO27001-352Z",
+        "COBIT2019-352Z"
+      ],
+      "policy_ids": [
+        "POL-UAT-45352Z-000",
+        "POL-UAT-45352Z-001",
+        "POL-UAT-45352Z-002"
+      ],
+      "mapping_ids": [
+        "6c8d5595-b249-4718-8454-fb741e187141",
+        "570ae7dc-52bc-41d4-bef4-b234b9aabfa5",
+        "f6860c6b-f110-43de-aad3-495af3a40c97",
+        "c8773f29-c46a-4ef7-bf7a-d346cedf057f",
+        "4f34398b-4587-409e-b027-867fe354401b",
+        "b65eb77f-345d-46a5-b2e0-c7d8aeda5918",
+        "0c1f7ca4-c637-4e7b-ba74-ef8cacbeeda9",
+        "cb834a36-6736-4ca4-8faf-d9e9bd551f28"
+      ],
+      "risk_ids": [
+        "RISK-UAT-45352Z-000",
+        "RISK-UAT-45352Z-001",
+        "RISK-UAT-45352Z-002",
+        "RISK-UAT-45352Z-003",
+        "RISK-UAT-45352Z-004",
+        "RISK-UAT-45352Z-005"
+      ],
+      "alert_rule_ids": [
+        "d2f12318-a0cb-4b59-a200-8a6f76f9e7e1",
+        "7826023f-4733-4060-b88f-c30550db5d71",
+        "ef620623-81d3-4a80-b236-c2c99325ffb3"
+      ],
+      "alert_ids": [
+        "2e377779-67c3-45fd-8e0b-a04ab487aa6a",
+        "565c9621-c93c-403f-8403-a649b0430145",
+        "cddef932-6a9f-45b9-b4bd-244fbd153ac6",
+        "13fa277a-ea6f-4aac-9776-21798974710f",
+        "db4482dd-5670-4992-ad77-de86b1a2d2e8",
+        "70417a59-076c-41fb-96e3-4b1e1b4bdb67"
+      ],
+      "report_run_ids": [
+        "756d1a3c-46e6-461d-a07a-8ce010af34f0",
+        "aad27189-b725-4541-880a-ecf9533986ef",
+        "84ad09f4-ae9a-4a53-a8f8-44e8f2862d72",
+        "94e40cdb-8572-4b66-9b50-7b0f9453f70c",
+        "392c7d32-394b-4cb7-aa92-b02a8e84e77e",
+        "1d8aa920-92e4-43d4-9970-a2a2b13ae695",
+        "e0619d58-d9ef-46b6-a5a3-a3a21b41b42f"
+      ],
+      "ai_audit_case_ids": [
+        "AIAUD-45352Z-000",
+        "AIAUD-45352Z-001",
+        "AIAUD-45352Z-002",
+        "AIAUD-45352Z-003",
+        "AIAUD-45352Z-004",
+        "AIAUD-45352Z-005"
+      ]
+    }
+  },
+  "finished_at": "2026-03-07T04:53:57.163018+00:00"
+}
