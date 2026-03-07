@@ -212,6 +212,7 @@ See `docs/COMPLIANCE_EVIDENCE_PACK.md` for details.
 - `docs/COMPLIANCE_EVIDENCE_PACK.md`
 
 ### End-to-End User and Organization Docs
+- `docs/MASTER_HANDBOOK.md`
 - `docs/PORTAL_END_TO_END_GUIDE.md`
 - `docs/ORGANIZATION_OPERATING_MODEL.md`
 - `docs/PAGE_FLOW_REFERENCE.md`
