@@ -377,6 +377,8 @@
         tableBody.addEventListener('click', function (event) {
           var runBtn = event.target.closest('.run-btn');
           if (!runBtn) return;
+          event.preventDefault();
+          event.stopPropagation();
           mockProcessButton(runBtn, function () {
             updateITGCRowStatus(runBtn.closest('tr'));
           });
