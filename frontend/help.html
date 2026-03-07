@@ -608,7 +608,7 @@
   .sn-fab svg{width:15px;height:15px}
   .sn-menu::-webkit-scrollbar{width:6px}
   .sn-menu::-webkit-scrollbar-thumb{background:rgba(138,149,170,.45);border-radius:999px}
-   (hover: none), (pointer: coarse){
+  @media (hover: none), (pointer: coarse){
     .suite-nav-widget:hover .sn-menu{transform:scale(.95) translateY(8px) !important;opacity:0;pointer-events:none}
   }
   @media (max-width: 768px){
@@ -621,7 +621,7 @@
 </style>
 </head>
 <body>
-  <div class="advisory-banner" style="position:sticky;top:0;z-index:2500;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 20px;background:#1a0a00;border-bottom:1px solid #f59e0b;color:#fcd34d;font-size:12px;"><span>⚠️ ADVISORY: AuditAI Suite findings are advisory only. No output constitutes an audit opinion, conclusion, or attestation under PCAOB AS 2201 or ISA 315. All findings require professional review by a qualified auditor before use in any compliance or financial reporting context.</span><span style="margin-left:auto;white-space:nowrap;font-family:monospace;">AuditAI Suite v4.0 ENTERPRISE</span></div>
+  <div class="advisory-banner" style="position:sticky;top:0;z-index:80;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:4px 10px;background:#1a0a00;border-bottom:1px solid #f59e0b;color:#fcd34d;font-size:10px;line-height:1.25;"><span>⚠️ ADVISORY: AuditAI Suite findings are advisory only. No output constitutes an audit opinion, conclusion, or attestation under PCAOB AS 2201 or ISA 315. All findings require professional review by a qualified auditor before use in any compliance or financial reporting context.</span><span style="margin-left:auto;white-space:nowrap;font-family:monospace;font-size:10px;opacity:.9;">AuditAI Suite v4.0 ENTERPRISE</span></div>
 
 <!-- BACK BAR -->
 <nav class="back-bar">
@@ -661,6 +661,11 @@
       <div class="toc-card-icon">🧭</div>
       <div class="toc-card-title">New Org Rollout</div>
       <div class="toc-card-desc">Latest features + end-to-end operating flow</div>
+    </a>
+    <a href="#end-user-playbook" class="toc-card">
+      <div class="toc-card-icon">🗺️</div>
+      <div class="toc-card-title">End User Playbook</div>
+      <div class="toc-card-desc">Step-by-step usage for daily audit operations</div>
     </a>
     <a href="#agents" class="toc-card">
       <div class="toc-card-icon">🤖</div>
@@ -725,6 +730,7 @@
       <a href="#overview" class="sidebar-link active">🏠 Suite Overview</a>
       <a href="#getting-started" class="sidebar-link">🚀 Getting Started</a>
       <a href="#org-onboarding" class="sidebar-link">🧭 New Org Rollout</a>
+      <a href="#end-user-playbook" class="sidebar-link">🗺️ End User Playbook</a>
       <div class="nav-group-title">Core Features</div>
       <a href="#agents" class="sidebar-link">🤖 The 10 AI Agents</a>
       <a href="#itgc" class="sidebar-link">🔒 ITGC Testing</a>
@@ -1278,6 +1284,136 @@
         <div class="alert-content">
           <strong>Suggested Operating Rhythm</strong>
           Weekly: run high-risk controls and review exceptions. Monthly: governance/risk review and remediation follow-up. Quarterly: full reporting pack with SOX mapping and evidence completeness checks.
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================
+         SECTION 2C: END USER PLAYBOOK
+         ============================ -->
+    <section class="help-section" id="end-user-playbook">
+      <div class="section-header">
+        <div class="section-icon">🗺️</div>
+        <div>
+          <h2>End User Playbook</h2>
+          <p class="section-subtitle">DAILY USAGE · TEAM HANDOFFS · DECISION FLOW</p>
+        </div>
+      </div>
+
+      <div class="prose">
+        <p>This playbook is written for end users who need to run audits, investigate findings, and communicate outcomes. It focuses on practical actions by page, by role, and by time horizon.</p>
+      </div>
+
+      <h3 class="sub-heading">First 30 Minutes for a New User</h3>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">Open Settings and Validate Connectors</div>
+            <div class="step-desc">Go to <code>settings.html</code> and configure at least one source (ERP, ITSM, cloud, or SFTP) using read-only credentials, then run <strong>Test Connection</strong>.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">Define Scope in the Master Audit Suite</div>
+            <div class="step-desc">Move to <code>app.html</code> and choose period, process/domain, and pilot boundary before launching work.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">Run ITGC and ITAC Validation Passes</div>
+            <div class="step-desc">Use <code>itgc-controls.html</code> and <code>itac-testing.html</code> to validate control rendering, test outputs, and exception visibility.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <div class="step-title">Cross-Check Evidence in Vault</div>
+            <div class="step-desc">Open <code>vault.html</code> and verify evidence lineage for material findings (status, timestamp, and record continuity).</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-body">
+            <div class="step-title">Prepare Governance and Reporting Pack</div>
+            <div class="step-desc">Use <code>governance.html</code> for risk posture and <code>reports.html</code> for management-ready output and handoff.</div>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="sub-heading">Operational Flow by Cadence</h3>
+      <table class="data-table">
+        <thead>
+          <tr><th>Cadence</th><th>Core Activities</th><th>Pages</th><th>Primary Owner</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Daily</td>
+            <td>Review connector health, run scoped tests, triage new exceptions, attach/verify evidence.</td>
+            <td><code>settings.html</code>, <code>app.html</code>, <code>itgc-controls.html</code>, <code>itac-testing.html</code>, <code>vault.html</code></td>
+            <td>Auditor / Analyst</td>
+          </tr>
+          <tr>
+            <td>Weekly</td>
+            <td>Reassess risk priority, remediation progress, overdue actions, and high-impact findings.</td>
+            <td><code>governance.html</code>, <code>reports.html</code></td>
+            <td>Audit Manager / Risk Lead</td>
+          </tr>
+          <tr>
+            <td>Monthly</td>
+            <td>Publish leadership report pack, update control strategy, and confirm scope for next cycle.</td>
+            <td><code>reports.html</code>, <code>help.html</code>, <code>settings.html</code></td>
+            <td>Audit Manager / Executive Sponsor</td>
+          </tr>
+          <tr>
+            <td>Quarterly</td>
+            <td>Perform full SOX/ICFR readiness review, evidence completeness check, and UAT release validation.</td>
+            <td><code>governance.html</code>, <code>reports.html</code>, <code>vault.html</code>, <code>uat.html</code></td>
+            <td>Program Owner + Admin/Dev</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 class="sub-heading">Decision Guide for End Users</h3>
+      <table class="data-table">
+        <thead>
+          <tr><th>If You Need To...</th><th>Start Here</th><th>Then Go To</th><th>Expected Outcome</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Connect a new ERP or platform</td>
+            <td><code>settings.html</code> Data Sources</td>
+            <td><code>app.html</code> pilot run setup</td>
+            <td>Connector marked connected and available for test workflows.</td>
+          </tr>
+          <tr>
+            <td>Validate a high-risk control failure</td>
+            <td><code>itgc-controls.html</code> or <code>itac-testing.html</code></td>
+            <td><code>vault.html</code> evidence verification</td>
+            <td>Confirmed exception with traceable evidence and next action owner.</td>
+          </tr>
+          <tr>
+            <td>Brief leadership on risk posture</td>
+            <td><code>governance.html</code></td>
+            <td><code>reports.html</code> export package</td>
+            <td>Aligned narrative from KPI to action plan and report output.</td>
+          </tr>
+          <tr>
+            <td>Prepare for release/UAT signoff</td>
+            <td><code>uat.html</code> (Admin/Developer only)</td>
+            <td><code>help.html</code> troubleshooting and controls reference</td>
+            <td>Release readiness checklist completed with known issues tracked.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="alert warn">
+        <span class="alert-icon">⚠️</span>
+        <div class="alert-content">
+          <strong>End-User Guardrail</strong>
+          Treat outputs as advisory decision support. Final conclusions, attestation language, and external reporting must be reviewed and approved by qualified audit professionals.
         </div>
       </div>
     </section>

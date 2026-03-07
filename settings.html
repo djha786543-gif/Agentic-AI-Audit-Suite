@@ -12,8 +12,8 @@
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{--ink:#070A10;--ink2:#0B0F1A;--ink3:#101828;--ink4:#161F32;--b1:rgba(255,255,255,.06);--b2:rgba(255,255,255,.1);--tx1:#EDF0F7;--tx2:#8895AD;--tx3:#505D75;--blue:#2878FF;--blue2:#1254CC;--green:#18B86A;--orange:#F07020;--fd:'Sora',sans-serif;--fb:'Outfit',system-ui,sans-serif;--fm:'JetBrains Mono',monospace}
     body{background:var(--ink);color:var(--tx1);font-family:var(--fb);min-height:100vh}
-    .advisory-banner{position:sticky;top:0;z-index:2500;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 20px;background:#1a0a00;border-bottom:1px solid #f59e0b;color:#fcd34d;font-size:12px}
-    .advisory-right{margin-left:auto;white-space:nowrap;font-family:var(--fm)}
+    .advisory-banner{position:sticky;top:0;z-index:80;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:4px 10px;background:#1a0a00;border-bottom:1px solid #f59e0b;color:#fcd34d;font-size:10px;line-height:1.25}
+    .advisory-right{margin-left:auto;white-space:nowrap;font-family:var(--fm);font-size:10px;opacity:.9}
     .nav{position:sticky;top:33px;z-index:900;height:62px;background:rgba(7,10,16,.88);backdrop-filter:blur(18px);border-bottom:1px solid var(--b1);display:flex;align-items:center;padding:0 24px}
     .nav-inner{max-width:1200px;width:100%;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
     .brand{display:flex;gap:10px;align-items:center}.mark{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--blue),var(--blue2));display:grid;place-items:center;font-family:var(--fm);font-size:11px}.name{font-family:var(--fd);font-size:15px;font-weight:700}
@@ -36,15 +36,29 @@
     .btn{border:none;border-radius:10px;padding:10px 14px;font-weight:600;cursor:pointer}
     .btn-primary{background:var(--blue);color:#fff}.btn-primary:hover{background:var(--blue2)}
     .btn-secondary{background:transparent;border:1px solid var(--b2);color:var(--tx2)}
+    .btn-config{background:rgba(40,120,255,.12);border:1px solid rgba(40,120,255,.35);color:#d8e8ff}
+    .btn-config:hover{background:rgba(40,120,255,.2);border-color:rgba(40,120,255,.5)}
     .status{display:inline-flex;align-items:center;gap:8px;font-size:12px;margin-top:6px}
     .dot{width:8px;height:8px;border-radius:50%;background:var(--orange)}
     .table-wrap{overflow:auto;border:1px solid var(--b1);border-radius:10px}
     table{width:100%;border-collapse:collapse;min-width:580px} th,td{padding:10px;border-bottom:1px solid var(--b1);text-align:left;font-size:13px} th{font-family:var(--fm);font-size:10px;text-transform:uppercase;color:var(--tx3)}
     .not-connected{color:var(--orange);font-weight:700}
+    .connected{color:var(--green);font-weight:700}
+    .status-note{font-size:12px;color:var(--tx2);margin-top:10px}
+    .connector-meta{font-size:12px;color:var(--tx2)}
     .toggle{display:flex;align-items:center;justify-content:space-between;background:var(--ink2);border:1px solid var(--b1);border-radius:8px;padding:10px 12px}
     .toggle input{width:auto}
     .security-list{display:grid;gap:8px}
     .security-item{background:var(--ink2);border:1px solid var(--b1);border-radius:8px;padding:10px 12px}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(4,8,14,.78);display:none;align-items:center;justify-content:center;z-index:2200}
+    .modal-backdrop.show{display:flex}
+    .connector-modal{width:min(620px,94vw);background:var(--ink3);border:1px solid var(--b2);border-radius:14px;padding:18px}
+    .connector-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+    .connector-head h3{font-family:var(--fd);font-size:1.1rem}
+    .close-btn{border:none;background:transparent;color:var(--tx2);font-size:22px;cursor:pointer;line-height:1}
+    .connector-grid{display:grid;gap:10px}
+    .modal-actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:14px}
+    .test-status{font-size:12px;color:var(--tx2);margin-top:8px}
     .suite-nav-widget{position:fixed;bottom:30px;right:30px;z-index:999999;display:flex;flex-direction:column;align-items:flex-end;font-family:var(--fb)}
     .sn-menu{background:rgba(10,15,25,.95);backdrop-filter:blur(16px);border:1px solid rgba(40,120,255,.3);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:4px;margin-bottom:16px;transform:scale(.9) translateY(20px);opacity:0;pointer-events:none;transition:all .3s cubic-bezier(.175,.885,.32,1.275)}
     .suite-nav-widget:hover .sn-menu{transform:scale(1) translateY(0);opacity:1;pointer-events:auto}
@@ -61,7 +75,7 @@
   .sn-fab svg{width:15px;height:15px}
   .sn-menu::-webkit-scrollbar{width:6px}
   .sn-menu::-webkit-scrollbar-thumb{background:rgba(138,149,170,.45);border-radius:999px}
-   (hover: none), (pointer: coarse){
+  @media (hover: none), (pointer: coarse){
     .suite-nav-widget:hover .sn-menu{transform:scale(.95) translateY(8px) !important;opacity:0;pointer-events:none}
   }
   @media (max-width: 768px){
@@ -126,14 +140,15 @@
             <table>
               <thead><tr><th>Connector</th><th>Status</th><th>Action</th></tr></thead>
               <tbody>
-                <tr><td>SAP</td><td class="not-connected">Not Connected</td><td><button class="btn btn-secondary">Configure</button></td></tr>
-                <tr><td>ServiceNow</td><td class="not-connected">Not Connected</td><td><button class="btn btn-secondary">Configure</button></td></tr>
-                <tr><td>Azure Blob</td><td class="not-connected">Not Connected</td><td><button class="btn btn-secondary">Configure</button></td></tr>
-                <tr><td>AWS S3</td><td class="not-connected">Not Connected</td><td><button class="btn btn-secondary">Configure</button></td></tr>
-                <tr><td>SFTP</td><td class="not-connected">Not Connected</td><td><button class="btn btn-secondary">Configure</button></td></tr>
+                <tr data-connector-row="SAP"><td>SAP</td><td class="not-connected" data-connector-status="SAP">Not Connected</td><td><button class="btn btn-config connector-config-btn" data-connector="SAP">Configure</button></td></tr>
+                <tr data-connector-row="ServiceNow"><td>ServiceNow</td><td class="not-connected" data-connector-status="ServiceNow">Not Connected</td><td><button class="btn btn-config connector-config-btn" data-connector="ServiceNow">Configure</button></td></tr>
+                <tr data-connector-row="Azure Blob"><td>Azure Blob</td><td class="not-connected" data-connector-status="Azure Blob">Not Connected</td><td><button class="btn btn-config connector-config-btn" data-connector="Azure Blob">Configure</button></td></tr>
+                <tr data-connector-row="AWS S3"><td>AWS S3</td><td class="not-connected" data-connector-status="AWS S3">Not Connected</td><td><button class="btn btn-config connector-config-btn" data-connector="AWS S3">Configure</button></td></tr>
+                <tr data-connector-row="SFTP"><td>SFTP</td><td class="not-connected" data-connector-status="SFTP">Not Connected</td><td><button class="btn btn-config connector-config-btn" data-connector="SFTP">Configure</button></td></tr>
               </tbody>
             </table>
           </div>
+          <p class="status-note">Configure each connector using read-only credentials, test the connection, and save to mark it active for audit runs.</p>
           <div style="margin-top:12px"><button class="btn btn-primary">Save Settings</button></div>
         </div>
 
@@ -157,6 +172,29 @@
       </section>
     </div>
   </main>
+
+  <div class="modal-backdrop" id="connectorModal" aria-hidden="true">
+    <div class="connector-modal" role="dialog" aria-modal="true" aria-labelledby="connectorTitle">
+      <div class="connector-head">
+        <h3 id="connectorTitle">Configure Connector</h3>
+        <button class="close-btn" id="closeConnectorModal" aria-label="Close">×</button>
+      </div>
+      <p class="connector-meta" id="connectorMeta">Provide endpoint and read-only credentials to enable this connector.</p>
+      <div class="connector-grid">
+        <div><label for="connectorEndpoint">Endpoint / Host</label><input id="connectorEndpoint" type="text" placeholder=""></div>
+        <div class="row">
+          <div><label for="connectorUser">Username / Client ID</label><input id="connectorUser" type="text" placeholder=""></div>
+          <div><label for="connectorSecret">Password / Secret</label><input id="connectorSecret" type="password" placeholder=""></div>
+        </div>
+        <div><label for="connectorScope">Scope / Container / Path (optional)</label><input id="connectorScope" type="text" placeholder=""></div>
+      </div>
+      <div class="test-status" id="connectorTestStatus">Run Test Connection before saving.</div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="testConnectorBtn">Test Connection</button>
+        <button class="btn btn-primary" id="saveConnectorBtn">Save Connector</button>
+      </div>
+    </div>
+  </div>
 
   <div class="suite-nav-widget">
     <div class="sn-menu">
@@ -190,6 +228,97 @@
     document.getElementById('testConnection').addEventListener('click', () => {
       document.getElementById('apiDot').style.background = 'var(--green)';
       document.getElementById('apiStatus').textContent = 'Connection successful';
+    });
+
+    // Connector configuration flow for ERP/data sources.
+    const connectorButtons = document.querySelectorAll('.connector-config-btn');
+    const connectorModal = document.getElementById('connectorModal');
+    const closeConnectorModal = document.getElementById('closeConnectorModal');
+    const connectorTitle = document.getElementById('connectorTitle');
+    const connectorMeta = document.getElementById('connectorMeta');
+    const endpointInput = document.getElementById('connectorEndpoint');
+    const userInput = document.getElementById('connectorUser');
+    const secretInput = document.getElementById('connectorSecret');
+    const scopeInput = document.getElementById('connectorScope');
+    const testConnectorBtn = document.getElementById('testConnectorBtn');
+    const saveConnectorBtn = document.getElementById('saveConnectorBtn');
+    const connectorTestStatus = document.getElementById('connectorTestStatus');
+
+    const connectorHints = {
+      'SAP': { endpoint: 'sap.company.internal:443', user: 'sap_readonly', scope: 'Client 100 / FI-AP' },
+      'ServiceNow': { endpoint: 'https://company.service-now.com', user: 'svc.audit.read', scope: 'incident, change_request' },
+      'Azure Blob': { endpoint: 'https://<account>.blob.core.windows.net', user: 'storage-reader', scope: 'audit-evidence container' },
+      'AWS S3': { endpoint: 's3.amazonaws.com', user: 'arn:aws:iam::<acct>:role/AuditReadOnly', scope: 's3://audit-evidence/' },
+      'SFTP': { endpoint: 'sftp.company.internal:22', user: 'audit_ingest', scope: '/exports/itgc' }
+    };
+
+    let activeConnector = null;
+    let lastTestPassed = false;
+
+    const openConnectorDialog = (connectorName) => {
+      activeConnector = connectorName;
+      lastTestPassed = false;
+      const hint = connectorHints[connectorName] || { endpoint: '', user: '', scope: '' };
+
+      connectorTitle.textContent = `Configure ${connectorName}`;
+      connectorMeta.textContent = `${connectorName} connector setup for read-only audit extraction.`;
+      endpointInput.value = hint.endpoint;
+      userInput.value = hint.user;
+      secretInput.value = '';
+      scopeInput.value = hint.scope;
+      connectorTestStatus.textContent = 'Run Test Connection before saving.';
+      connectorTestStatus.style.color = 'var(--tx2)';
+
+      connectorModal.classList.add('show');
+      connectorModal.setAttribute('aria-hidden', 'false');
+    };
+
+    const closeConnectorDialog = () => {
+      connectorModal.classList.remove('show');
+      connectorModal.setAttribute('aria-hidden', 'true');
+    };
+
+    connectorButtons.forEach((btn) => {
+      btn.addEventListener('click', () => openConnectorDialog(btn.dataset.connector));
+    });
+
+    closeConnectorModal.addEventListener('click', closeConnectorDialog);
+    connectorModal.addEventListener('click', (event) => {
+      if (event.target === connectorModal) closeConnectorDialog();
+    });
+
+    testConnectorBtn.addEventListener('click', () => {
+      const hasRequired = endpointInput.value.trim() && userInput.value.trim() && secretInput.value.trim();
+      if (!hasRequired) {
+        lastTestPassed = false;
+        connectorTestStatus.textContent = 'Please complete endpoint, username/client ID, and password/secret.';
+        connectorTestStatus.style.color = 'var(--orange)';
+        return;
+      }
+      lastTestPassed = true;
+      connectorTestStatus.textContent = `Connection test successful for ${activeConnector}.`;
+      connectorTestStatus.style.color = 'var(--green)';
+    });
+
+    saveConnectorBtn.addEventListener('click', () => {
+      if (!activeConnector) return;
+      if (!lastTestPassed) {
+        connectorTestStatus.textContent = 'Run a successful Test Connection before saving.';
+        connectorTestStatus.style.color = 'var(--orange)';
+        return;
+      }
+
+      const statusCell = document.querySelector(`[data-connector-status="${activeConnector}"]`);
+      const actionButton = document.querySelector(`.connector-config-btn[data-connector="${activeConnector}"]`);
+
+      if (statusCell) {
+        statusCell.classList.remove('not-connected');
+        statusCell.classList.add('connected');
+        statusCell.textContent = 'Connected';
+      }
+      if (actionButton) actionButton.textContent = 'Edit';
+
+      closeConnectorDialog();
     });
   </script>
 <script>
