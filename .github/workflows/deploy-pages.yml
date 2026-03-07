@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'frontend/**'
+      - 'docs/**'
       - '.github/workflows/deploy-pages.yml'
       - '.github/workflows/pages-smoke-test.yml'
   workflow_dispatch:
@@ -46,6 +47,12 @@ jobs:
           if [ -f frontend/styles.css ]; then cp frontend/styles.css "$target/styles.css"; fi
           if [ -f frontend/script.js ]; then cp frontend/script.js "$target/script.js"; fi
           if [ -d frontend/images ]; then rsync -av --delete frontend/images/ "$target/images/"; fi
+
+          # Publish docs for handbook/help deep links.
+          if [ -d docs ]; then
+            rsync -av --delete docs/ "$target/docs/"
+            rsync -av --delete docs/ "$target/frontend/docs/"
+          fi
 
       - name: Commit and push if changed
         run: |

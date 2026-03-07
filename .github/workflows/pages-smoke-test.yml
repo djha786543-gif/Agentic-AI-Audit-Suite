@@ -30,6 +30,8 @@ jobs:
             "$BASE_URL/itac-testing.html"
             "$BASE_URL/settings.html"
             "$BASE_URL/help.html"
+            "$BASE_URL/docs/MASTER_HANDBOOK.md"
+            "$BASE_URL/docs/PORTAL_END_TO_END_GUIDE.md"
           )
 
           for u in "${urls[@]}"; do
