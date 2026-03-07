@@ -166,6 +166,18 @@
             <div class="security-item"><strong>Session Timeout:</strong> 30 minutes</div>
             <div class="security-item"><strong>Data Retention:</strong> 7 years</div>
             <div class="security-item"><strong>Encryption:</strong> AES-256 at rest, TLS 1.3 in transit</div>
+            <label class="toggle">
+              <span>Redaction Toggle (tokenize PII for AI processing)</span>
+              <input type="checkbox" id="redactionToggle">
+            </label>
+            <div class="security-item">
+              <strong>Evidence Vault Session Key (local only):</strong>
+              <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
+                <input id="vaultSessionKey" type="password" placeholder="Enter session key (never sent to server)">
+                <button class="btn btn-secondary" id="saveSessionKeyBtn" type="button">Set Session Key</button>
+              </div>
+              <div id="vaultSessionKeyStatus" class="status-note">No active session key.</div>
+            </div>
           </div>
           <div style="margin-top:12px"><button class="btn btn-primary">Save Settings</button></div>
         </div>
@@ -319,6 +331,37 @@
       if (actionButton) actionButton.textContent = 'Edit';
 
       closeConnectorDialog();
+    });
+
+    const redactionToggle = document.getElementById('redactionToggle');
+    const vaultSessionKey = document.getElementById('vaultSessionKey');
+    const saveSessionKeyBtn = document.getElementById('saveSessionKeyBtn');
+    const vaultSessionKeyStatus = document.getElementById('vaultSessionKeyStatus');
+
+    const storedRedaction = localStorage.getItem('auditai_redaction_enabled') === 'true';
+    redactionToggle.checked = storedRedaction;
+
+    const activeSessionKey = sessionStorage.getItem('auditai_vault_session_key') || '';
+    if (activeSessionKey) {
+      vaultSessionKeyStatus.textContent = 'Session key loaded for current browser session.';
+      vaultSessionKeyStatus.style.color = 'var(--green)';
+    }
+
+    redactionToggle.addEventListener('change', () => {
+      localStorage.setItem('auditai_redaction_enabled', String(redactionToggle.checked));
+    });
+
+    saveSessionKeyBtn.addEventListener('click', () => {
+      const key = vaultSessionKey.value.trim();
+      if (!key) {
+        vaultSessionKeyStatus.textContent = 'Please enter a non-empty session key.';
+        vaultSessionKeyStatus.style.color = 'var(--orange)';
+        return;
+      }
+      sessionStorage.setItem('auditai_vault_session_key', key);
+      vaultSessionKey.value = '';
+      vaultSessionKeyStatus.textContent = 'Session key stored in browser session memory only.';
+      vaultSessionKeyStatus.style.color = 'var(--green)';
     });
   </script>
 <script>

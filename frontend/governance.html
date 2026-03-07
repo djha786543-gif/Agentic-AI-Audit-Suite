@@ -186,6 +186,8 @@
     <button class="tab-btn" onclick="switchTab('frameworks')">🏛️ Frameworks</button>
     <button class="tab-btn" onclick="switchTab('risks')">⚠️ Risk Register</button>
     <button class="tab-btn" onclick="switchTab('rules')">🔔 Alert Rules</button>
+    <button class="tab-btn" onclick="switchTab('remediation')">🛠 Remediation</button>
+    <button class="tab-btn" onclick="switchTab('responses')">🧾 Management Responses</button>
   </div>
 
   <!-- Alerts Tab -->
@@ -381,6 +383,43 @@
     </div>
   </div>
 
+  <div id="tab-remediation" class="tab-pane">
+    <div class="two-col">
+      <div class="panel">
+        <div class="section-title"><span class="dot"></span> Findings Requiring Action</div>
+        <div id="remediationList"></div>
+      </div>
+      <div class="panel">
+        <div class="section-title"><span class="dot"></span> Assign Remediation Owner</div>
+        <div class="form-row">
+          <div class="form-group"><label>Finding ID (UUID)</label><input id="remFindingId" placeholder="Paste finding UUID"></div>
+          <div class="form-group"><label>Owner</label><input id="remOwner" placeholder="e.g. AP Process Owner"></div>
+        </div>
+        <div class="form-group" style="margin-bottom:12px"><label>Due Date</label><input id="remDueDate" type="date"></div>
+        <div class="actions"><button class="btn btn-primary" onclick="assignRemediation()">Assign Owner & Due Date</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-responses" class="tab-pane">
+    <div class="two-col">
+      <div class="panel">
+        <div class="section-title"><span class="dot"></span> Process Owner Queue (Read-Only)</div>
+        <div id="ownerQueue"></div>
+      </div>
+      <div class="panel">
+        <div class="section-title"><span class="dot"></span> Submit Management Response</div>
+        <div class="form-row">
+          <div class="form-group"><label>Finding ID (UUID)</label><input id="respFindingId" placeholder="Paste finding UUID"></div>
+          <div class="form-group"><label>Responsible Owner</label><input id="respOwner" placeholder="e.g. Procure-to-Pay Lead"></div>
+        </div>
+        <div class="form-group" style="margin-bottom:12px"><label>Target Date</label><input id="respTargetDate" type="date"></div>
+        <div class="form-group" style="margin-bottom:12px"><label>Response / Justification</label><textarea id="respText" placeholder="Management response or remediation plan"></textarea></div>
+        <div class="actions"><button class="btn btn-primary" onclick="submitManagementResponse()">Submit Response</button></div>
+      </div>
+    </div>
+  </div>
+
 </main>
 
 <script>
@@ -422,7 +461,8 @@
     document.getElementById('tab-' + name).classList.add('active');
     event.currentTarget.classList.add('active');
     const loaders = { alerts: loadAlerts, policies: loadPolicies,
-                      frameworks: loadFrameworks, risks: loadRisks, rules: loadRules };
+                      frameworks: loadFrameworks, risks: loadRisks, rules: loadRules,
+                      remediation: loadRemediation, responses: loadOwnerQueue };
     if (loaders[name]) loaders[name]();
   }
 
@@ -691,6 +731,102 @@
     const r = await fetch(`${API}/alerts/rules`, { method: 'POST', headers: headers(), body: JSON.stringify(body) });
     if (r.ok) { showSuccess('Alert rule created.'); loadRules(); }
     else { const err = await r.json(); showError(err.detail || 'Failed.'); }
+  }
+
+  async function loadRemediation() {
+    const el = document.getElementById('remediationList');
+    el.innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
+    try {
+      const r = await fetch(`${API}/findings/`, { headers: headers() });
+      const data = await r.json();
+      if (!Array.isArray(data) || !data.length) {
+        el.innerHTML = '<div class="empty-state"><div class="empty-icon">🛠</div>No findings available</div>';
+        return;
+      }
+      el.innerHTML = `<table><thead><tr><th>ID</th><th>Control</th><th>Severity</th><th>Owner</th><th>Due</th><th>Status</th></tr></thead><tbody>
+        ${data.map(f => `<tr>
+          <td style="font-family:'JetBrains Mono',monospace;font-size:.7rem">${f.id}</td>
+          <td>${f.control_id || '—'}</td>
+          <td>${severityBadge((f.severity || '').toUpperCase())}</td>
+          <td>${f.remediation_owner || 'Unassigned'}</td>
+          <td>${f.remediation_due_date ? new Date(f.remediation_due_date).toLocaleDateString() : '—'}</td>
+          <td>${statusBadge(f.status || 'open')}</td>
+        </tr>`).join('')}
+      </tbody></table>`;
+    } catch (e) {
+      el.innerHTML = '<div class="empty-state">Failed to load remediation queue.</div>';
+    }
+  }
+
+  async function assignRemediation() {
+    const findingId = document.getElementById('remFindingId').value.trim();
+    const owner = document.getElementById('remOwner').value.trim();
+    const dueDate = document.getElementById('remDueDate').value;
+    if (!findingId || !owner || !dueDate) {
+      showError('Finding ID, owner, and due date are required.');
+      return;
+    }
+    const r = await fetch(`${API}/findings/${findingId}/remediation`, {
+      method: 'PATCH', headers: headers(),
+      body: JSON.stringify({ remediation_owner: owner, remediation_due_date: new Date(dueDate).toISOString() })
+    });
+    if (r.ok) {
+      showSuccess('Remediation assignment saved.');
+      loadRemediation();
+    } else {
+      const err = await r.json();
+      showError(err.detail || 'Failed to assign remediation owner.');
+    }
+  }
+
+  async function loadOwnerQueue() {
+    const el = document.getElementById('ownerQueue');
+    el.innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
+    try {
+      const r = await fetch(`${API}/findings/`, { headers: headers() });
+      const data = await r.json();
+      if (!Array.isArray(data) || !data.length) {
+        el.innerHTML = '<div class="empty-state"><div class="empty-icon">🧾</div>No owner items found</div>';
+        return;
+      }
+      el.innerHTML = `<table><thead><tr><th>Finding</th><th>Owner</th><th>Due</th><th>Logic Breakdown</th></tr></thead><tbody>
+        ${data.map(f => `<tr>
+          <td style="font-family:'JetBrains Mono',monospace;font-size:.7rem">${f.id}</td>
+          <td>${f.remediation_owner || 'Unassigned'}</td>
+          <td>${f.remediation_due_date ? new Date(f.remediation_due_date).toLocaleDateString() : '—'}</td>
+          <td style="font-size:.78rem">${f.logic_breakdown || '—'}</td>
+        </tr>`).join('')}
+      </tbody></table>`;
+    } catch (e) {
+      el.innerHTML = '<div class="empty-state">Failed to load management queue.</div>';
+    }
+  }
+
+  async function submitManagementResponse() {
+    const findingId = document.getElementById('respFindingId').value.trim();
+    const owner = document.getElementById('respOwner').value.trim();
+    const targetDate = document.getElementById('respTargetDate').value;
+    const responseText = document.getElementById('respText').value.trim();
+    if (!findingId || !owner || !responseText) {
+      showError('Finding ID, owner, and response text are required.');
+      return;
+    }
+    const r = await fetch(`${API}/findings/${findingId}/management-response`, {
+      method: 'POST', headers: headers(),
+      body: JSON.stringify({
+        finding_id: findingId,
+        responsible_owner: owner,
+        response_text: responseText,
+        target_date: targetDate ? new Date(targetDate).toISOString() : null
+      })
+    });
+    if (r.ok) {
+      showSuccess('Management response submitted.');
+      loadOwnerQueue();
+    } else {
+      const err = await r.json();
+      showError(err.detail || 'Failed to submit management response.');
+    }
   }
 
   // ── Init ────────────────────────────────────────────────────────────────────

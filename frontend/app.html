@@ -9729,6 +9729,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         file: null,
         data: [],
         headers: [],
+        lineageMap: {},
         mapping: {},
         violations: [],
         riskSummary: {},
@@ -11603,7 +11604,28 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         var ext = file.name.split('.').pop().toLowerCase();
         function done(data, headers) { if (callback) callback(data, headers); else { STATE.data = data; STATE.headers = headers; showPreview(); buildMapping(); } }
         if (ext === 'csv' || ext === 'tsv') {
-          Papa.parse(file, { header: true, skipEmptyLines: true, complete: function (res) { done(res.data, res.meta.fields || []); } });
+          var rows = [];
+          var lineage = {};
+          var rowNumber = 1;
+          Papa.parse(file, {
+            header: true,
+            skipEmptyLines: true,
+            worker: true,
+            fastMode: true,
+            chunk: function (chunk) {
+              if (!chunk || !chunk.data) return;
+              chunk.data.forEach(function (row) {
+                rowNumber += 1;
+                var fp = JSON.stringify(row);
+                lineage[fp] = { source_file: file.name, row_number: rowNumber, erp_table: 'csv_upload' };
+                rows.push(row);
+              });
+            },
+            complete: function (res) {
+              STATE.lineageMap = lineage;
+              done(rows, res.meta.fields || []);
+            }
+          });
         } else if (ext === 'xlsx' || ext === 'xls') {
           var reader = new FileReader();
           reader.onload = function (e) {
@@ -12312,6 +12334,22 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         'CD': 'CD', 'INT': 'INT', 'TT': 'TT', 'FRR': 'FRR', 'MDG': 'MDG', 'ALL': 'ALL'
       };
 
+      var _redactionMap = {};
+      function isRedactionEnabled() {
+        return localStorage.getItem('auditai_redaction_enabled') === 'true';
+      }
+
+      function redactIdentity(value) {
+        if (!isRedactionEnabled()) return value;
+        if (!value) return value;
+        if (!_redactionMap[value]) {
+          var idx = Object.keys(_redactionMap).length + 1;
+          var suffix = String.fromCharCode(64 + ((idx - 1) % 26) + 1);
+          _redactionMap[value] = 'User_' + suffix;
+        }
+        return _redactionMap[value];
+      }
+
       function renderFindingsTable(vio) {
         var tbody = document.getElementById('ccFindingsTbody');
         document.getElementById('ccFindCount').textContent = vio.length + ' findings · Click row for AI narrative';
@@ -12328,7 +12366,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
           var areaPrefix = v.id ? v.id.split('-')[0] : '';
           html += '<tr class="cc-tr" id="ccrow' + idx + '" onclick="showNarrative(' + idx + ')">';
           html += '<td><span class="cc-dot ' + dotClass + '"></span></td>';
-          html += '<td class="cc-entity" title="' + v.entity + '">' + v.entity + '</td>';
+          html += '<td class="cc-entity" title="' + redactIdentity(v.entity) + '">' + redactIdentity(v.entity) + '</td>';
           html += '<td class="cc-rule-txt"><span class="cc-rule-id">' + v.id + '</span><br>' + v.rule + '</td>';
           html += '<td class="cc-area-txt">' + areaPrefix + '</td>';
           html += '<td><span class="cc-sev-pill ' + pillClass + '">' + v.severity + '</span></td>';
@@ -12351,7 +12389,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         if (row) { row.classList.add('cc-sel'); row.scrollIntoView({ block: 'nearest' }); }
 
         // Update header
-        document.getElementById('ccNarrId').textContent = v.id + ' — ' + v.entity;
+        document.getElementById('ccNarrId').textContent = v.id + ' — ' + redactIdentity(v.entity);
         var sevEl = document.getElementById('ccNarrSev');
         sevEl.textContent = v.severity;
         var sc = v.severity === 'Critical' ? 'cc-pill-c' : v.severity === 'High' ? 'cc-pill-h' : v.severity === 'Medium' ? 'cc-pill-m' : 'cc-pill-l';
@@ -12399,13 +12437,29 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         body += '<div style="margin-top:.6rem"><div style="font-family:\'JetBrains Mono\',monospace;font-size:.5rem;letter-spacing:.12em;text-transform:uppercase;color:#1e3a5f;margin-bottom:.35rem">🔎 Audit Evidence</div>';
         body += '<div class="cc-ev-rows">';
         body += '<div class="cc-ev-row"><span class="cc-ev-k">Finding ID</span><span class="cc-ev-v">' + v.id + '</span></div>';
-        body += '<div class="cc-ev-row"><span class="cc-ev-k">Entity / User</span><span class="cc-ev-v danger">' + v.entity + '</span></div>';
+        body += '<div class="cc-ev-row"><span class="cc-ev-k">Entity / User</span><span class="cc-ev-v danger">' + redactIdentity(v.entity) + '</span></div>';
         body += '<div class="cc-ev-row"><span class="cc-ev-k">Evidence A</span><span class="cc-ev-v">' + v.field1 + '</span></div>';
         body += '<div class="cc-ev-row"><span class="cc-ev-k">Evidence B</span><span class="cc-ev-v danger">' + v.field2 + '</span></div>';
         body += '<div class="cc-ev-row"><span class="cc-ev-k">Severity</span><span class="cc-ev-v danger">' + v.severity + '</span></div>';
         body += '</div></div>';
+        body += '<div style="margin-top:.7rem"><button class="btn" style="font-size:.72rem;padding:.4rem .7rem" onclick="testTheTester(' + idx + ')">Test the Tester</button></div>';
 
         document.getElementById('ccNarrBody').innerHTML = body;
+      }
+
+      function testTheTester(idx) {
+        var vio = CC.filtered || [];
+        var v = vio[idx];
+        if (!v) return;
+        var chain = v.chain || {};
+        var payload = {
+          prompt: 'Evaluate SOX control exception severity using the provided control failure, fraud scenario, and FS impact.',
+          rule: v.rule,
+          finding_id: v.id,
+          logic_breakdown: chain,
+          severity: v.severity
+        };
+        alert('Re-performance payload:\n\n' + JSON.stringify(payload, null, 2));
       }
 
       // ─── LIVE FEED BUILDER ───────────────────────────────────────────────────────
@@ -13648,7 +13702,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         // Parse as CSV and populate STATE
         var csv = IPE_STATE.extractedCSV;
         Papa.parse(csv, {
-          header: true, skipEmptyLines: true,
+          header: true, skipEmptyLines: true, worker: true, fastMode: true,
           complete: function (res) {
             STATE.data = res.data;
             STATE.headers = res.meta.fields || [];
@@ -13678,7 +13732,7 @@ Build: AIA-MLV46SFI | SHA256: 784DA906BD3AAD80
         var text = document.getElementById('pasteDataArea') ? document.getElementById('pasteDataArea').value.trim() : '';
         if (!text) { alert('Please paste some data first.'); return; }
         Papa.parse(text, {
-          header: true, skipEmptyLines: true,
+          header: true, skipEmptyLines: true, worker: true, fastMode: true,
           complete: function (res) {
             if (!res.data.length) { alert('Could not parse data. Make sure the first line is column headers.'); return; }
             STATE.data = res.data;

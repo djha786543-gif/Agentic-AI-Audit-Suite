@@ -621,6 +621,91 @@
         const API_LOCAL = 'http://127.0.0.1:8005';
         const API_HEADERS = { 'Bypass-Tunnel-Reminder': 'true' };
 
+        async function deriveVaultKey(sessionKey, salt) {
+            const enc = new TextEncoder();
+            const keyMaterial = await crypto.subtle.importKey(
+                'raw',
+                enc.encode(sessionKey),
+                { name: 'PBKDF2' },
+                false,
+                ['deriveKey']
+            );
+            return crypto.subtle.deriveKey(
+                {
+                    name: 'PBKDF2',
+                    salt,
+                    iterations: 120000,
+                    hash: 'SHA-256'
+                },
+                keyMaterial,
+                { name: 'AES-GCM', length: 256 },
+                false,
+                ['encrypt', 'decrypt']
+            );
+        }
+
+        function openVaultDb() {
+            return new Promise(function (resolve, reject) {
+                const req = indexedDB.open('auditai_vault_db', 1);
+                req.onupgradeneeded = function () {
+                    const db = req.result;
+                    if (!db.objectStoreNames.contains('secure_cache')) {
+                        db.createObjectStore('secure_cache');
+                    }
+                };
+                req.onsuccess = function () { resolve(req.result); };
+                req.onerror = function () { reject(req.error); };
+            });
+        }
+
+        async function cacheVaultEncrypted(records) {
+            const sessionKey = sessionStorage.getItem('auditai_vault_session_key');
+            if (!sessionKey || !records || !records.length) return;
+            const salt = crypto.getRandomValues(new Uint8Array(16));
+            const iv = crypto.getRandomValues(new Uint8Array(12));
+            const key = await deriveVaultKey(sessionKey, salt);
+            const plain = new TextEncoder().encode(JSON.stringify(records));
+            const cipher = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, plain);
+
+            const db = await openVaultDb();
+            await new Promise(function (resolve, reject) {
+                const tx = db.transaction('secure_cache', 'readwrite');
+                const store = tx.objectStore('secure_cache');
+                store.put({
+                    salt: Array.from(salt),
+                    iv: Array.from(iv),
+                    cipher: Array.from(new Uint8Array(cipher)),
+                    saved_at: new Date().toISOString(),
+                }, 'vault_records_v1');
+                tx.oncomplete = function () { resolve(); };
+                tx.onerror = function () { reject(tx.error); };
+            });
+            db.close();
+        }
+
+        async function loadVaultEncryptedCache() {
+            const sessionKey = sessionStorage.getItem('auditai_vault_session_key');
+            if (!sessionKey) return null;
+            const db = await openVaultDb();
+            const cached = await new Promise(function (resolve, reject) {
+                const tx = db.transaction('secure_cache', 'readonly');
+                const store = tx.objectStore('secure_cache');
+                const req = store.get('vault_records_v1');
+                req.onsuccess = function () { resolve(req.result || null); };
+                req.onerror = function () { reject(req.error); };
+            });
+            db.close();
+            if (!cached) return null;
+
+            const salt = new Uint8Array(cached.salt || []);
+            const iv = new Uint8Array(cached.iv || []);
+            const cipher = new Uint8Array(cached.cipher || []);
+            const key = await deriveVaultKey(sessionKey, salt);
+            const plainBuffer = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, cipher);
+            const plainText = new TextDecoder().decode(plainBuffer);
+            return JSON.parse(plainText);
+        }
+
         // DOM Elements
         const searchInput = document.getElementById('searchInput');
         const originFilter = document.getElementById('originFilter');
@@ -829,6 +914,7 @@
                 const vaultRes = await fetch(API_BASE + '/api/v1/audit/vault', { headers: API_HEADERS });
                 if (!vaultRes.ok) throw new Error('Vault fetch failed');
                 allVaultData = await vaultRes.json();
+                await cacheVaultEncrypted(allVaultData);
                 if (!Array.isArray(allVaultData) || allVaultData.length === 0) {
                     throw new Error('Vault returned no records');
                 }
@@ -839,6 +925,17 @@
                 updateDashboardState(true);
             } catch (e) {
                 console.error('Engine disconnected', e);
+                try {
+                    const cached = await loadVaultEncryptedCache();
+                    if (Array.isArray(cached) && cached.length) {
+                        allVaultData = cached;
+                        isDemoMode = false;
+                        updateDashboardState(true);
+                        return;
+                    }
+                } catch (cacheErr) {
+                    console.warn('Encrypted cache unavailable:', cacheErr);
+                }
                 isDemoMode = true;
                 loadDemoVaultData();
                 demoBanner.classList.remove('hidden');
