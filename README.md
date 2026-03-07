@@ -211,6 +211,12 @@ See `docs/COMPLIANCE_EVIDENCE_PACK.md` for details.
 - `docs/SSO_CLAIM_MAPPING.md`
 - `docs/COMPLIANCE_EVIDENCE_PACK.md`
 
+### End-to-End User and Organization Docs
+- `docs/PORTAL_END_TO_END_GUIDE.md`
+- `docs/ORGANIZATION_OPERATING_MODEL.md`
+- `docs/PAGE_FLOW_REFERENCE.md`
+- `docs/API_DATAFLOW_REFERENCE.md`
+
 ### Prerequisites
 * **Python 3.10+** (Required for `asyncpg` and FastAPI compatibility)
 * **Docker Desktop** (For native PostgreSQL and Redis instances)
