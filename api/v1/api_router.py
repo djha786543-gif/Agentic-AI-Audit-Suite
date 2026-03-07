@@ -6,6 +6,7 @@ from api.v1.endpoints import governance, alerts, reports
 from api.v1.endpoints import findings
 from api.v1.endpoints import uat
 from api.v1.endpoints import system_logs
+from api.v1.endpoints import ai_decisions
 
 api_router = APIRouter()
 api_router.include_router(auth.router,        prefix="/auth",        tags=["Auth"])
@@ -23,5 +24,6 @@ api_router.include_router(reports.router,     prefix="/reports",     tags=["Ente
 api_router.include_router(findings.router,    prefix="/findings",    tags=["Findings Workflow"])
 api_router.include_router(uat.router,         prefix="/uat",         tags=["UAT Reports"])
 api_router.include_router(system_logs.router, prefix="/logs",        tags=["System Logs"])
+api_router.include_router(ai_decisions.router, prefix="/ai_decisions", tags=["AI Explainability"])
 api_router.include_router(health.router,      prefix="",             tags=["Health"])
 
