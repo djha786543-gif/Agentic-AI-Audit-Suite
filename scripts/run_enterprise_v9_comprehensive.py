@@ -141,6 +141,7 @@ class WalkthroughConfig:
     record_video: bool
     seed: int
     scenario: ScenarioProfile
+    include_landing: bool
 
 
 @dataclass
@@ -258,11 +259,12 @@ async def first_visible(page: Page, selectors: List[str], timeout_ms: int = 1500
     return None
 
 
-async def click_locator(locator: Locator) -> None:
-    await locator.scroll_into_view_if_needed()
+async def click_locator(locator: Locator, timeout_ms: int = 5000) -> None:
+    await locator.wait_for(state="visible", timeout=timeout_ms)
+    await locator.scroll_into_view_if_needed(timeout=timeout_ms)
     await highlight(locator)
     await pause(0.15, 0.35)
-    await locator.click(force=True)
+    await locator.click(force=True, timeout=timeout_ms)
 
 
 async def fill_first(page: Page, selectors: List[str], value: str, timeout_ms: int = 1200) -> bool:
@@ -415,10 +417,66 @@ async def page_command_center(page: Page, runner: Runner) -> None:
     await runner.evidence.screenshot(page, "10_app_landing", runner.state)
 
     async def select_agent() -> None:
-        preferred = page.get_by_text(s.selected_agent, exact=False).first
-        await click_locator(preferred)
-        cont = page.get_by_text("Continue", exact=False).first
-        await click_locator(cont)
+        # Defensive prep: close optional enterprise modal and force SOX 404 module context.
+        try:
+            close_candidates = [
+                "button:has-text('Continue Exploring')",
+                "#enterpriseModal .btn-enterprise",
+                ".em-close",
+                ".enterprise-close",
+            ]
+            for sel in close_candidates:
+                btn = page.locator(sel).first
+                if await btn.is_visible(timeout=700):
+                    await click_locator(btn, timeout_ms=2500)
+                    await pause(0.15, 0.35)
+            await page.keyboard.press("Escape")
+        except Exception:
+            pass
+
+        try:
+            m1_tab = page.locator("#mnavM1").first
+            if await m1_tab.is_visible(timeout=1500):
+                await click_locator(m1_tab, timeout_ms=3000)
+        except Exception:
+            pass
+
+        agent_map = {
+            "SOD Auditor": "sod",
+            "Logical Access Auditor": "access",
+            "Financial Reporting Risk": "frr",
+            "Change Mgmt Auditor": "change",
+        }
+        agent_key = agent_map.get(s.selected_agent, "")
+        selectors = []
+        if agent_key:
+            selectors.append(f"div.agent-option[data-agent='{agent_key}']")
+        selectors.extend(
+            [
+                f".agent-option:has(h4:has-text('{s.selected_agent}'))",
+                f"h4:has-text('{s.selected_agent}')",
+            ]
+        )
+
+        picked = await first_visible(page, selectors, timeout_ms=2500)
+        if not picked:
+            raise RuntimeError(f"Agent card not found for '{s.selected_agent}'")
+        await click_locator(picked, timeout_ms=5000)
+
+        continue_btn = await first_visible(
+            page,
+            [
+                "#btnNext1",
+                "button:has-text('Continue')",
+            ],
+            timeout_ms=2500,
+        )
+        if not continue_btn:
+            raise RuntimeError("Continue button for Step 1 not found")
+        await click_locator(continue_btn, timeout_ms=5000)
+
+        view2 = page.locator("#v2.active, #v2.view.active").first
+        await view2.wait_for(state="visible", timeout=6000)
 
     await runner.do(name, "select_agent", select_agent, f"selected_agent={s.selected_agent}")
     await runner.evidence.screenshot(page, "11_app_agent_selected", runner.state)
@@ -705,6 +763,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--continue-on-error", action="store_true", help="Continue to next page after page failure")
     parser.add_argument("--seed", type=int, default=42, help="Random seed for deterministic wait jitter")
     parser.add_argument("--video", action="store_true", help="Record browser video")
+    parser.add_argument(
+        "--include-landing",
+        action="store_true",
+        help="Include index.html walkthrough; default run focuses on operational pages",
+    )
     return parser.parse_args()
 
 
@@ -719,6 +782,7 @@ def build_run_state(cfg: WalkthroughConfig, run_id: str) -> RunState:
         "continue_on_error": cfg.continue_on_error,
         "record_video": cfg.record_video,
         "seed": cfg.seed,
+        "include_landing": cfg.include_landing,
         "scenario": asdict(cfg.scenario),
     }
     return RunState(started_at=now_iso(), run_id=run_id, config=safe_cfg)
@@ -752,13 +816,14 @@ async def orchestrate(cfg: WalkthroughConfig) -> int:
         runner = Runner(cfg=cfg, evidence=evidence, state=state)
 
         page_flow = [
-            ("index", page_landing),
             ("app", page_command_center),
             ("vault", page_vault),
             ("governance", page_governance),
             ("uat", page_uat),
             ("help", page_help),
         ]
+        if cfg.include_landing:
+            page_flow.insert(0, ("index", page_landing))
 
         overall_error = False
         try:
@@ -814,6 +879,7 @@ def main() -> None:
         record_video=args.video,
         seed=args.seed,
         scenario=scenario,
+        include_landing=args.include_landing,
     )
 
     exit_code = asyncio.run(orchestrate(cfg))
