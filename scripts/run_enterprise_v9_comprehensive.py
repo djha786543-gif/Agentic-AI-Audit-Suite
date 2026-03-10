@@ -38,6 +38,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import hashlib
 import json
 import os
 import random
@@ -142,6 +143,7 @@ class WalkthroughConfig:
     seed: int
     scenario: ScenarioProfile
     include_landing: bool
+    fullscreen: bool
 
 
 @dataclass
@@ -155,15 +157,28 @@ class ActionRecord:
 
 
 @dataclass
+class AssertionRecord:
+    page: str
+    control: str
+    status: str
+    details: str
+    started_at: str
+    duration_ms: int
+
+
+@dataclass
 class RunState:
     started_at: str
     run_id: str
     config: Dict[str, Any]
     actions: List[ActionRecord] = field(default_factory=list)
+    assertions: List[AssertionRecord] = field(default_factory=list)
     page_status: Dict[str, str] = field(default_factory=dict)
     screenshots: List[str] = field(default_factory=list)
     errors: List[str] = field(default_factory=list)
+    artifact_hashes: Dict[str, str] = field(default_factory=dict)
     video_file: Optional[str] = None
+    summary_file: Optional[str] = None
     ended_at: Optional[str] = None
 
 
@@ -173,6 +188,7 @@ class EvidenceStore:
         self.shots_dir = self.run_dir / "screenshots"
         self.log_file = self.run_dir / "run.log"
         self.manifest_file = self.run_dir / "manifest.json"
+        self.summary_file = self.run_dir / "executive_summary.md"
         self.run_dir.mkdir(parents=True, exist_ok=True)
         self.shots_dir.mkdir(parents=True, exist_ok=True)
 
@@ -193,6 +209,8 @@ class EvidenceStore:
         return rel
 
     def write_manifest(self, state: RunState) -> None:
+        pass_assertions = sum(1 for a in state.assertions if a.status == "PASS")
+        fail_assertions = sum(1 for a in state.assertions if a.status == "FAIL")
         payload = {
             "started_at": state.started_at,
             "ended_at": state.ended_at,
@@ -201,18 +219,83 @@ class EvidenceStore:
             "page_status": state.page_status,
             "screenshots": state.screenshots,
             "video_file": state.video_file,
+            "summary_file": state.summary_file,
+            "artifact_hashes_sha256": state.artifact_hashes,
             "errors": state.errors,
             "actions": [asdict(a) for a in state.actions],
+            "assertions": [asdict(a) for a in state.assertions],
             "metrics": {
                 "total_actions": len(state.actions),
                 "passed_actions": sum(1 for a in state.actions if a.status == "PASS"),
                 "failed_actions": sum(1 for a in state.actions if a.status == "FAIL"),
+                "total_assertions": len(state.assertions),
+                "passed_assertions": pass_assertions,
+                "failed_assertions": fail_assertions,
                 "pages_completed": sum(1 for s in state.page_status.values() if s == "PASS"),
                 "pages_failed": sum(1 for s in state.page_status.values() if s == "FAIL"),
             },
         }
         with self.manifest_file.open("w", encoding="utf-8") as f:
             json.dump(payload, f, indent=2)
+
+    def hash_artifacts(self) -> Dict[str, str]:
+        hashes: Dict[str, str] = {}
+        for path in sorted(self.run_dir.rglob("*")):
+            if not path.is_file() or path.name == self.manifest_file.name:
+                continue
+            digest = hashlib.sha256(path.read_bytes()).hexdigest()
+            rel = str(path.relative_to(self.run_dir)).replace("\\", "/")
+            hashes[rel] = digest
+        return hashes
+
+    def write_executive_summary(self, state: RunState) -> str:
+        pass_pages = sum(1 for p in state.page_status.values() if p == "PASS")
+        fail_pages = sum(1 for p in state.page_status.values() if p == "FAIL")
+        pass_assertions = sum(1 for a in state.assertions if a.status == "PASS")
+        fail_assertions = sum(1 for a in state.assertions if a.status == "FAIL")
+
+        lines = [
+            "# AuditAI Enterprise Walkthrough - Executive Summary",
+            "",
+            f"- Run ID: {state.run_id}",
+            f"- Started (UTC): {state.started_at}",
+            f"- Ended (UTC): {state.ended_at or 'n/a'}",
+            f"- Scenario: {state.config.get('scenario', {}).get('name', 'n/a')}",
+            f"- Base URL: {state.config.get('base_url', 'n/a')}",
+            "",
+            "## Outcome",
+            f"- Pages passed: {pass_pages}",
+            f"- Pages failed: {fail_pages}",
+            f"- Control assertions passed: {pass_assertions}",
+            f"- Control assertions failed: {fail_assertions}",
+            f"- Total actions executed: {len(state.actions)}",
+            "",
+            "## Page Status",
+        ]
+        for page_name, status in state.page_status.items():
+            lines.append(f"- {page_name}: {status}")
+
+        lines.append("")
+        lines.append("## Assertion Highlights")
+        for assertion in state.assertions:
+            lines.append(f"- [{assertion.status}] {assertion.page}.{assertion.control} - {assertion.details}")
+
+        if state.errors:
+            lines.append("")
+            lines.append("## Errors")
+            for err in state.errors:
+                lines.append(f"- {err}")
+
+        lines.append("")
+        lines.append("## Evidence")
+        if state.video_file:
+            lines.append(f"- Video: {state.video_file}")
+        lines.append(f"- Screenshots: {len(state.screenshots)} files")
+        lines.append("- See manifest.json for complete telemetry and SHA-256 hashes")
+
+        content = "\n".join(lines) + "\n"
+        self.summary_file.write_text(content, encoding="utf-8")
+        return str(self.summary_file.relative_to(self.run_dir)).replace("\\", "/")
 
 
 def now_iso() -> str:
@@ -350,6 +433,37 @@ class Runner:
         url = f"{self.cfg.base_url.rstrip('/')}/{relative_path.lstrip('/')}"
         await page.goto(url, wait_until="networkidle", timeout=self.cfg.timeout_ms)
         await pause(0.4, 0.8)
+
+    async def assert_control(
+        self,
+        page_name: str,
+        control: str,
+        fn: Callable[[], Awaitable[tuple[bool, str]]],
+    ) -> None:
+        started = perf_counter()
+        started_at = now_iso()
+        status = "FAIL"
+        details = ""
+        try:
+            ok, details = await fn()
+            status = "PASS" if ok else "FAIL"
+        except Exception as exc:
+            details = str(exc)
+
+        duration = int((perf_counter() - started) * 1000)
+        self.state.assertions.append(
+            AssertionRecord(
+                page=page_name,
+                control=control,
+                status=status,
+                details=details,
+                started_at=started_at,
+                duration_ms=duration,
+            )
+        )
+        self.evidence.log(f"ASSERT [{page_name}] {control} -> {status} ({details})")
+        if status == "FAIL":
+            self.state.errors.append(f"ASSERT FAIL [{page_name}] {control}: {details}")
 
 
 async def page_landing(page: Page, runner: Runner) -> None:
@@ -513,6 +627,16 @@ async def page_command_center(page: Page, runner: Runner) -> None:
         await view2.wait_for(state="visible", timeout=8000)
 
     await runner.do(name, "select_agent", select_agent, f"selected_agent={s.selected_agent}")
+    await runner.assert_control(
+        name,
+        "step_2_activated",
+        lambda: page.evaluate(
+            """() => {
+                const v2 = document.getElementById('v2');
+                return [!!(v2 && v2.classList.contains('active')), 'v2 active state verified'];
+            }"""
+        ),
+    )
     await runner.evidence.screenshot(page, "11_app_agent_selected", runner.state)
 
     async def load_data() -> None:
@@ -556,6 +680,19 @@ async def page_command_center(page: Page, runner: Runner) -> None:
         raise RuntimeError("Results were not detected after triggering run")
 
     await runner.do(name, "run_audit", run_audit, "Execute full audit")
+    await runner.assert_control(
+        name,
+        "results_surface_present",
+        lambda: page.evaluate(
+            """() => {
+                const rowCount = document.querySelectorAll('table tbody tr').length;
+                const hasSeverity = !!Array.from(document.querySelectorAll('button,span,div')).find(
+                    el => /^(CRITICAL|HIGH|MEDIUM|ALL)$/i.test((el.textContent || '').trim())
+                );
+                return [rowCount > 0 || hasSeverity, `rows=${rowCount}, severityTabs=${hasSeverity}`];
+            }"""
+        ),
+    )
     await runner.evidence.screenshot(page, "12_app_results_loaded", runner.state)
 
     async def review_filters() -> None:
@@ -607,6 +744,17 @@ async def page_command_center(page: Page, runner: Runner) -> None:
                 continue
 
     await runner.do(name, "trigger_exports", export_actions)
+    await runner.assert_control(
+        name,
+        "export_controls_present",
+        lambda: page.evaluate(
+            """() => {
+                const text = document.body.innerText || '';
+                const hasAny = text.includes('Audit Report') || text.includes('Dashboard PDF') || text.includes('Export to Excel');
+                return [hasAny, 'export controls detected in current view'];
+            }"""
+        ),
+    )
     await runner.evidence.screenshot(page, "13_app_exports", runner.state)
 
 
@@ -626,6 +774,17 @@ async def page_vault(page: Page, runner: Runner) -> None:
                 continue
 
     await runner.do(name, "filter_evidence_origin", apply_filters)
+    await runner.assert_control(
+        name,
+        "vault_filters_rendered",
+        lambda: page.evaluate(
+            """() => {
+                const text = document.body.innerText || '';
+                const ok = text.includes('All Origins') && text.includes('Azure AD');
+                return [ok, 'expected origin filters are rendered'];
+            }"""
+        ),
+    )
 
     async def toggle_sort() -> None:
         oldest = page.get_by_text("Oldest First", exact=False).first
@@ -637,6 +796,17 @@ async def page_vault(page: Page, runner: Runner) -> None:
     await runner.do(name, "toggle_sort", toggle_sort)
 
     await runner.do(name, "scroll_ledger", lambda: human_scroll(page, 700, 6))
+    await runner.assert_control(
+        name,
+        "ledger_surface_visible",
+        lambda: page.evaluate(
+            """() => {
+                const rowCount = document.querySelectorAll('table tbody tr').length;
+                const hasTable = !!document.querySelector('table');
+                return [rowCount > 0 || hasTable, `hasTable=${hasTable}, rows=${rowCount}`];
+            }"""
+        ),
+    )
     await runner.evidence.screenshot(page, "21_vault_ledger", runner.state)
 
 
@@ -708,6 +878,17 @@ async def page_governance(page: Page, runner: Runner) -> None:
         await click_locator(btn)
 
     await runner.do(name, "create_alert_rule", create_alert_rule)
+    await runner.assert_control(
+        name,
+        "governance_tabs_accessible",
+        lambda: page.evaluate(
+            """() => {
+                const text = document.body.innerText || '';
+                const ok = text.includes('Risk Register') && text.includes('Alert Rules');
+                return [ok, 'governance tab labels visible after workflow'];
+            }"""
+        ),
+    )
     await runner.evidence.screenshot(page, "31_governance_completed", runner.state)
 
 
@@ -736,6 +917,17 @@ async def page_uat(page: Page, runner: Runner) -> None:
                 continue
 
     await runner.do(name, "run_uat_actions", click_actions)
+    await runner.assert_control(
+        name,
+        "uat_readiness_gate_visible",
+        lambda: page.evaluate(
+            """() => {
+                const text = document.body.innerText || '';
+                const ok = text.includes('Readiness Gate');
+                return [ok, 'readiness gate present in UAT console'];
+            }"""
+        ),
+    )
     await runner.evidence.screenshot(page, "41_uat_actions", runner.state)
 
 
@@ -755,6 +947,17 @@ async def page_help(page: Page, runner: Runner) -> None:
                 continue
 
     await runner.do(name, "open_help_sections", open_sections)
+    await runner.assert_control(
+        name,
+        "help_sections_visible",
+        lambda: page.evaluate(
+            """() => {
+                const text = document.body.innerText || '';
+                const ok = text.includes('FAQ') || text.includes('Suite Overview');
+                return [ok, 'core help sections detected'];
+            }"""
+        ),
+    )
     await runner.evidence.screenshot(page, "50_help_sections", runner.state)
 
 
@@ -802,6 +1005,11 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Include index.html walkthrough; default run focuses on operational pages",
     )
+    parser.add_argument(
+        "--windowed",
+        action="store_true",
+        help="Run with fixed viewport instead of fullscreen window",
+    )
     return parser.parse_args()
 
 
@@ -817,6 +1025,7 @@ def build_run_state(cfg: WalkthroughConfig, run_id: str) -> RunState:
         "record_video": cfg.record_video,
         "seed": cfg.seed,
         "include_landing": cfg.include_landing,
+        "fullscreen": cfg.fullscreen,
         "scenario": asdict(cfg.scenario),
     }
     return RunState(started_at=now_iso(), run_id=run_id, config=safe_cfg)
@@ -831,13 +1040,19 @@ async def orchestrate(cfg: WalkthroughConfig) -> int:
     evidence.log(f"RUN START id={run_id} scenario={cfg.scenario.key}")
 
     async with async_playwright() as playwright:
+        launch_args = []
+        if cfg.fullscreen:
+            launch_args.extend(["--start-maximized", "--kiosk"])
+        else:
+            launch_args.append("--start-maximized")
+
         browser = await playwright.chromium.launch(
             headless=cfg.headless,
             slow_mo=cfg.slow_mo,
-            args=["--start-maximized"],
+            args=launch_args,
         )
 
-        context_kwargs: Dict[str, Any] = {"viewport": {"width": 1600, "height": 900}}
+        context_kwargs: Dict[str, Any] = {"viewport": None if cfg.fullscreen else {"width": 1600, "height": 900}}
         if cfg.record_video:
             video_dir = str((evidence.run_dir / "video").resolve())
             os.makedirs(video_dir, exist_ok=True)
@@ -884,11 +1099,19 @@ async def orchestrate(cfg: WalkthroughConfig) -> int:
             await browser.close()
 
     state.ended_at = now_iso()
+    state.summary_file = evidence.write_executive_summary(state)
+    state.artifact_hashes = evidence.hash_artifacts()
     evidence.write_manifest(state)
 
     pass_pages = sum(1 for p in state.page_status.values() if p == "PASS")
     fail_pages = sum(1 for p in state.page_status.values() if p == "FAIL")
     evidence.log(f"RUN SUMMARY pass_pages={pass_pages} fail_pages={fail_pages} errors={len(state.errors)}")
+    evidence.log(
+        "RUN ASSERTIONS "
+        f"total={len(state.assertions)} "
+        f"pass={sum(1 for a in state.assertions if a.status == 'PASS')} "
+        f"fail={sum(1 for a in state.assertions if a.status == 'FAIL')}"
+    )
     evidence.log(f"ARTIFACTS {evidence.run_dir}")
 
     if overall_error and not cfg.continue_on_error:
@@ -914,6 +1137,7 @@ def main() -> None:
         seed=args.seed,
         scenario=scenario,
         include_landing=args.include_landing,
+        fullscreen=not args.windowed,
     )
 
     exit_code = asyncio.run(orchestrate(cfg))
