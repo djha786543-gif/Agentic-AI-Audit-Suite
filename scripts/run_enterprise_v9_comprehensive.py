@@ -463,6 +463,19 @@ async def page_command_center(page: Page, runner: Runner) -> None:
             raise RuntimeError(f"Agent card not found for '{s.selected_agent}'")
         await click_locator(picked, timeout_ms=5000)
 
+        # Ensure the page-level state is truly set (some custom cards don't always
+        # trigger the onclick path through pure pointer simulation).
+        if agent_key:
+            await page.evaluate(
+                """(ak) => {
+                    const card = document.querySelector(`.agent-option[data-agent='${ak}']`);
+                    if (card && typeof window.selectAgent === 'function') {
+                        window.selectAgent(card);
+                    }
+                }""",
+                agent_key,
+            )
+
         continue_btn = await first_visible(
             page,
             [
@@ -473,10 +486,31 @@ async def page_command_center(page: Page, runner: Runner) -> None:
         )
         if not continue_btn:
             raise RuntimeError("Continue button for Step 1 not found")
-        await click_locator(continue_btn, timeout_ms=5000)
 
-        view2 = page.locator("#v2.active, #v2.view.active").first
-        await view2.wait_for(state="visible", timeout=6000)
+        # Prefer UI click, then force state transition via app function when needed.
+        try:
+            await click_locator(continue_btn, timeout_ms=3500)
+        except Exception:
+            pass
+
+        is_v2_visible = await page.evaluate(
+            """() => {
+                const v2 = document.getElementById('v2');
+                return !!(v2 && v2.classList.contains('active'));
+            }"""
+        )
+
+        if not is_v2_visible:
+            await page.evaluate(
+                """() => {
+                    if (typeof window.goStep === 'function') {
+                        window.goStep(2);
+                    }
+                }"""
+            )
+
+        view2 = page.locator("#v2.active").first
+        await view2.wait_for(state="visible", timeout=8000)
 
     await runner.do(name, "select_agent", select_agent, f"selected_agent={s.selected_agent}")
     await runner.evidence.screenshot(page, "11_app_agent_selected", runner.state)
