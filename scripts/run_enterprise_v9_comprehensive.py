@@ -54,6 +54,21 @@ from playwright.async_api import Locator, Page, async_playwright
 
 DEFAULT_BASE_URL = "https://djha786543-gif.github.io/Agentic-AI-Audit-Suite"
 
+POPUP_SELECTORS = [
+    "#enterpriseModal .em-close",
+    "#enterpriseModal .btn-enterprise",
+    "button:has-text('Continue Exploring')",
+    "button:has-text('Close')",
+    "button:has-text('Dismiss')",
+    "button:has-text('No thanks')",
+    "button:has-text('Got it')",
+    "[aria-label='Close']",
+    "[data-dismiss='modal']",
+    ".modal .close",
+    ".popup .close",
+    ".overlay .close",
+]
+
 
 @dataclass
 class ScenarioProfile:
@@ -342,12 +357,52 @@ async def first_visible(page: Page, selectors: List[str], timeout_ms: int = 1500
     return None
 
 
+async def dismiss_known_popups(page: Page) -> int:
+    closed = 0
+    for selector in POPUP_SELECTORS:
+        try:
+            loc = page.locator(selector).first
+            if await loc.is_visible(timeout=150):
+                await loc.click(force=True, timeout=800)
+                closed += 1
+        except Exception:
+            continue
+    try:
+        await page.keyboard.press("Escape")
+    except Exception:
+        pass
+    return closed
+
+
+async def popup_reaper(page: Page, evidence: EvidenceStore, stop_event: asyncio.Event) -> None:
+    while not stop_event.is_set():
+        try:
+            closed = await dismiss_known_popups(page)
+            if closed:
+                evidence.log(f"POPUP_REAPER closed={closed}")
+        except Exception:
+            pass
+        await asyncio.sleep(0.6)
+
+
 async def click_locator(locator: Locator, timeout_ms: int = 5000) -> None:
+    page: Optional[Page] = None
+    try:
+        page = locator.page
+    except Exception:
+        page = None
+    if page is not None:
+        await dismiss_known_popups(page)
     await locator.wait_for(state="visible", timeout=timeout_ms)
     await locator.scroll_into_view_if_needed(timeout=timeout_ms)
     await highlight(locator)
     await pause(0.15, 0.35)
-    await locator.click(force=True, timeout=timeout_ms)
+    try:
+        await locator.click(force=True, timeout=timeout_ms)
+    except Exception:
+        if page is not None:
+            await dismiss_known_popups(page)
+        await locator.click(force=True, timeout=timeout_ms)
 
 
 async def fill_first(page: Page, selectors: List[str], value: str, timeout_ms: int = 1200) -> bool:
@@ -1042,9 +1097,10 @@ async def orchestrate(cfg: WalkthroughConfig) -> int:
     async with async_playwright() as playwright:
         launch_args = []
         if cfg.fullscreen:
-            launch_args.extend(["--start-maximized", "--kiosk"])
+            launch_args.extend(["--start-maximized", "--start-fullscreen", "--kiosk"])
         else:
             launch_args.append("--start-maximized")
+        launch_args.extend(["--disable-notifications", "--disable-popup-blocking"])
 
         browser = await playwright.chromium.launch(
             headless=cfg.headless,
@@ -1052,7 +1108,7 @@ async def orchestrate(cfg: WalkthroughConfig) -> int:
             args=launch_args,
         )
 
-        context_kwargs: Dict[str, Any] = {"viewport": None if cfg.fullscreen else {"width": 1600, "height": 900}}
+        context_kwargs: Dict[str, Any] = {"no_viewport": True} if cfg.fullscreen else {"viewport": {"width": 1600, "height": 900}}
         if cfg.record_video:
             video_dir = str((evidence.run_dir / "video").resolve())
             os.makedirs(video_dir, exist_ok=True)
@@ -1061,6 +1117,20 @@ async def orchestrate(cfg: WalkthroughConfig) -> int:
 
         context = await browser.new_context(**context_kwargs)
         page = await context.new_page()
+
+        async def close_new_page(new_page: Page) -> None:
+            if new_page is page:
+                return
+            try:
+                evidence.log(f"POPUP_TAB closing url={new_page.url}")
+                await new_page.close()
+            except Exception:
+                pass
+
+        context.on("page", lambda p: asyncio.create_task(close_new_page(p)))
+        page.on("dialog", lambda d: asyncio.create_task(d.dismiss()))
+        reaper_stop = asyncio.Event()
+        reaper_task = asyncio.create_task(popup_reaper(page, evidence, reaper_stop))
 
         runner = Runner(cfg=cfg, evidence=evidence, state=state)
 
@@ -1086,6 +1156,11 @@ async def orchestrate(cfg: WalkthroughConfig) -> int:
             overall_error = True
         finally:
             video_obj = page.video
+            reaper_stop.set()
+            try:
+                await asyncio.wait_for(reaper_task, timeout=2.0)
+            except Exception:
+                pass
             await context.close()
             if cfg.record_video and video_obj:
                 try:
