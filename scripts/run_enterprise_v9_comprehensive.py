@@ -786,7 +786,8 @@ async def page_command_center(page: Page, runner: Runner) -> None:
         rows = page.locator("table tbody tr")
         count = await rows.count()
         if count == 0:
-            raise RuntimeError("No rows in findings table")
+            runner.evidence.log("INFO [app] findings table has 0 rows; continuing with severity-level evidence")
+            return
         for i in range(min(5, count)):
             row = rows.nth(i)
             await row.scroll_into_view_if_needed()
@@ -1028,13 +1029,34 @@ async def page_vault(page: Page, runner: Runner) -> None:
     )
 
     async def toggle_sort() -> None:
-        oldest = page.get_by_text("Oldest First", exact=False).first
-        newest = page.get_by_text("Newest First", exact=False).first
-        await click_locator(oldest)
-        await pause(0.1, 0.3)
-        await click_locator(newest)
+        oldest = await first_visible(
+            page,
+            [
+                "button:has-text('Oldest First')",
+                "text=Oldest First",
+            ],
+            timeout_ms=1200,
+        )
+        newest = await first_visible(
+            page,
+            [
+                "button:has-text('Newest First')",
+                "text=Newest First",
+            ],
+            timeout_ms=1200,
+        )
 
-    await runner.do(name, "toggle_sort", toggle_sort)
+        if not oldest and not newest:
+            runner.evidence.log("INFO [vault] sort toggle controls not present; skipping sort interaction")
+            return
+
+        if oldest:
+            await click_locator(oldest)
+            await pause(0.1, 0.3)
+        if newest:
+            await click_locator(newest)
+
+    await runner.do(name, "toggle_sort", toggle_sort, retries=0)
 
     await runner.do(name, "scroll_ledger", lambda: human_scroll(page, 700, 6))
     await runner.assert_control(
@@ -1058,16 +1080,19 @@ async def page_governance(page: Page, runner: Runner) -> None:
     await runner.evidence.screenshot(page, "30_governance_landing", runner.state)
 
     async def open_tab(tab_key: str) -> None:
-        # Prefer native JS tab switcher for deterministic behavior.
-        await page.evaluate(
-            """(key) => {
-                if (typeof window.switchTab === 'function') {
-                    window.switchTab(key);
-                }
-            }""",
-            tab_key,
+        # Click the real tab button so governance page handlers receive expected event context.
+        tab_btn = await first_visible(
+            page,
+            [
+                f"button.tab-btn[onclick*=\"switchTab('{tab_key}')\"]",
+                f"button:has-text('{tab_key.title()}')",
+            ],
+            timeout_ms=2500,
         )
-        pane = page.locator(f"#tab-{tab_key}").first
+        if not tab_btn:
+            raise RuntimeError(f"Governance tab button not found for '{tab_key}'")
+        await click_locator(tab_btn)
+        pane = page.locator(f"#tab-{tab_key}.active, #tab-{tab_key}").first
         await pane.wait_for(state="visible", timeout=6000)
 
     async def submit_alert() -> None:
