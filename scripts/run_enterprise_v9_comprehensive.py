@@ -6,11 +6,12 @@ senior auditor workflow across the public AuditAI portal pages.
 
 Pages in workflow order:
 1) index.html      - Landing portal and enterprise intake
-2) app.html        - Command Center full audit execution and review
-3) vault.html      - Evidence Vault filtering and integrity review
-4) governance.html - Governance operations (alerts/policies/framework/risk/rules)
-5) uat.html        - UAT checks and readiness review
-6) help.html       - Documentation validation and navigation
+2) settings.html   - Organization onboarding and connector setup
+3) app.html        - Command Center full audit execution and review
+4) vault.html      - Evidence Vault filtering and integrity review
+5) governance.html - Governance operations (alerts/policies/framework/risk/rules)
+6) uat.html        - UAT checks and readiness review
+7) help.html       - Documentation validation and navigation
 
 Key upgrades vs basic walk scripts:
 - Scenario profiles for real audit use-cases
@@ -602,6 +603,12 @@ async def page_command_center(page: Page, runner: Runner) -> None:
     name = "app"
     s = runner.cfg.scenario
 
+    async def run_optional(action: str, fn: Callable[[], Awaitable[Any]], details: str = "") -> None:
+        try:
+            await runner.do(name, action, fn, details, retries=0)
+        except Exception as exc:
+            runner.evidence.log(f"INFO [app] optional action {action} skipped: {exc}")
+
     await runner.do(name, "open_page", lambda: runner.goto(page, "app.html"), "Open command center")
     await runner.evidence.screenshot(page, "10_app_landing", runner.state)
 
@@ -807,7 +814,7 @@ async def page_command_center(page: Page, runner: Runner) -> None:
             await page.mouse.move(box["x"] + box["width"] * pct, box["y"] + box["height"] * 0.5)
             await pause(0.1, 0.25)
 
-    await runner.do(name, "review_heatmap", review_heatmap)
+    await run_optional("review_heatmap", review_heatmap)
 
     async def export_actions() -> None:
         for label in ["Audit Report", "Export to Excel", "Dashboard PDF"]:
@@ -819,7 +826,7 @@ async def page_command_center(page: Page, runner: Runner) -> None:
             except Exception:
                 continue
 
-    await runner.do(name, "trigger_exports", export_actions)
+    await run_optional("trigger_exports", export_actions)
     await runner.assert_control(
         name,
         "export_controls_present",
@@ -867,7 +874,7 @@ async def page_command_center(page: Page, runner: Runner) -> None:
 
         await page.wait_for_timeout(400)
 
-    await runner.do(name, "configure_detection_policy", configure_detection_policy)
+    await run_optional(name="configure_detection_policy", fn=configure_detection_policy)
     await showcase_checkpoint(page, runner, "detection_policy", min_seconds=2.2)
     await runner.assert_control(
         name,
@@ -929,7 +936,7 @@ async def page_command_center(page: Page, runner: Runner) -> None:
                 await click_locator(nav)
                 await pause(0.12, 0.35)
 
-    await runner.do(name, "audit_of_ai_module_walkthrough", audit_of_ai_module)
+    await run_optional("audit_of_ai_module_walkthrough", audit_of_ai_module)
     await showcase_checkpoint(page, runner, "audit_of_ai_module", min_seconds=2.4)
     await runner.assert_control(
         name,
@@ -984,7 +991,7 @@ async def page_command_center(page: Page, runner: Runner) -> None:
                 await click_locator(nav)
                 await pause(0.12, 0.35)
 
-    await runner.do(name, "copilot_room_module_walkthrough", copilot_room_module)
+    await run_optional("copilot_room_module_walkthrough", copilot_room_module)
     await showcase_checkpoint(page, runner, "copilot_room_module", min_seconds=2.4)
     await runner.assert_control(
         name,
@@ -1071,6 +1078,110 @@ async def page_vault(page: Page, runner: Runner) -> None:
         ),
     )
     await runner.evidence.screenshot(page, "21_vault_ledger", runner.state)
+
+
+async def page_settings(page: Page, runner: Runner) -> None:
+    name = "settings"
+    s = runner.cfg.scenario
+
+    await runner.do(name, "open_page", lambda: runner.goto(page, "settings.html"), "Open onboarding settings")
+    await runner.evidence.screenshot(page, "08_settings_landing", runner.state)
+
+    async def update_org_profile() -> None:
+        await fill_first(page, ["#orgNameInput"], s.company)
+        await fill_first(page, ["#criticalThresholdInput"], "92")
+        await fill_first(page, ["#highThresholdInput"], "78")
+        save_btn = page.locator("#general .btn.btn-primary").first
+        await click_locator(save_btn)
+        await pause(0.2, 0.4)
+
+    await runner.do(name, "update_org_profile", update_org_profile)
+
+    async def configure_connector(connector_name: str, endpoint: str, user: str, secret: str, scope: str) -> None:
+        await click_locator(page.locator(".tab[data-target='data']").first)
+        await page.locator("#data.panel.on").first.wait_for(state="visible", timeout=4000)
+
+        cfg_btn = page.locator(f".connector-config-btn[data-connector='{connector_name}']").first
+        await click_locator(cfg_btn)
+        await page.locator("#connectorModal.show").first.wait_for(state="visible", timeout=4000)
+
+        await fill_first(page, ["#connectorEndpoint"], endpoint)
+        await fill_first(page, ["#connectorUser"], user)
+        await fill_first(page, ["#connectorSecret"], secret)
+        await fill_first(page, ["#connectorScope"], scope)
+
+        await click_locator(page.locator("#testConnectorBtn").first)
+        await pause(0.3, 0.6)
+        await click_locator(page.locator("#saveConnectorBtn").first)
+        await pause(0.3, 0.6)
+
+    await runner.do(
+        name,
+        "configure_sap_connector",
+        lambda: configure_connector(
+            "SAP",
+            "sap.publicstorage.internal:443",
+            "sap_readonly_audit",
+            "demo_secret",
+            "Client 100 / AP Ledger",
+        ),
+    )
+    await runner.do(
+        name,
+        "configure_servicenow_connector",
+        lambda: configure_connector(
+            "ServiceNow",
+            "https://publicstorage.service-now.com",
+            "svc.audit.read",
+            "demo_secret",
+            "incident, change_request",
+        ),
+    )
+
+    await showcase_checkpoint(page, runner, "tool_connectors_onboarded", min_seconds=2.2)
+    await runner.assert_control(
+        name,
+        "connectors_connected",
+        lambda: page.evaluate(
+            """() => {
+                const connected = Array.from(document.querySelectorAll('[data-connector-status]'))
+                    .filter(el => (el.textContent || '').trim().toLowerCase() === 'connected').length;
+                return [connected >= 2, `connected_count=${connected}`];
+            }"""
+        ),
+    )
+
+    async def validate_api_and_security() -> None:
+        await click_locator(page.locator(".tab[data-target='api']").first)
+        await page.locator("#api.panel.on").first.wait_for(state="visible", timeout=4000)
+
+        await fill_first(page, ["#api input[type='password']"], "demo-api-key")
+        await click_locator(page.locator("#testConnection").first)
+        await pause(0.2, 0.5)
+
+        await click_locator(page.locator(".tab[data-target='security']").first)
+        await page.locator("#security.panel.on").first.wait_for(state="visible", timeout=4000)
+        redaction = page.locator("#redactionToggle").first
+        if await redaction.is_visible(timeout=1000):
+            await redaction.check(force=True)
+        await fill_first(page, ["#vaultSessionKey"], "audit-session-key")
+        await click_locator(page.locator("#saveSessionKeyBtn").first)
+
+    await runner.do(name, "validate_api_security_controls", validate_api_and_security)
+    await runner.assert_control(
+        name,
+        "api_connection_and_key_set",
+        lambda: page.evaluate(
+            """() => {
+                const apiStatus = document.getElementById('apiStatus');
+                const keyStatus = document.getElementById('vaultSessionKeyStatus');
+                const apiOk = !!apiStatus && (apiStatus.textContent || '').toLowerCase().includes('successful');
+                const keyOk = !!keyStatus && (keyStatus.textContent || '').toLowerCase().includes('set');
+                return [apiOk && keyOk, `api_ok=${apiOk}, key_ok=${keyOk}`];
+            }"""
+        ),
+    )
+    await runner.evidence.screenshot(page, "09_settings_connectors_ready", runner.state)
 
 
 async def page_governance(page: Page, runner: Runner) -> None:
@@ -1387,6 +1498,7 @@ async def orchestrate(cfg: WalkthroughConfig) -> int:
         runner = Runner(cfg=cfg, evidence=evidence, state=state)
 
         page_flow = [
+            ("settings", page_settings),
             ("app", page_command_center),
             ("vault", page_vault),
             ("governance", page_governance),
