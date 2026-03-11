@@ -159,6 +159,8 @@ class WalkthroughConfig:
     scenario: ScenarioProfile
     include_landing: bool
     fullscreen: bool
+    strict_critical: bool
+    showcase_seconds: float
 
 
 @dataclass
@@ -189,11 +191,13 @@ class RunState:
     actions: List[ActionRecord] = field(default_factory=list)
     assertions: List[AssertionRecord] = field(default_factory=list)
     page_status: Dict[str, str] = field(default_factory=dict)
+    page_durations_ms: Dict[str, int] = field(default_factory=dict)
     screenshots: List[str] = field(default_factory=list)
     errors: List[str] = field(default_factory=list)
     artifact_hashes: Dict[str, str] = field(default_factory=dict)
     video_file: Optional[str] = None
     summary_file: Optional[str] = None
+    rerun_command: Optional[str] = None
     ended_at: Optional[str] = None
 
 
@@ -232,9 +236,11 @@ class EvidenceStore:
             "run_id": state.run_id,
             "config": state.config,
             "page_status": state.page_status,
+            "page_durations_ms": state.page_durations_ms,
             "screenshots": state.screenshots,
             "video_file": state.video_file,
             "summary_file": state.summary_file,
+            "rerun_command": state.rerun_command,
             "artifact_hashes_sha256": state.artifact_hashes,
             "errors": state.errors,
             "actions": [asdict(a) for a in state.actions],
@@ -277,6 +283,7 @@ class EvidenceStore:
             f"- Ended (UTC): {state.ended_at or 'n/a'}",
             f"- Scenario: {state.config.get('scenario', {}).get('name', 'n/a')}",
             f"- Base URL: {state.config.get('base_url', 'n/a')}",
+            f"- Rerun command: {state.rerun_command or 'n/a'}",
             "",
             "## Outcome",
             f"- Pages passed: {pass_pages}",
@@ -289,6 +296,11 @@ class EvidenceStore:
         ]
         for page_name, status in state.page_status.items():
             lines.append(f"- {page_name}: {status}")
+
+        lines.append("")
+        lines.append("## Page Timings")
+        for page_name, duration in state.page_durations_ms.items():
+            lines.append(f"- {page_name}: {duration} ms")
 
         lines.append("")
         lines.append("## Assertion Highlights")
@@ -383,6 +395,14 @@ async def popup_reaper(page: Page, evidence: EvidenceStore, stop_event: asyncio.
         except Exception:
             pass
         await asyncio.sleep(0.6)
+
+
+async def showcase_checkpoint(page: Page, runner: "Runner", label: str, min_seconds: float = 0.0) -> None:
+    dwell = max(min_seconds, runner.cfg.showcase_seconds)
+    if dwell <= 0:
+        return
+    runner.evidence.log(f"SHOWCASE {label} dwell={dwell:.1f}s")
+    await pause(dwell, dwell + 0.2)
 
 
 async def click_locator(locator: Locator, timeout_ms: int = 5000) -> None:
@@ -847,6 +867,7 @@ async def page_command_center(page: Page, runner: Runner) -> None:
         await page.wait_for_timeout(400)
 
     await runner.do(name, "configure_detection_policy", configure_detection_policy)
+    await showcase_checkpoint(page, runner, "detection_policy", min_seconds=2.2)
     await runner.assert_control(
         name,
         "policy_configuration_applied",
@@ -908,6 +929,7 @@ async def page_command_center(page: Page, runner: Runner) -> None:
                 await pause(0.12, 0.35)
 
     await runner.do(name, "audit_of_ai_module_walkthrough", audit_of_ai_module)
+    await showcase_checkpoint(page, runner, "audit_of_ai_module", min_seconds=2.4)
     await runner.assert_control(
         name,
         "audit_of_ai_visible",
@@ -962,6 +984,7 @@ async def page_command_center(page: Page, runner: Runner) -> None:
                 await pause(0.12, 0.35)
 
     await runner.do(name, "copilot_room_module_walkthrough", copilot_room_module)
+    await showcase_checkpoint(page, runner, "copilot_room_module", min_seconds=2.4)
     await runner.assert_control(
         name,
         "copilot_room_initialized",
@@ -1201,12 +1224,15 @@ async def run_page(
     state: RunState,
 ) -> None:
     runner.evidence.log(f"PAGE START {page_label}")
+    started = perf_counter()
     try:
         await fn(page, runner)
         state.page_status[page_label] = "PASS"
+        state.page_durations_ms[page_label] = int((perf_counter() - started) * 1000)
         runner.evidence.log(f"PAGE PASS {page_label}")
     except Exception as exc:
         state.page_status[page_label] = "FAIL"
+        state.page_durations_ms[page_label] = int((perf_counter() - started) * 1000)
         err = f"Page {page_label} failed: {exc}"
         state.errors.append(err)
         runner.evidence.log(err)
@@ -1242,6 +1268,17 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Run with fixed viewport instead of fullscreen window",
     )
+    parser.add_argument(
+        "--strict-critical",
+        action="store_true",
+        help="Fail run if any critical modules fail (app, vault, governance)",
+    )
+    parser.add_argument(
+        "--showcase-seconds",
+        type=float,
+        default=1.8,
+        help="Minimum dwell seconds for key module checkpoints in video",
+    )
     return parser.parse_args()
 
 
@@ -1258,6 +1295,8 @@ def build_run_state(cfg: WalkthroughConfig, run_id: str) -> RunState:
         "seed": cfg.seed,
         "include_landing": cfg.include_landing,
         "fullscreen": cfg.fullscreen,
+        "strict_critical": cfg.strict_critical,
+        "showcase_seconds": cfg.showcase_seconds,
         "scenario": asdict(cfg.scenario),
     }
     return RunState(started_at=now_iso(), run_id=run_id, config=safe_cfg)
@@ -1270,6 +1309,17 @@ async def orchestrate(cfg: WalkthroughConfig) -> int:
 
     random.seed(cfg.seed)
     evidence.log(f"RUN START id={run_id} scenario={cfg.scenario.key}")
+    state.rerun_command = (
+        "python scripts/run_enterprise_v9_comprehensive.py "
+        f"--scenario {cfg.scenario.key} "
+        f"--max-retries {cfg.max_retries} "
+        f"--showcase-seconds {cfg.showcase_seconds:.1f} "
+        + ("--continue-on-error " if cfg.continue_on_error else "")
+        + ("--video " if cfg.record_video else "")
+        + ("--include-landing " if cfg.include_landing else "")
+        + ("--windowed " if not cfg.fullscreen else "")
+        + ("--strict-critical" if cfg.strict_critical else "")
+    ).strip()
 
     async with async_playwright() as playwright:
         launch_args = []
@@ -1368,6 +1418,12 @@ async def orchestrate(cfg: WalkthroughConfig) -> int:
 
     if overall_error and not cfg.continue_on_error:
         return 2
+    if cfg.strict_critical:
+        critical_pages = ["app", "vault", "governance"]
+        critical_failures = [p for p in critical_pages if state.page_status.get(p) != "PASS"]
+        if critical_failures:
+            evidence.log(f"STRICT_CRITICAL FAIL pages={critical_failures}")
+            return 3
     if fail_pages > 0:
         return 1
     return 0
@@ -1390,6 +1446,8 @@ def main() -> None:
         scenario=scenario,
         include_landing=args.include_landing,
         fullscreen=not args.windowed,
+        strict_critical=args.strict_critical,
+        showcase_seconds=max(0.0, args.showcase_seconds),
     )
 
     exit_code = asyncio.run(orchestrate(cfg))
