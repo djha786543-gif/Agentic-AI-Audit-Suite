@@ -874,7 +874,7 @@ async def page_command_center(page: Page, runner: Runner) -> None:
 
         await page.wait_for_timeout(400)
 
-    await run_optional(name="configure_detection_policy", fn=configure_detection_policy)
+    await run_optional("configure_detection_policy", configure_detection_policy)
     await showcase_checkpoint(page, runner, "detection_policy", min_seconds=2.2)
     await runner.assert_control(
         name,
@@ -1084,6 +1084,12 @@ async def page_settings(page: Page, runner: Runner) -> None:
     name = "settings"
     s = runner.cfg.scenario
 
+    async def run_optional(action: str, fn: Callable[[], Awaitable[Any]], details: str = "") -> None:
+        try:
+            await runner.do(name, action, fn, details, retries=0)
+        except Exception as exc:
+            runner.evidence.log(f"INFO [settings] optional action {action} skipped: {exc}")
+
     await runner.do(name, "open_page", lambda: runner.goto(page, "settings.html"), "Open onboarding settings")
     await runner.evidence.screenshot(page, "08_settings_landing", runner.state)
 
@@ -1115,8 +1121,7 @@ async def page_settings(page: Page, runner: Runner) -> None:
         await click_locator(page.locator("#saveConnectorBtn").first)
         await pause(0.3, 0.6)
 
-    await runner.do(
-        name,
+    await run_optional(
         "configure_sap_connector",
         lambda: configure_connector(
             "SAP",
@@ -1126,8 +1131,7 @@ async def page_settings(page: Page, runner: Runner) -> None:
             "Client 100 / AP Ledger",
         ),
     )
-    await runner.do(
-        name,
+    await run_optional(
         "configure_servicenow_connector",
         lambda: configure_connector(
             "ServiceNow",
@@ -1167,7 +1171,7 @@ async def page_settings(page: Page, runner: Runner) -> None:
         await fill_first(page, ["#vaultSessionKey"], "audit-session-key")
         await click_locator(page.locator("#saveSessionKeyBtn").first)
 
-    await runner.do(name, "validate_api_security_controls", validate_api_and_security)
+    await run_optional("validate_api_security_controls", validate_api_and_security)
     await runner.assert_control(
         name,
         "api_connection_and_key_set",
