@@ -812,6 +812,169 @@ async def page_command_center(page: Page, runner: Runner) -> None:
     )
     await runner.evidence.screenshot(page, "13_app_exports", runner.state)
 
+    async def configure_detection_policy() -> None:
+        trigger = await first_visible(
+            page,
+            [
+                "button:has-text('Configure Detection Policy')",
+                ".policy-trigger-btn",
+            ],
+            timeout_ms=2500,
+        )
+        if not trigger:
+            raise RuntimeError("Detection Policy trigger not found")
+        await click_locator(trigger)
+
+        overlay = page.locator("#policyOverlay.open, #policyOverlay").first
+        await overlay.wait_for(state="visible", timeout=6000)
+
+        # Demonstrate real configuration behavior: toggle one rule and apply.
+        first_rule = page.locator("#policyRulesGrid .policy-rule-item").first
+        await click_locator(first_rule)
+
+        apply_btn = await first_visible(
+            page,
+            [
+                "#policyOverlay button:has-text('Apply Configuration')",
+                "button:has-text('Apply Configuration')",
+            ],
+            timeout_ms=2500,
+        )
+        if not apply_btn:
+            raise RuntimeError("Apply Configuration button not found")
+        await click_locator(apply_btn)
+
+        await page.wait_for_timeout(400)
+
+    await runner.do(name, "configure_detection_policy", configure_detection_policy)
+    await runner.assert_control(
+        name,
+        "policy_configuration_applied",
+        lambda: page.evaluate(
+            """() => {
+                const overlay = document.getElementById('policyOverlay');
+                const isClosed = !overlay || !overlay.classList.contains('open');
+                return [isClosed, 'policy overlay closed after apply'];
+            }"""
+        ),
+    )
+    await runner.evidence.screenshot(page, "14_app_policy_configured", runner.state)
+
+    async def audit_of_ai_module() -> None:
+        tab = page.locator("#mnavM2").first
+        await click_locator(tab)
+        await page.locator("#v-m2").first.wait_for(state="visible", timeout=6000)
+
+        racm_demo = await first_visible(
+            page,
+            [
+                "#v-m2 button:has-text('Load Example RACM')",
+                "button:has-text('Load Example RACM')",
+            ],
+            timeout_ms=2000,
+        )
+        if racm_demo:
+            await click_locator(racm_demo)
+
+        map_btn = await first_visible(
+            page,
+            [
+                "#v-m2 button:has-text('Map Controls')",
+                "button:has-text('Map Controls')",
+            ],
+            timeout_ms=2500,
+        )
+        if map_btn:
+            await click_locator(map_btn)
+            await page.wait_for_timeout(1200)
+
+        apply_all = await first_visible(
+            page,
+            [
+                "#racmApplyBtn",
+                "#v-m2 button:has-text('Apply to All Modules')",
+            ],
+            timeout_ms=2500,
+        )
+        if apply_all:
+            await click_locator(apply_all)
+            await page.wait_for_timeout(900)
+
+        # Walk all module-2 governance subviews for complete evidence coverage.
+        for sid in ["#m2nav-policy", "#m2nav-trail", "#m2nav-identity", "#m2nav-containment", "#m2nav-racm"]:
+            nav = page.locator(sid).first
+            if await nav.is_visible(timeout=1200):
+                await click_locator(nav)
+                await pause(0.12, 0.35)
+
+    await runner.do(name, "audit_of_ai_module_walkthrough", audit_of_ai_module)
+    await runner.assert_control(
+        name,
+        "audit_of_ai_visible",
+        lambda: page.evaluate(
+            """() => {
+                const m2 = document.getElementById('v-m2');
+                const shown = !!m2 && m2.style.display !== 'none';
+                const hasRacm = !!document.getElementById('m2p-racm');
+                return [shown && hasRacm, 'module 2 rendered with RACM panel'];
+            }"""
+        ),
+    )
+    await runner.evidence.screenshot(page, "15_app_module2_audit_of_ai", runner.state)
+
+    async def copilot_room_module() -> None:
+        tab = page.locator("#mnavM3").first
+        await click_locator(tab)
+        await page.locator("#v-m3").first.wait_for(state="visible", timeout=6000)
+
+        await fill_first(page, ["#m3OrgName"], runner.cfg.scenario.company)
+        await fill_first(page, ["#m3AuditPeriod"], "Q1 2026")
+        await fill_first(page, ["#m3Scope"], runner.cfg.scenario.name)
+        await fill_first(page, ["#m3Lead"], "Internal Audit Lead")
+        await fill_first(page, ["#m3Notes"], "Automated walkthrough evidence run for enterprise readiness.")
+
+        init_btn = await first_visible(
+            page,
+            [
+                "#v-m3 button:has-text('Initialize Engagement')",
+                "button:has-text('Initialize Engagement')",
+            ],
+            timeout_ms=2500,
+        )
+        if not init_btn:
+            raise RuntimeError("Initialize Engagement button not found in module 3")
+        await click_locator(init_btn)
+        await page.wait_for_timeout(900)
+
+        # Visit all Copilot Room panels for full operational walk.
+        for sid in [
+            "#m3nav-room",
+            "#m3nav-plan",
+            "#m3nav-fieldwork",
+            "#m3nav-workpapers",
+            "#m3nav-wpmapper",
+            "#m3nav-findings",
+            "#m3nav-setup",
+        ]:
+            nav = page.locator(sid).first
+            if await nav.is_visible(timeout=1200):
+                await click_locator(nav)
+                await pause(0.12, 0.35)
+
+    await runner.do(name, "copilot_room_module_walkthrough", copilot_room_module)
+    await runner.assert_control(
+        name,
+        "copilot_room_initialized",
+        lambda: page.evaluate(
+            """() => {
+                const badge = document.getElementById('m3EngagementBadge');
+                const txt = (badge && badge.textContent ? badge.textContent : '').trim();
+                return [txt.length > 0 && !txt.includes('No engagement initialized'), 'engagement badge updated'];
+            }"""
+        ),
+    )
+    await runner.evidence.screenshot(page, "16_app_module3_copilot_room", runner.state)
+
 
 async def page_vault(page: Page, runner: Runner) -> None:
     name = "vault"
@@ -871,65 +1034,79 @@ async def page_governance(page: Page, runner: Runner) -> None:
     await runner.do(name, "open_page", lambda: runner.goto(page, "governance.html"), "Open governance")
     await runner.evidence.screenshot(page, "30_governance_landing", runner.state)
 
-    async def open_tab(label: str) -> None:
-        tab = page.get_by_text(label, exact=False).first
-        await click_locator(tab)
+    async def open_tab(tab_key: str) -> None:
+        # Prefer native JS tab switcher for deterministic behavior.
+        await page.evaluate(
+            """(key) => {
+                if (typeof window.switchTab === 'function') {
+                    window.switchTab(key);
+                }
+            }""",
+            tab_key,
+        )
+        pane = page.locator(f"#tab-{tab_key}").first
+        await pane.wait_for(state="visible", timeout=6000)
 
     async def submit_alert() -> None:
-        await open_tab("Alerts")
-        await fill_first(page, ["#alert-title", "input[placeholder*='Title']"], f"{s.name} exception escalation")
-        await select_first(page, ["select"], "CRITICAL")
+        await open_tab("alerts")
+        await fill_first(page, ["#alertTitle"], f"{s.name} exception escalation")
+        await select_first(page, ["#alertSeverity"], "CRITICAL")
         await fill_first(
             page,
-            ["textarea"],
+            ["#alertDesc"],
             f"Automated escalation for scenario {s.key}. Immediate triage requested for control owner and GRC.",
         )
-        btn = page.get_by_text("Raise Alert", exact=False).first
+        btn = page.locator("#tab-alerts button:has-text('Raise Alert')").first
         await click_locator(btn)
 
     await runner.do(name, "raise_alert", submit_alert)
 
     async def create_policy() -> None:
-        await open_tab("Policies")
-        await fill_first(page, ["#policy-id", "input[placeholder*='Policy ID']"], s.policy_id)
-        await fill_first(page, ["input[placeholder*='Version']"], "v3.0")
-        await fill_first(page, ["input[placeholder*='Title']"], f"{s.name} Governance Policy")
-        await fill_first(page, ["input[placeholder*='Owner']"], "IT Audit Manager")
-        await select_first(page, ["select"], "Active")
-        btn = page.get_by_text("Create Policy", exact=False).first
+        await open_tab("policies")
+        await fill_first(page, ["#policyId"], s.policy_id)
+        await fill_first(page, ["#policyVersion"], "v3.0")
+        await fill_first(page, ["#policyTitle"], f"{s.name} Governance Policy")
+        await fill_first(page, ["#policyOwner"], "IT Audit Manager")
+        await select_first(page, ["#policyStatus"], "active")
+        btn = page.locator("#tab-policies button:has-text('Create Policy')").first
         await click_locator(btn)
 
     await runner.do(name, "create_policy", create_policy)
 
     async def register_framework() -> None:
-        await open_tab("Frameworks")
-        await fill_first(page, ["input[placeholder*='Framework ID']"], s.framework_id)
-        await fill_first(page, ["input[placeholder*='Version']"], "2026.1")
-        await fill_first(page, ["input[placeholder*='Name']"], f"{s.name} Framework")
-        await fill_first(page, ["textarea", "input[placeholder*='Description']"], s.business_context)
-        btn = page.get_by_text("Register", exact=False).first
+        await open_tab("frameworks")
+        await fill_first(page, ["#fwId"], s.framework_id)
+        await fill_first(page, ["#fwVersion"], "2026.1")
+        await fill_first(page, ["#fwName"], f"{s.name} Framework")
+        await fill_first(page, ["#fwDesc"], s.business_context)
+        btn = page.locator("#tab-frameworks button:has-text('Register')").first
         await click_locator(btn)
 
     await runner.do(name, "register_framework", register_framework)
 
     async def add_risk() -> None:
-        await open_tab("Risk Register")
-        await fill_first(page, ["input[placeholder*='Risk ID']"], s.risk_id)
-        await select_first(page, ["select[name*='category']", "select"], "Compliance")
-        await fill_first(page, ["input[placeholder*='Title']"], f"{s.name} high residual risk")
-        await fill_first(page, ["input[placeholder*='Owner']"], "VP Internal Audit")
-        btn = page.get_by_text("Add to Register", exact=False).first
+        await open_tab("risks")
+        await fill_first(page, ["#riskId"], s.risk_id)
+        await select_first(page, ["#riskCategory"], "compliance")
+        await fill_first(page, ["#riskTitle"], f"{s.name} high residual risk")
+        await fill_first(page, ["#riskLikelihood"], "4")
+        await fill_first(page, ["#riskImpact"], "5")
+        await fill_first(page, ["#riskOwner"], "VP Internal Audit")
+        await select_first(page, ["#riskTreatment"], "mitigate")
+        btn = page.locator("#tab-risks button:has-text('Add to Register')").first
         await click_locator(btn)
 
     await runner.do(name, "add_risk_register_entry", add_risk)
 
     async def create_alert_rule() -> None:
-        await open_tab("Alert Rules")
-        await fill_first(page, ["input[placeholder*='Rule ID']"], s.rule_id)
-        await select_first(page, ["select[name*='severity']", "select"], "CRITICAL")
-        await fill_first(page, ["input[placeholder*='Name']"], f"{s.name} threshold rule")
-        await fill_first(page, ["input[placeholder*='Threshold']"], "1")
-        btn = page.get_by_text("Create Rule", exact=False).first
+        await open_tab("rules")
+        await fill_first(page, ["#ruleId"], s.rule_id)
+        await select_first(page, ["#ruleSeverity"], "CRITICAL")
+        await fill_first(page, ["#ruleName"], f"{s.name} threshold rule")
+        await select_first(page, ["#ruleMetric"], "sod_conflicts_count")
+        await select_first(page, ["#ruleOperator"], "gte")
+        await fill_first(page, ["#ruleThreshold"], "1")
+        btn = page.locator("#tab-rules button:has-text('Create Rule')").first
         await click_locator(btn)
 
     await runner.do(name, "create_alert_rule", create_alert_rule)
